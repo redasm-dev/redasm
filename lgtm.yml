@@ -1,6 +1,0 @@
-path_classifiers:
-  submodules:
-    - LibREDasm
-  resources:
-    - web
-    - res
