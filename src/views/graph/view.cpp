@@ -7,13 +7,13 @@
 #include <redasm/redasm.h>
 
 GraphView::GraphView(QWidget* parent): QAbstractScrollArea(parent) {
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::Base, themeprovider::color(RD_THEME_GRAPH_BG));
-
     this->horizontalScrollBar()->setSingleStep(this->fontMetrics().height());
     this->verticalScrollBar()->setSingleStep(this->fontMetrics().height());
     this->setFrameShape(QFrame::NoFrame);
     this->setAutoFillBackground(true);
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::Base, themeprovider::graph_bg());
     this->setPalette(palette);
 }
 

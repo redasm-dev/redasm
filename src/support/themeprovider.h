@@ -9,6 +9,7 @@ namespace themeprovider {
 bool is_dark_theme();
 QStringList themes();
 QString theme(const QString& name);
+QColor graph_bg();
 QColor color(RDThemeKind kind);
 QIcon icon(const QString& name);
 void apply_theme();

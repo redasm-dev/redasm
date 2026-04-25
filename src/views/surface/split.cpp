@@ -62,10 +62,10 @@ SurfaceSplitDelegate::SurfaceSplitDelegate(RDContext* ctx, QObject* parent)
 
 QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* split,
                                              SplitWidget* current) {
-    QAction* actback = split->add_button(FA_ICON_COLOR(
-        0xf053, themeprovider::color(RD_THEME_GRAPH_EDGE_LOOP_COND)));
-    QAction* actforward = split->add_button(FA_ICON_COLOR(
-        0xf054, themeprovider::color(RD_THEME_GRAPH_EDGE_LOOP_COND)));
+    QAction* actback = split->add_button(
+        FA_ICON_COLOR(0xf053, themeprovider::color(RD_THEME_SUCCESS)));
+    QAction* actforward = split->add_button(
+        FA_ICON_COLOR(0xf054, themeprovider::color(RD_THEME_SUCCESS)));
     split->add_button(actions::get(actions::GOTO));
 
     auto* stack = new QStackedWidget();

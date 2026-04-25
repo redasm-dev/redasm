@@ -10,7 +10,6 @@ QColor get_foreground_color(const RDSymbol& sym) {
         case RD_SYMBOL_FUNCTION: return themeprovider::color(RD_THEME_FUNCTION);
         case RD_SYMBOL_TYPE: return themeprovider::color(RD_THEME_TYPE);
         case RD_SYMBOL_STRING: return themeprovider::color(RD_THEME_STRING);
-        case RD_SYMBOL_IMPORTED: return themeprovider::color(RD_THEME_IMPORT);
         default: break;
     }
 
@@ -60,7 +59,7 @@ QVariant SymbolsModel::data(const QModelIndex& index, int role) const {
     }
     else if(role == Qt::ForegroundRole) {
         if(m_highlightaddress && index.column() == 0)
-            return themeprovider::color(RD_THEME_ADDRESS);
+            return themeprovider::color(RD_THEME_LOCATION);
         if(m_highlightsymbol && index.column() == 2)
             return get_foreground_color(sym);
     }

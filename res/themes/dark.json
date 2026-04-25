@@ -12,42 +12,36 @@
     "ToolTipBase": "#3b3b3b",
     "ToolTipText": "#ecf0f1",
 
+    "foreground": "#ecf0f1",
+    "background": "#303030",
     "seek": "#3b3b3b",
-    "comment": "#2ecc71",
-    "auto_comment": "#16a085",
 
     "highlight_fg": "#3b3b3b",
     "highlight_bg": "#ef717a",
 
     "segment": "#f47cc3",
     "function": "#3498db",
-
-    "address": "#6a89b4",
-    "constant": "#bdc3c7",
-    "reg": "#27ae60",
-
-    "string": "#a38671",
-    "label": "#b8c9f1",
-    "data": "#9b59b6",
-    "pointer": "#d95459",
-    "import": "#745ec5",
     "type": "#d95459",
 
+    "location": "#6a89b4",
+    "number": "#bdc3c7",
+    "reg": "#27ae60",
+    "string": "#a38671",
+
+    "comment": "#2ecc71",
+
     "ret": "#c0392b",
-    "nop": "#7f8c8d",
     "call": "#2ecc71",
     "jump": "#5065a1",
-    "jump_c": "#e67e22",
-
-    "entry_fg": "#d45c9e",
-    "entry_bg": "#2d5036",
-
-    "graph_bg": "#262626",
-    "graph_edge": "#1abc9c",
-    "graph_edge_loop": "#3498db",
-    "graph_edge_loop_c": "#f47cc3",
+    "jump_cond": "#e67e22",
 
     "success": "#2ecc71",
     "fail": "#e74c3c",
-    "warning": "#ffcd02"
+    "warning": "#ffcd02",
+    "muted": "#7f8c8d",
+
+    "flag_code": "#3366aa",
+    "flag_data": "#337733",
+
+    "graph_bg": "#262626"
 }

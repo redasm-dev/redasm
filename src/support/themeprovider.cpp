@@ -18,36 +18,23 @@ namespace themeprovider {
 
 namespace {
 
+constexpr const char* GRAPH_BG_KEY = "graph_bg";
+
 QJsonDocument g_theme;
 
 // clang-format off
 const QHash<QString, RDThemeKind> THEMES = {
-    {"foreground", RD_THEME_FOREGROUND}, {"background", RD_THEME_BACKGROUND},
-    {"seek", RD_THEME_SEEK},
-    {"auto_comment", RD_THEME_AUTOCOMMENT}, {"comment", RD_THEME_COMMENT},
+    {"foreground", RD_THEME_FOREGROUND}, {"background", RD_THEME_BACKGROUND}, {"seek", RD_THEME_SEEK},
     {"highlight_fg", RD_THEME_HIGHLIGHT_FG}, {"highlight_bg", RD_THEME_HIGHLIGHT_BG},
     {"selection_fg", RD_THEME_SELECTION_FG}, {"selection_bg", RD_THEME_SELECTION_BG},
     {"cursor_fg", RD_THEME_CURSOR_FG}, {"cursor_bg", RD_THEME_CURSOR_BG},
-    {"segment", RD_THEME_SEGMENT},
-    {"function", RD_THEME_FUNCTION},
-    {"address", RD_THEME_ADDRESS},
-    {"constant", RD_THEME_CONSTANT},
-    {"reg", RD_THEME_REG},
-    {"string", RD_THEME_STRING},
-    {"label", RD_THEME_LABEL},
-    {"data", RD_THEME_DATA},
-    {"pointer", RD_THEME_POINTER},
-    {"import", RD_THEME_IMPORT},
-    {"type", RD_THEME_TYPE},
-    {"nop", RD_THEME_NOP},
-    {"ret", RD_THEME_RET},
-    {"call", RD_THEME_CALL},
-    {"jump", RD_THEME_JUMP},
-    {"jump_c", RD_THEME_JUMP_COND},
-    {"entry_fg", RD_THEME_ENTRY_FG}, {"entry_bg", RD_THEME_ENTRY_BG},
-    {"graph_bg", RD_THEME_GRAPH_BG}, {"graph_edge", RD_THEME_GRAPH_EDGE}, 
-    {"graph_edge_loop", RD_THEME_GRAPH_EDGE_LOOP}, {"graph_edge_loop_cond", RD_THEME_GRAPH_EDGE_LOOP_COND},
-    {"success", RD_THEME_SUCCESS}, {"fail", RD_THEME_FAIL}, {"warning", RD_THEME_WARNING}};
+    {"segment", RD_THEME_SEGMENT}, {"function", RD_THEME_FUNCTION}, {"type", RD_THEME_TYPE},
+    {"location", RD_THEME_LOCATION}, {"number", RD_THEME_NUMBER}, {"reg", RD_THEME_REG}, {"string", RD_THEME_STRING},
+    {"comment", RD_THEME_COMMENT},
+    {"ret", RD_THEME_RET}, {"call", RD_THEME_CALL}, {"jump", RD_THEME_JUMP}, {"jump_cond", RD_THEME_JUMP_COND},
+    {"success", RD_THEME_SUCCESS}, {"fail", RD_THEME_FAIL}, {"warning", RD_THEME_WARNING}, {"muted", RD_THEME_MUTED},
+    {"flag_code", RD_THEME_FLAG_CODE}, {"flag_data", RD_THEME_FLAG_DATA},
+};
 // clang-format on
 
 bool load_theme(const QString& theme) {
@@ -115,6 +102,16 @@ bool is_dark_theme() {
                            (0.114 * (c.blue() * c.blue())));
 
     return hsp <= 127.5;
+}
+
+QColor graph_bg() {
+    auto obj = g_theme.object();
+
+    if(obj.contains(themeprovider::GRAPH_BG_KEY))
+        return obj[themeprovider::GRAPH_BG_KEY].toString();
+
+    QColor bg = themeprovider::color(RD_THEME_BACKGROUND);
+    return bg.lightnessF() > 0.5 ? bg.darker(108) : bg.lighter(108);
 }
 
 QColor color(RDThemeKind kind) {
