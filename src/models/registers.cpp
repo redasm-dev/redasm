@@ -16,18 +16,15 @@ RDAddress RegistersModel::address(const QModelIndex& index) const {
 
 QVariant RegistersModel::data(const QModelIndex& index, int role) const {
     if(role == Qt::DisplayRole) {
-        const RDTrackedReg& r = rd_slice_at(m_registers, index.row());
-        const char* regname = rd_get_register_name(m_context, r.reg);
+        const RDTrackedReg& tr = rd_slice_at(m_registers, index.row());
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(r.address);
-            case 1: return regname ? QString::fromUtf8(regname) : QString{};
+            case 0: return utils::to_hex_addr(tr.address);
+            case 1: return QString::fromUtf8(tr.reg.name);
 
             case 2: {
-                if(r.value != RD_REGVAL_UNKNOWN)
-                    return QString::number(r.value, 16);
-
-                return "N/A";
+                if(tr.reg.has_value) return QString::number(tr.reg.value, 16);
+                return "???";
             }
 
             default: break;
