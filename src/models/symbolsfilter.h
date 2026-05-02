@@ -18,6 +18,11 @@ public:
     [[nodiscard]] RDAddress address(const QModelIndex& index) const;
     void resync();
 
+    void set_symbol_column_text(const QString& s) {
+        auto* src = qobject_cast<SymbolsModel*>(this->sourceModel());
+        src->set_symbol_column_text(s);
+    }
+
     void set_type_filter(usize s) {
         m_typefilter = s;
         this->invalidate();

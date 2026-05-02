@@ -30,6 +30,10 @@ QAbstractItemModel* TableDialog::model() const {
     return static_cast<QSortFilterProxyModel*>(sfmodel)->sourceModel();
 }
 
+void TableDialog::set_stretch_last_column(bool b) { // NOLINT
+    m_ui.tvtable->header()->setStretchLastSection(b);
+}
+
 void TableDialog::set_description(const QString& descr) { // NOLINT
     m_ui.lbldescription->setText(descr);
     m_ui.lbldescription->setVisible(!descr.isEmpty());

@@ -14,6 +14,7 @@ public:
     void move_column(int fromidx, int toidx) const;
     void hide_column(int idx) const;
     void resize_column(int idx, QHeaderView::ResizeMode r) const;
+    void set_stretch_last_column(bool b);
     void set_description(const QString& descr);
     void set_model(QAbstractItemModel* m);
     void set_button_box_visible(bool b);

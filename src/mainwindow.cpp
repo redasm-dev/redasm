@@ -424,8 +424,15 @@ void MainWindow::show_strings() {
                 dlg->accept();
             });
 
-    dlg->set_model(new SymbolsFilterModel(ctxview->context(), RD_SYMBOL_STRING,
-                                          true, dlg));
+    auto* symbolsmodel =
+        new SymbolsFilterModel(ctxview->context(), RD_SYMBOL_STRING, true, dlg);
+
+    symbolsmodel->set_symbol_column_text("String");
+
+    dlg->set_model(symbolsmodel);
+    dlg->set_stretch_last_column(false);
+    dlg->resize_column(2, QHeaderView::Stretch);
+    dlg->resize_column(3, QHeaderView::ResizeToContents);
     dlg->hide_column(1);
     dlg->show();
 }
