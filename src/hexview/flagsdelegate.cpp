@@ -22,14 +22,15 @@ QString FlagsDelegate::comment(quint64 offset, quint8 b,
         bool (*pred)(const RDFlagsBuffer*, usize);
         const char* name;
     } PREDS[] = {
+        {rd_flagsbuffer_has_code, "CODE"},
+        {rd_flagsbuffer_has_data, "DATA"},
         {rd_flagsbuffer_has_func, "FUNC"},
-        {rd_flagsbuffer_has_noret, "NORET"},
         {rd_flagsbuffer_has_call, "CALL"},
         {rd_flagsbuffer_has_jump, "JUMP"},
         {rd_flagsbuffer_has_cond, "COND"},
+        {rd_flagsbuffer_has_dslot, "DSLOT"},
         {rd_flagsbuffer_has_flow, "FLOW"},
-        {rd_flagsbuffer_has_code, "CODE"},
-        {rd_flagsbuffer_has_data, "DATA"},
+        {rd_flagsbuffer_has_noret, "NORET"},
         {rd_flagsbuffer_has_name, "NAME"},
         {rd_flagsbuffer_has_exported, "EXPORTED"},
         {rd_flagsbuffer_has_imported, "IMPORTED"},
