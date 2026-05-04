@@ -51,8 +51,8 @@ QVariant SymbolsModel::data(const QModelIndex& index, int role) const {
             case 2: return rd_symbol_to_string(&sym, m_context);
 
             case 3: {
-                RDXRefSlice refs = rd_get_xrefs_to(m_context, sym.address);
-                return QString::number(rd_slice_length(refs));
+                if(rd_has_refs_to(m_context, sym.address)) return "YES";
+                return "NO";
             }
 
             default: break;
@@ -84,7 +84,7 @@ QVariant SymbolsModel::headerData(int section, Qt::Orientation orientation,
         case 0: return "Address";
         case 1: return "Type";
         case 2: return m_colsymbol;
-        case 3: return "# XRefs";
+        case 3: return "Has XRefs";
         default: break;
     }
 
