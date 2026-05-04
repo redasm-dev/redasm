@@ -12,6 +12,9 @@ GotoDialog::GotoDialog(RDContext* ctx, QWidget* parent)
     m_filtermodel->setSourceModel(m_symbolsmodel);
     m_ui.tvsymbols->setModel(m_filtermodel);
 
+    m_ui.tvsymbols->header()->setStretchLastSection(false);
+    m_ui.tvsymbols->header()->setSectionResizeMode(2, QHeaderView::Stretch);
+
     connect(m_ui.lesearch, &QLineEdit::textChanged, this,
             [=](const QString&) { this->validate_and_filter_entry(); });
     connect(m_ui.lesearch, &QLineEdit::returnPressed, this,

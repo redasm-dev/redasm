@@ -18,6 +18,12 @@ QVariant ExportedModel::data(const QModelIndex& index, int role) const {
         switch(index.column()) {
             case 0: return utils::to_hex_addr(addr, seg);
             case 1: return rd_get_name(m_context, addr);
+
+            case 2: {
+                if(rd_has_refs_to(m_context, addr)) return "YES";
+                return "NO";
+            }
+
             default: break;
         }
     }
@@ -37,13 +43,14 @@ QVariant ExportedModel::headerData(int section, Qt::Orientation orientation,
     switch(section) {
         case 0: return "Address";
         case 1: return "Name";
+        case 2: return "Has XRefs";
         default: break;
     }
 
     return {};
 }
 
-int ExportedModel::columnCount(const QModelIndex&) const { return 2; }
+int ExportedModel::columnCount(const QModelIndex&) const { return 3; }
 
 int ExportedModel::rowCount(const QModelIndex&) const {
     return rd_slice_length(m_exported);

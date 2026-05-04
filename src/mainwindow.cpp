@@ -462,6 +462,8 @@ void MainWindow::show_exported() {
             });
 
     dlg->set_model(new ExportedModel(ctxview->context(), dlg));
+    dlg->set_stretch_last_column(false);
+    dlg->resize_column(1, QHeaderView::Stretch);
     dlg->show();
 }
 
@@ -482,6 +484,8 @@ void MainWindow::show_imported() {
             });
 
     dlg->set_model(new ImportedModel(ctxview->context(), dlg));
+    dlg->set_stretch_last_column(false);
+    dlg->resize_column(2, QHeaderView::Stretch);
     dlg->show();
 }
 

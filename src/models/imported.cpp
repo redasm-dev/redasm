@@ -32,6 +32,11 @@ QVariant ImportedModel::data(const QModelIndex& index, int role) const {
                 return ok && imp.module ? QString::fromUtf8(imp.module)
                                         : QString{};
 
+            case 4: {
+                if(rd_has_refs_to(m_context, addr)) return "YES";
+                return "NO";
+            }
+
             default: break;
         }
     }
@@ -52,13 +57,14 @@ QVariant ImportedModel::headerData(int section, Qt::Orientation orientation,
         case 1: return "Ordinal";
         case 2: return "Name";
         case 3: return "Module";
+        case 4: return "Has XRefs";
         default: break;
     }
 
     return {};
 }
 
-int ImportedModel::columnCount(const QModelIndex&) const { return 4; }
+int ImportedModel::columnCount(const QModelIndex&) const { return 5; }
 
 int ImportedModel::rowCount(const QModelIndex&) const {
     return rd_slice_length(m_imported);
