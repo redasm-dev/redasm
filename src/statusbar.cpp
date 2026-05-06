@@ -11,6 +11,7 @@ namespace {
 QLabel* g_lblstatuslabel;
 QPushButton* g_pbstatus;
 QPushButton* g_pbproblems;
+bool g_busy = false;
 
 } // namespace
 
@@ -42,6 +43,8 @@ QPushButton* create_status_button(int size, QWidget* parent) {
 void set_status_text(const QString& s) { g_lblstatuslabel->setText(s); }
 
 void set_address(ISurface* surface) {
+    if(g_busy) return;
+
     auto address = surface->get_current_address();
 
     if(!address) {
@@ -97,6 +100,7 @@ void set_busy_status() {
 
     g_pbstatus->setStyleSheet(STYLE);
     g_pbstatus->show();
+    g_busy = true;
 }
 
 void set_pause_status() {
@@ -105,6 +109,7 @@ void set_pause_status() {
 
     g_pbstatus->setStyleSheet(STYLE);
     g_pbstatus->show();
+    g_busy = false;
 }
 
 void set_ready_status() {
@@ -113,6 +118,7 @@ void set_ready_status() {
 
     g_pbstatus->setStyleSheet(STYLE);
     g_pbstatus->show();
+    g_busy = false;
 }
 
 void check_problems(const RDContext* ctx) {
