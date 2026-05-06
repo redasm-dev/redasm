@@ -11,8 +11,13 @@ ContextView::ContextView(RDContext* ctx, QWidget* parent)
     m_ui.tvfunctions->setModel(m_functionsmodel);
     m_ui.tvfunctions->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
+    m_analysis_timer.setInterval(0);
     m_throttle_timer.start();
+
     statusbar::set_busy_status();
+
+    connect(&m_analysis_timer, &QTimer::timeout, this,
+            &ContextView::analyze_step);
 
     connect(m_ui.tvfunctions, &QTreeView::doubleClicked, this,
             [&](const QModelIndex& index) {
@@ -30,8 +35,25 @@ void ContextView::toggle_pause() {
         this->schedule_step();
         statusbar::set_busy_status();
     }
-    else
+    else {
+        m_analysis_timer.stop();
         statusbar::set_pause_status();
+    }
+}
+
+void ContextView::analyze_step() {
+    if(rd_step(m_context, &m_status)) {
+        bool notify = m_status.is_listing_changed ||
+                      m_throttle_timer.elapsed() >= THROTTLE_INTERVAL_MS;
+        if(notify) {
+            m_throttle_timer.restart();
+            this->check_status();
+        }
+    }
+    else {
+        m_analysis_timer.stop();
+        this->check_status();
+    }
 }
 
 void ContextView::check_status() {
@@ -64,19 +86,5 @@ void ContextView::check_status() {
 }
 
 void ContextView::schedule_step() {
-    QTimer::singleShot(0, this, [&]() {
-        if(rd_step(m_context, &m_status)) {
-            bool notify = m_status.is_listing_changed ||
-                          m_throttle_timer.elapsed() >= THROTTLE_INTERVAL_MS;
-            if(notify) {
-                m_throttle_timer.restart();
-                this->check_status();
-            }
-
-            if(m_pause) return;
-            this->schedule_step();
-        }
-        else
-            this->check_status();
-    });
+    if(!m_analysis_timer.isActive()) m_analysis_timer.start();
 }
