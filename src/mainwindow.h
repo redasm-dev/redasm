@@ -12,7 +12,6 @@ public:
     [[nodiscard]] ContextView* context_view() const;
     void log(RDLogLevel level, const QString& tag, const QString& msg);
     void init_searchpaths();
-    bool loop();
 
 protected:
     void dragEnterEvent(QDragEnterEvent* e) override;

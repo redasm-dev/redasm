@@ -12,7 +12,7 @@ class ContextView: public QWidget {
 public:
     explicit ContextView(RDContext* ctx, QWidget* parent = nullptr);
     ~ContextView() override;
-    bool loop();
+    void schedule_step();
 
     [[nodiscard]] RDContext* context() const { return m_context; }
 
@@ -21,17 +21,16 @@ public:
     }
 
 public Q_SLOTS:
-    void toggle_active();
+    void toggle_pause();
 
 private:
-    void report_status();
+    void check_status();
 
 private:
     ui::ContextView m_ui;
     RDContext* m_context{nullptr};
-    const RDWorkerStatus* m_status{nullptr};
-    bool m_busy{true};
-    bool m_active{true};
+    RDWorkerStatus m_status{};
+    bool m_pause{false};
     FunctionsModel* m_functionsmodel;
     QElapsedTimer m_throttle_timer;
 };

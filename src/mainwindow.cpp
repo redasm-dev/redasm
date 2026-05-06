@@ -95,7 +95,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow{parent}, m_ui{this} {
 
     connect(statusbar::status_button(), &QPushButton::clicked, this, [&]() {
         ContextView* ctxview = this->context_view();
-        if(ctxview) ctxview->toggle_active();
+        if(ctxview) ctxview->toggle_pause();
     });
 }
 
@@ -215,7 +215,10 @@ void MainWindow::show_context_view(RDContext* ctx) {
     QDir::setCurrent(fi.path());
     this->setWindowTitle(fi.fileName());
 
-    this->replace_view(new ContextView(ctx));
+    auto* cv = new ContextView(ctx);
+    this->replace_view(cv);
+    cv->schedule_step();
+
     this->enable_context_actions(true);
 }
 
@@ -239,11 +242,6 @@ void MainWindow::clear_recents() {
 
 ContextView* MainWindow::context_view() const {
     return qobject_cast<ContextView*>(m_ui.stackwidget->currentWidget());
-}
-
-bool MainWindow::loop() { // NOLINT
-    ContextView* cv = this->context_view();
-    return cv && cv->loop();
 }
 
 bool MainWindow::can_close() const {

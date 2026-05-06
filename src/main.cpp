@@ -8,7 +8,6 @@
 namespace {
 
 const QString REDASM_VERSION = "4.0";
-bool running = true;
 
 void on_log(RDLogLevel level, const char* tag, const char* msg,
             void* userdata) {
@@ -27,6 +26,7 @@ int main(int argc, char** argv) {
 
     theme_provider::apply_theme();
     surface_renderer::init();
+    int res = 0;
 
     { // Scoping makes sure that widgets and context are freed before deinit
         MainWindow mw;
@@ -36,18 +36,10 @@ int main(int argc, char** argv) {
         rd_init();
         mw.init_searchpaths();
 
-        QObject::connect(&mw, &MainWindow::closed, []() { running = false; });
-
-        while(running) {
-            if(mw.loop())
-                app.processEvents(QEventLoop::AllEvents);
-            else
-                app.processEvents(QEventLoop::WaitForMoreEvents);
-        }
-
+        res = app.exec();
         rd_set_log_callback(nullptr, nullptr);
     }
 
     rd_deinit();
-    return 0;
+    return res;
 }
