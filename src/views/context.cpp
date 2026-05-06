@@ -2,7 +2,11 @@
 #include "statusbar.h"
 #include <QTimer>
 
-static constexpr int THROTTLE_INTERVAL_MS = 100;
+// static constexpr int BURST_BUDGET_MS = 16; // Fastest
+static constexpr int BURST_BUDGET_MS = 8; // Balanced
+// static constexpr int BURST_BUDGET_MS = 4; // Smoothest
+
+static constexpr int NOTIFY_INTERVAL_MS = 100;
 
 ContextView::ContextView(RDContext* ctx, QWidget* parent)
     : QWidget{parent}, m_ui{ctx, this}, m_context{ctx} {
@@ -11,13 +15,8 @@ ContextView::ContextView(RDContext* ctx, QWidget* parent)
     m_ui.tvfunctions->setModel(m_functionsmodel);
     m_ui.tvfunctions->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    m_analysis_timer.setInterval(0);
-    m_throttle_timer.start();
-
+    m_notify_timer.start();
     statusbar::set_busy_status();
-
-    connect(&m_analysis_timer, &QTimer::timeout, this,
-            &ContextView::analyze_step);
 
     connect(m_ui.tvfunctions, &QTreeView::doubleClicked, this,
             [&](const QModelIndex& index) {
@@ -35,25 +34,33 @@ void ContextView::toggle_pause() {
         this->schedule_step();
         statusbar::set_busy_status();
     }
-    else {
-        m_analysis_timer.stop();
+    else
         statusbar::set_pause_status();
-    }
 }
 
-void ContextView::analyze_step() {
-    if(rd_step(m_context, &m_status)) {
+void ContextView::schedule_step() {
+    QTimer::singleShot(0, this, [&]() {
+        m_burst_timer.restart();
+
+        while(m_burst_timer.elapsed() < BURST_BUDGET_MS) {
+            if(!rd_step(m_context, &m_status)) {
+                this->check_status();
+                return;
+            }
+
+            if(m_status.is_listing_changed) break; // yield
+        }
+
         bool notify = m_status.is_listing_changed ||
-                      m_throttle_timer.elapsed() >= THROTTLE_INTERVAL_MS;
+                      m_notify_timer.elapsed() >= NOTIFY_INTERVAL_MS;
+
         if(notify) {
-            m_throttle_timer.restart();
+            m_notify_timer.restart();
             this->check_status();
         }
-    }
-    else {
-        m_analysis_timer.stop();
-        this->check_status();
-    }
+
+        if(!m_pause) this->schedule_step();
+    });
 }
 
 void ContextView::check_status() {
@@ -83,8 +90,4 @@ void ContextView::check_status() {
                                        .arg(m_status.pending_calls)
                                        .arg(m_status.pending_jumps));
     }
-}
-
-void ContextView::schedule_step() {
-    if(!m_analysis_timer.isActive()) m_analysis_timer.start();
 }

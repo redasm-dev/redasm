@@ -4,7 +4,6 @@
 #include "ui/contextview.h"
 #include "views/surface/isurface.h"
 #include <QElapsedTimer>
-#include <QTimer>
 #include <redasm/redasm.h>
 
 class ContextView: public QWidget {
@@ -24,9 +23,6 @@ public:
 public Q_SLOTS:
     void toggle_pause();
 
-private Q_SLOTS:
-    void analyze_step();
-
 private:
     void check_status();
 
@@ -36,6 +32,6 @@ private:
     RDWorkerStatus m_status{};
     bool m_pause{false};
     FunctionsModel* m_functionsmodel;
-    QElapsedTimer m_throttle_timer;
-    QTimer m_analysis_timer;
+    QElapsedTimer m_burst_timer;
+    QElapsedTimer m_notify_timer;
 };
