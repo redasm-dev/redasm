@@ -3,6 +3,7 @@
 #include "models/functions.h"
 #include "ui/contextview.h"
 #include "views/surface/isurface.h"
+#include <QElapsedTimer>
 #include <redasm/redasm.h>
 
 class ContextView: public QWidget {
@@ -32,4 +33,5 @@ private:
     bool m_busy{true};
     bool m_active{true};
     FunctionsModel* m_functionsmodel;
+    QElapsedTimer m_throttle_timer;
 };

@@ -1,12 +1,16 @@
 #include "context.h"
 #include "statusbar.h"
 
+static constexpr int THROTTLE_INTERVAL_MS = 100;
+
 ContextView::ContextView(RDContext* ctx, QWidget* parent)
     : QWidget{parent}, m_ui{ctx, this}, m_context{ctx} {
 
     m_functionsmodel = new FunctionsModel(ctx, this);
     m_ui.tvfunctions->setModel(m_functionsmodel);
     m_ui.tvfunctions->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+
+    m_throttle_timer.start();
 
     connect(m_ui.tvfunctions, &QTreeView::doubleClicked, this,
             [&](const QModelIndex& index) {
@@ -22,24 +26,26 @@ void ContextView::toggle_active() {
 }
 
 void ContextView::report_status() {
-    QString s;
+    if(m_status->is_busy && m_throttle_timer.elapsed() < THROTTLE_INTERVAL_MS)
+        return;
 
-    s += QString::fromWCharArray(L"<b>Step: </b>%1\u00A0\u00A0")
-             .arg(m_status->step);
-
-    s += QString::fromWCharArray(L"<b>Pending Calls: </b>%1\u00A0\u00A0")
-             .arg(m_status->pending_calls);
-
-    s += QString::fromWCharArray(L"<b>Pending Jumps: </b>%1\u00A0\u00A0")
-             .arg(m_status->pending_jumps);
+    m_throttle_timer.restart();
 
     if(m_status->segment && m_status->address.has_value) {
-        s += QString::fromWCharArray(L"<b>Address: </b>%1\u00A0\u00A0")
-                 .arg(m_status->address.value, m_status->segment->unit * 2, 16,
-                      QLatin1Char('0'));
+        statusbar::set_status_text(
+            QString{"Step: %1  Calls: %2  Jumps: %3  Address: %4"}
+                .arg(m_status->step)
+                .arg(m_status->pending_calls)
+                .arg(m_status->pending_jumps)
+                .arg(m_status->address.value, m_status->segment->unit * 2, 16,
+                     QLatin1Char('0')));
     }
-
-    statusbar::set_status_text(s);
+    else {
+        statusbar::set_status_text(QString{"Step: %1  Calls: %2  Jumps: %3"}
+                                       .arg(m_status->step)
+                                       .arg(m_status->pending_calls)
+                                       .arg(m_status->pending_jumps));
+    }
 }
 
 bool ContextView::loop() {
