@@ -51,7 +51,6 @@ QString optype_tostring(const RDOperand* op) {
         case RD_OP_IMM: return "OP_IMM";
         case RD_OP_ADDR: return "OP_ADDR";
         case RD_OP_MEM: return "OP_MEM";
-        case RD_OP_PHRASE: return "OP_PHRASE";
         case RD_OP_DISPL: return "OP_DISPL";
         default: break;
     }
@@ -72,7 +71,7 @@ QString instrflow_tostring(const RDInstruction* instr) {
         default: f = "IF_NONE"; break;
     }
 
-    if(rd_is_delay_slot(instr)) f.append(" | IS_DSLOT");
+    if(rd_instr_is_delay_slot(instr)) f.append(" | IS_DSLOT");
     return f;
 }
 
@@ -172,16 +171,6 @@ void show_details() {
                 case RD_OP_MEM: {
                     strop.append(QString("<b>mem:</b> %1<br>")
                                      .arg(rd_to_hex(cv->context(), op->mem)));
-                    break;
-                }
-
-                case RD_OP_PHRASE: {
-                    strop.append(
-                        QString("<b>base:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->phrase.base)));
-                    strop.append(
-                        QString("<b>index:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->phrase.index)));
                     break;
                 }
 

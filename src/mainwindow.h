@@ -23,7 +23,7 @@ private Q_SLOTS:
     void select_file();
     void show_segments();
     void show_mappings();
-    void show_tracked_registers();
+    void show_segment_regs();
     void show_strings();
     void show_exported();
     void show_imported();

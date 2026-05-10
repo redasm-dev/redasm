@@ -23,7 +23,7 @@ struct MainWindow {
     QAction *acttoolsflc, *acttoolsdecoder, *acttoolsproblems;
     QAction *actedit, *actview, *acttools;
     QAction *actviewmemorymap, *actviewsegments, *actviewmappings,
-        *actviewtrackedregisters, *actviewstrings, *actviewimported,
+        *actviewsegmentregs, *actviewstrings, *actviewimported,
         *actviewexported;
     QAction* acttbseparator;
     ::LogView* logview;
@@ -83,28 +83,27 @@ struct MainWindow {
         this->acttoolsdecoder = this->mnutools->addAction("&Decoder");
 
         this->actviewmemorymap = this->mnuview->addAction(
-            "&Memory Map", QKeySequence{Qt::CTRL | Qt::Key_M});
-
-        this->actviewtrackedregisters = this->mnuview->addAction(
-            "&Tracked Registers",
-            QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_T});
-
-        this->actviewsegments = this->mnuview->addAction(
-            "&Segments", QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_S});
+            "Memory Map", QKeySequence{Qt::SHIFT | Qt::Key_F1});
 
         this->actviewmappings = this->mnuview->addAction(
-            "M&appings", QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_M});
+            "Mappings", QKeySequence{Qt::SHIFT | Qt::Key_F2});
+
+        this->actviewsegments = this->mnuview->addAction(
+            "Segments", QKeySequence{Qt::SHIFT | Qt::Key_F3});
+
+        this->actviewsegmentregs = this->mnuview->addAction(
+            "Segment Registers", QKeySequence{Qt::SHIFT | Qt::Key_F4});
 
         this->actviewstrings = this->mnuview->addAction(
-            FA_ICON(0xf031), "&Strings", QKeySequence{Qt::CTRL | Qt::Key_S});
+            FA_ICON(0xf031), "&Strings", QKeySequence{Qt::SHIFT | Qt::Key_F5});
 
         this->mnuview->addSeparator();
 
         this->actviewexported = this->mnuview->addAction(
-            FA_ICON(0xf56e), "&Exported", QKeySequence{Qt::CTRL | Qt::Key_E});
+            FA_ICON(0xf56e), "&Exported", QKeySequence{Qt::SHIFT | Qt::Key_F6});
 
         this->actviewimported = this->mnuview->addAction(
-            FA_ICON(0xf56f), "&Imported", QKeySequence{Qt::CTRL | Qt::Key_I});
+            FA_ICON(0xf56f), "&Imported", QKeySequence{Qt::SHIFT | Qt::Key_F7});
 
         auto* toolbar = new QToolBar(self);
         toolbar->setObjectName("MainToolBar");

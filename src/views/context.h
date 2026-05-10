@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dialogs/segmentregs.h"
 #include "models/functions.h"
 #include "ui/contextview.h"
 #include "views/surface/isurface.h"
@@ -12,6 +13,7 @@ class ContextView: public QWidget {
 public:
     explicit ContextView(RDContext* ctx, QWidget* parent = nullptr);
     ~ContextView() override;
+    void show_segment_regs();
     void schedule_step();
 
     [[nodiscard]] RDContext* context() const { return m_context; }
@@ -34,4 +36,7 @@ private:
     FunctionsModel* m_functionsmodel;
     QElapsedTimer m_burst_timer;
     QElapsedTimer m_notify_timer;
+
+private:
+    SegmentRegsDialog* m_dlg_sregs{nullptr};
 };

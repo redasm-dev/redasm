@@ -27,6 +27,21 @@ ContextView::ContextView(RDContext* ctx, QWidget* parent)
 
 ContextView::~ContextView() { rd_destroy(m_context); }
 
+void ContextView::show_segment_regs() {
+    if(m_dlg_sregs) {
+        m_dlg_sregs->raise();
+        m_dlg_sregs->activateWindow();
+        return;
+    }
+
+    m_dlg_sregs = new SegmentRegsDialog(m_context, this);
+
+    connect(m_dlg_sregs, &SegmentRegsDialog::destroyed, this,
+            [&]() { m_dlg_sregs = nullptr; });
+
+    m_dlg_sregs->show();
+}
+
 void ContextView::toggle_pause() {
     m_pause = !m_pause;
 

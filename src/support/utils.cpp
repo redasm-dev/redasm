@@ -71,6 +71,17 @@ QString to_hex_addr(RDAddress address, const RDSegment* seg) {
     return s;
 }
 
+QString confidence_text(RDConfidence c) {
+    switch(c) {
+        case RD_CONFIDENCE_AUTO: return "AUTO";
+        case RD_CONFIDENCE_LIBRARY: return "LIBRARY";
+        case RD_CONFIDENCE_USER: return "USER";
+        default: break;
+    }
+
+    return {};
+}
+
 QMenu* create_surface_menu(ISurface* surface) {
     QAction* actcopy = actions::get(actions::COPY);
     QAction* actrefs = actions::get(actions::REFS_TO);

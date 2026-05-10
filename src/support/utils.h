@@ -18,6 +18,7 @@ inline MainWindow* mainwindow{nullptr};
 inline QStringList search_paths;
 
 QString to_hex_addr(RDAddress address, const RDSegment* seg = nullptr);
+QString confidence_text(RDConfidence c);
 QMenu* create_surface_menu(ISurface* surface);
 QToolButton* create_screenshot_button(QWidget* w);
 QPixmap get_logo();

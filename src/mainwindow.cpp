@@ -9,7 +9,6 @@
 #include "models/imported.h"
 #include "models/mappings.h"
 #include "models/problems.h"
-#include "models/registers.h"
 #include "models/segments.h"
 #include "models/symbols.h"
 #include "models/symbolsfilter.h"
@@ -55,8 +54,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow{parent}, m_ui{this} {
             &MainWindow::show_segments);
     connect(m_ui.actviewmappings, &QAction::triggered, this,
             &MainWindow::show_mappings);
-    connect(m_ui.actviewtrackedregisters, &QAction::triggered, this,
-            &MainWindow::show_tracked_registers);
+    connect(m_ui.actviewsegmentregs, &QAction::triggered, this,
+            &MainWindow::show_segment_regs);
     connect(m_ui.actviewstrings, &QAction::triggered, this,
             &MainWindow::show_strings);
     connect(m_ui.actviewexported, &QAction::triggered, this,
@@ -267,6 +266,7 @@ void MainWindow::enable_context_actions(bool e) { // NOLINT
     m_ui.acttoolsflc->setVisible(e);
     m_ui.acttoolsproblems->setVisible(e);
     m_ui.actviewexported->setVisible(e);
+    m_ui.actviewsegmentregs->setVisible(e);
     m_ui.actviewimported->setVisible(e);
     m_ui.actviewstrings->setVisible(e);
 
@@ -389,29 +389,9 @@ void MainWindow::show_mappings() {
     dlg->show();
 }
 
-void MainWindow::show_tracked_registers() {
+void MainWindow::show_segment_regs() { // NOLINT
     ContextView* ctxview = this->context_view();
-    if(!ctxview) return;
-
-    static TableDialog* dlg = nullptr;
-
-    if(dlg) {
-        dlg->activateWindow();
-        return;
-    }
-
-    dlg = new TableDialog("Tracked Registers", this);
-
-    connect(dlg, &TableDialog::double_clicked, this,
-            [&, ctxview](const QModelIndex& index) {
-                auto* m = static_cast<RegistersModel*>(dlg->model());
-                ctxview->surface()->jump_to(m->address(index));
-            });
-
-    connect(dlg, &TableDialog::closed, this, []() { dlg = nullptr; });
-
-    dlg->set_model(new RegistersModel(ctxview->context(), dlg));
-    dlg->show();
+    if(ctxview) ctxview->show_segment_regs();
 }
 
 void MainWindow::show_strings() {
