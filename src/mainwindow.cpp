@@ -296,9 +296,10 @@ void MainWindow::open_file(const QString& filepath) {
         if(rd_accept(dlgloader->context, dlgloader->processorplugin,
                      &dlgloader->addressing))
             this->select_analyzers(dlgloader->context);
-        else
-            QMessageBox::information(this, "Loader",
-                                     "Loading failed or aborted");
+        else {
+            rd_destroy(dlgloader->context);
+            QMessageBox::warning(this, "Loader", "Loading aborted");
+        }
     });
 
     connect(dlgloader, &LoaderDialog::rejected, this, []() { rd_reject(); });
