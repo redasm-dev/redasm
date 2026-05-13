@@ -102,17 +102,19 @@ void DecoderDialog::do_decode() { // NOLINT
         cursor.insertText(" ", cf);
         cursor.insertText(QString::fromUtf8(dec.instr_text), cf);
 
-        cursor.insertBlock();
-        cf.setForeground(theme_provider::color(RD_THEME_COMMENT));
+        if(m_ui.cbxdetails->isChecked()) {
+            cursor.insertBlock();
+            cf.setForeground(theme_provider::color(RD_THEME_COMMENT));
 
-        // indent lines
-        QStringList dump =
-            QString::fromUtf8(rd_dump_instruction(&dec.instr)).split("\n");
+            // indent lines
+            QStringList dump =
+                QString::fromUtf8(rd_dump_instruction(&dec.instr)).split("\n");
 
-        for(const QString& s : dump) {
-            if(s != dump.front()) cursor.insertBlock();
-            cursor.insertText("  ", cf);
-            cursor.insertText(s, cf);
+            for(const QString& s : dump) {
+                if(s != dump.front()) cursor.insertBlock();
+                cursor.insertText("  ", cf);
+                cursor.insertText(s, cf);
+            }
         }
     }
 }

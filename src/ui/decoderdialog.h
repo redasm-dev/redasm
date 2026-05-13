@@ -1,10 +1,12 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QHexView/qhexview.h>
 #include <QLabel>
 #include <QLineEdit>
@@ -19,6 +21,7 @@ struct DecoderDialog {
     QHexView* hexview;
     QComboBox* cbprocessors;
     QLineEdit* leaddress;
+    QCheckBox* cbxdetails;
     QPlainTextEdit* ptedecoded;
     QDialogButtonBox* buttonbox;
     QPushButton* pbclear;
@@ -32,6 +35,7 @@ struct DecoderDialog {
         this->cbprocessors = new QComboBox();
         this->leaddress = new QLineEdit();
         this->pbclear = new QPushButton("Clear");
+        this->cbxdetails = new QCheckBox("Show details");
 
         auto* grid = new QGridLayout();
         grid->setColumnStretch(1, 1);
@@ -62,10 +66,15 @@ struct DecoderDialog {
         QObject::connect(this->buttonbox, &QDialogButtonBox::rejected, self,
                          &QDialog::reject);
 
-        auto* vboxlayout = new QVBoxLayout(self);
-        vboxlayout->addLayout(grid);
-        vboxlayout->addWidget(splitter);
-        vboxlayout->addWidget(buttonbox);
+        auto* hbox = new QHBoxLayout();
+        hbox->addWidget(this->cbxdetails);
+        hbox->addStretch();
+        hbox->addWidget(buttonbox);
+
+        auto* vbox = new QVBoxLayout(self);
+        vbox->addLayout(grid);
+        vbox->addWidget(splitter);
+        vbox->addLayout(hbox);
     }
 
 private:
