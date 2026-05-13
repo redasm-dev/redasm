@@ -30,7 +30,6 @@ struct DecoderDialog {
         self->setAttribute(Qt::WA_DeleteOnClose);
         self->setWindowTitle("Instructions Decoder");
         self->resize(700, 500);
-        self->setModal(true);
 
         this->cbprocessors = new QComboBox();
         this->leaddress = new QLineEdit();
