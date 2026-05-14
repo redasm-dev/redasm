@@ -23,11 +23,11 @@ QVariant SegmentRegsModel::data(const QModelIndex& index, int role) const {
         const RDSegmentReg& sreg = rd_slice_at(m_registers, index.row());
 
         switch(index.column()) {
-            case 0: return rd_to_hex(m_context, sreg.address);
+            case 0: return rd_to_hexaddr(m_context, sreg.address);
             case 1: return QString::fromUtf8(sreg.name);
 
             case 2: {
-                if(sreg.has_value) return rd_to_hex(m_context, sreg.value);
+                if(sreg.has_value) return rd_to_hexaddr(m_context, sreg.value);
                 break;
             }
 

@@ -11,7 +11,6 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     [[nodiscard]] ContextView* context_view() const;
     void log(RDLogLevel level, const QString& tag, const QString& msg);
-    void init_searchpaths();
 
 protected:
     void dragEnterEvent(QDragEnterEvent* e) override;

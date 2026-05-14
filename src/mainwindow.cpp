@@ -18,13 +18,11 @@
 #include "support/settings.h"
 #include "support/utils.h"
 #include "views/welcome.h"
-#include <QDirIterator>
 #include <QDragMoveEvent>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QMimeData>
-#include <QStandardPaths>
-#include <QTimer>
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow{parent}, m_ui{this} {
     utils::mainwindow = this;
@@ -314,32 +312,6 @@ void MainWindow::select_file() {
 void MainWindow::log(RDLogLevel level, const QString& tag, // NOLINT
                      const QString& msg) {
     m_ui.logview->log(level, tag, msg);
-}
-
-void MainWindow::init_searchpaths() {
-    const char* appdir = std::getenv("APPDIR");
-    bool isappimage = appdir && std::getenv("APPIMAGE");
-
-    utils::search_paths =
-        QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-
-    if(isappimage) utils::search_paths.prepend(QString::fromUtf8(appdir));
-
-    utils::search_paths.prepend(qApp->applicationDirPath() + "/../processors");
-    utils::search_paths.prepend(qApp->applicationDirPath() + "/../loaders");
-    utils::search_paths.prepend(qApp->applicationDirPath() + "/../commands");
-    utils::search_paths.prepend(qApp->applicationDirPath());
-
-    for(const QString& searchpath : utils::search_paths) {
-        QDirIterator it{searchpath, QDirIterator::Subdirectories};
-
-        while(it.hasNext()) {
-            QFileInfo fi = it.nextFileInfo();
-
-            if(fi.isFile() && ("." + fi.suffix() == SHARED_OBJECT_EXT))
-                rd_module_load(qUtf8Printable(fi.filePath()));
-        }
-    }
 }
 
 void MainWindow::select_analyzers(RDContext* ctx) {

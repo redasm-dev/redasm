@@ -16,6 +16,7 @@ namespace utils {
 
 inline MainWindow* mainwindow{nullptr};
 inline QStringList search_paths;
+inline QList<QByteArray> kb_search_paths; // C compatibility
 
 QString to_hex_addr(RDAddress address, const RDSegment* seg = nullptr);
 QString confidence_text(RDConfidence c);

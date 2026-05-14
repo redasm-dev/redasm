@@ -125,29 +125,31 @@ void show_details() {
     RDOffset offset;
     bool has_offset = rd_to_offset(cv->context(), address, &offset);
 
-    QString s = DETAIL_TEMPLATE.arg(rd_to_hex(cv->context(), address))
+    QString s = DETAIL_TEMPLATE.arg(rd_to_hexaddr(cv->context(), address))
                     .arg(has_offset ? utils::to_hex_addr(offset) : "N/A");
 
     RDInstruction instr;
 
     if(rd_decode(cv->context(), address, &instr)) {
         QString strinstr =
-            INSTR_TEMPLATE.arg(rd_to_hex(cv->context(), instr.address))
-                .arg(rd_to_hex(cv->context(), instr.id))
+            INSTR_TEMPLATE.arg(rd_to_hexaddr(cv->context(), instr.address))
+                .arg(rd_to_hexaddr(cv->context(), instr.id))
                 .arg(instrflow_tostring(&instr))
-                .arg(rd_to_hex(cv->context(), instr.length))
+                .arg(rd_to_hexaddr(cv->context(), instr.length))
                 .arg(QString::number(instr.delay_slots));
 
         rd_foreach_operand(i, op, &instr) {
-            QString strop = OP_TEMPLATE.arg(i)
-                                .arg(optype_tostring(op))
-                                .arg(rd_to_hex(cv->context(), op->userdata1))
-                                .arg(rd_to_hex(cv->context(), op->userdata2));
+            QString strop =
+                OP_TEMPLATE.arg(i)
+                    .arg(optype_tostring(op))
+                    .arg(rd_to_hexaddr(cv->context(), op->userdata1))
+                    .arg(rd_to_hexaddr(cv->context(), op->userdata2));
 
             switch(op->kind) {
                 case RD_OP_CNST: {
-                    strop.append(QString("<b>cnst:</b> %1<br>")
-                                     .arg(rd_to_hex(cv->context(), op->cnst)));
+                    strop.append(
+                        QString("<b>cnst:</b> %1<br>")
+                            .arg(rd_to_hexaddr(cv->context(), op->cnst)));
                     break;
                 }
 
@@ -157,55 +159,58 @@ void show_details() {
                 }
 
                 case RD_OP_IMM: {
-                    strop.append(QString("<b>imm:</b> %1<br>")
-                                     .arg(rd_to_hex(cv->context(), op->imm)));
+                    strop.append(
+                        QString("<b>imm:</b> %1<br>")
+                            .arg(rd_to_hexaddr(cv->context(), op->imm)));
                     break;
                 }
 
                 case RD_OP_ADDR: {
-                    strop.append(QString("<b>addr:</b> %1<br>")
-                                     .arg(rd_to_hex(cv->context(), op->addr)));
+                    strop.append(
+                        QString("<b>addr:</b> %1<br>")
+                            .arg(rd_to_hexaddr(cv->context(), op->addr)));
                     break;
                 }
 
                 case RD_OP_MEM: {
-                    strop.append(QString("<b>mem:</b> %1<br>")
-                                     .arg(rd_to_hex(cv->context(), op->mem)));
+                    strop.append(
+                        QString("<b>mem:</b> %1<br>")
+                            .arg(rd_to_hexaddr(cv->context(), op->mem)));
                     break;
                 }
 
                 case RD_OP_DISPL: {
                     strop.append(
                         QString("<b>base:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->displ.base)));
-                    strop.append(
-                        QString("<b>index:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->displ.index)));
-                    strop.append(
-                        QString("<b>displ:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->displ.offset)));
+                            .arg(rd_to_hexaddr(cv->context(), op->displ.base)));
+                    strop.append(QString("<b>index:</b> %1<br>")
+                                     .arg(rd_to_hexaddr(cv->context(),
+                                                        op->displ.index)));
+                    strop.append(QString("<b>displ:</b> %1<br>")
+                                     .arg(rd_to_hexaddr(cv->context(),
+                                                        op->displ.offset)));
                     break;
                 }
 
                 default: {
                     strop.append(
                         QString("<b>reg1:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.reg1)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.reg1)));
                     strop.append(
                         QString("<b>reg2:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.reg2)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.reg2)));
                     strop.append(
                         QString("<b>reg3:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.reg3)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.reg3)));
                     strop.append(
                         QString("<b>val1:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.val1)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.val1)));
                     strop.append(
                         QString("<b>val2:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.val2)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.val2)));
                     strop.append(
                         QString("<b>val3:</b> %1<br>")
-                            .arg(rd_to_hex(cv->context(), op->user.val3)));
+                            .arg(rd_to_hexaddr(cv->context(), op->user.val3)));
                     break;
                 }
             }
@@ -220,14 +225,14 @@ void show_details() {
 
     if(!rd_slice_is_empty(xrefs)) {
         s.append(QString{"<br><b>==== XREFS FROM %1 ====</b><br>"}.arg(
-            rd_to_hex(cv->context(), address)));
+            rd_to_hexaddr(cv->context(), address)));
 
         for(usize i = 0; i < rd_slice_length(xrefs); i++) {
             RDXRef r = rd_slice_at(xrefs, i);
 
             s.append(QString{"[%1]: %2 (%3)<br>"}
                          .arg(i)
-                         .arg(rd_to_hex(cv->context(), r.address))
+                         .arg(rd_to_hexaddr(cv->context(), r.address))
                          .arg(xreftype_tostring(r)));
         }
     }
@@ -236,20 +241,21 @@ void show_details() {
 
     if(!rd_slice_is_empty(xrefs)) {
         s.append(QString{"<br><b>==== XREFS TO %1 ====</b><br>"}.arg(
-            rd_to_hex(cv->context(), address)));
+            rd_to_hexaddr(cv->context(), address)));
 
         for(usize i = 0; i < rd_slice_length(xrefs); i++) {
             RDXRef r = rd_slice_at(xrefs, i);
 
             s.append(QString{"[%1]: %2 (%3)<br>"}
                          .arg(i)
-                         .arg(rd_to_hex(cv->context(), r.address))
+                         .arg(rd_to_hexaddr(cv->context(), r.address))
                          .arg(xreftype_tostring(r)));
         }
     }
 
     auto* dlg = new DetailDialog(cv);
-    auto title = QString("Details @ %1").arg(rd_to_hex(cv->context(), address));
+    auto title =
+        QString("Details @ %1").arg(rd_to_hexaddr(cv->context(), address));
     dlg->setWindowTitle(title);
     dlg->set_html(s);
     dlg->show();
@@ -281,7 +287,7 @@ void refs_to() {
     if(!address) return;
 
     auto* dlg = new TableDialog(
-        QString("References to %1").arg(rd_to_hex(cv->context(), *address)),
+        QString("References to %1").arg(rd_to_hexaddr(cv->context(), *address)),
         cv);
 
     QObject::connect(dlg, &TableDialog::double_clicked, g_mainwindow,
@@ -343,7 +349,7 @@ void rename() {
     bool ok = false;
     QString s = QInputDialog::getText(
         g_mainwindow,
-        QString("Rename @ %1").arg(rd_to_hex(cv->context(), *address)),
+        QString("Rename @ %1").arg(rd_to_hexaddr(cv->context(), *address)),
         "New Name", QLineEdit::Normal, name, &ok);
 
     if(ok && rd_user_name(cv->context(), *address, qUtf8Printable(s)))
