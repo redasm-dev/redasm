@@ -38,8 +38,7 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
         }
     }
     else if(role == Qt::TextAlignmentRole) {
-        if(index.column() == 0)
-            return QVariant{Qt::AlignRight | Qt::AlignVCenter};
+        if(index.column() == 0) return Qt::AlignRight;
         return Qt::AlignCenter;
     }
 

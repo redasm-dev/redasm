@@ -26,7 +26,7 @@ SymbolsModel::SymbolsModel(RDContext* ctx, bool autoalign, QObject* parent)
 }
 
 RDAddress SymbolsModel::address(const QModelIndex& index) const {
-    if(index.row() < static_cast<int>(m_symbols.length))
+    if(index.row() < static_cast<int>(rd_slice_length(m_symbols)))
         return rd_slice_at(m_symbols, index.row()).address;
 
     qFatal("Cannot get symbol address");
@@ -37,6 +37,14 @@ void SymbolsModel::resync() {
     this->beginResetModel();
     m_symbols = rd_get_all_symbols(m_context);
     this->endResetModel();
+}
+
+RDSymbol SymbolsModel::symbol(const QModelIndex& index) const {
+    if(index.row() < static_cast<int>(rd_slice_length(m_symbols)))
+        return rd_slice_at(m_symbols, index.row());
+
+    qFatal("Cannot get symbol");
+    return {};
 }
 
 QVariant SymbolsModel::data(const QModelIndex& index, int role) const {

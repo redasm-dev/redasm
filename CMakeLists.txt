@@ -51,6 +51,7 @@ target_sources(${PROJECT_NAME}
         src/models/references.cpp
         src/models/segmentregs.cpp
         src/models/segments.cpp
+        src/models/strings.cpp
         src/models/symbols.cpp
         src/models/symbolsfilter.cpp
         src/support/actions.cpp

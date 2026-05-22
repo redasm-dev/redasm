@@ -15,7 +15,7 @@ public:
     explicit SymbolsFilterModel(RDContext* ctx, usize filter,
                                 bool autoalign = true,
                                 QObject* parent = nullptr);
-    [[nodiscard]] RDAddress address(const QModelIndex& index) const;
+    [[nodiscard]] virtual RDAddress address(const QModelIndex& index) const;
     void resync();
 
     void set_symbol_column_text(const QString& s) {

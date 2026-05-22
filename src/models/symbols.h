@@ -10,6 +10,8 @@ public:
     explicit SymbolsModel(RDContext* ctx, bool autoalign = true,
                           QObject* parent = nullptr);
     [[nodiscard]] RDAddress address(const QModelIndex& index) const;
+    [[nodiscard]] RDContext* context() const { return m_context; }
+    [[nodiscard]] RDSymbol symbol(const QModelIndex& index) const;
     void set_symbol_column_text(const QString& s) { m_colsymbol = s; }
     void set_highlight_address(bool b) { m_highlightaddress = b; }
     void set_highlight_symbol(bool b) { m_highlightsymbol = b; }

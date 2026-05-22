@@ -11,6 +11,7 @@ public:
     explicit TableDialog(QWidget* parent = nullptr);
     explicit TableDialog(const QString& title, QWidget* parent = nullptr);
     [[nodiscard]] QAbstractItemModel* model() const;
+    [[nodiscard]] QAbstractItemModel* source_model() const;
     void move_column(int fromidx, int toidx) const;
     void hide_column(int idx) const;
     void resize_column(int idx, QHeaderView::ResizeMode r) const;

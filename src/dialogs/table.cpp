@@ -23,11 +23,10 @@ TableDialog::TableDialog(const QString& title, QWidget* parent)
     this->setWindowTitle(title);
 }
 
-QAbstractItemModel* TableDialog::model() const {
-    auto* sfmodel = m_ui.tvtable->model();
-    if(!sfmodel) return nullptr;
+QAbstractItemModel* TableDialog::model() const { return m_ui.tvtable->model(); }
 
-    return static_cast<QSortFilterProxyModel*>(sfmodel)->sourceModel();
+QAbstractItemModel* TableDialog::source_model() const {
+    return qobject_cast<QSortFilterProxyModel*>(this->model())->sourceModel();
 }
 
 void TableDialog::set_stretch_last_column(bool b) { // NOLINT

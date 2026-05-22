@@ -10,8 +10,7 @@
 #include "models/mappings.h"
 #include "models/problems.h"
 #include "models/segments.h"
-#include "models/symbols.h"
-#include "models/symbolsfilter.h"
+#include "models/strings.h"
 #include "support/actions.h"
 // #include "rdui/qtui.h"
 #include "statusbar.h"
@@ -196,8 +195,8 @@ void MainWindow::show_problems() {
     QObject::connect(dlg, &TableDialog::double_clicked, this,
                      [&, dlg](const QModelIndex& index) {
                          if(ContextView* cv = this->context_view(); cv) {
-                             auto* m =
-                                 static_cast<ProblemsModel*>(dlg->model());
+                             auto* m = static_cast<ProblemsModel*>(
+                                 dlg->source_model());
                              cv->surface()->jump_to(m->address(index));
                              dlg->accept();
                          }
@@ -335,7 +334,7 @@ void MainWindow::show_segments() {
 
     connect(dlg, &TableDialog::double_clicked, this,
             [&, ctxview, dlg](const QModelIndex& index) {
-                auto* m = static_cast<SegmentsModel*>(dlg->model());
+                auto* m = static_cast<SegmentsModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
                 dlg->accept();
             });
@@ -353,7 +352,7 @@ void MainWindow::show_mappings() {
 
     connect(dlg, &TableDialog::double_clicked, this,
             [&, ctxview, dlg](const QModelIndex& index) {
-                auto* m = static_cast<MappingsModel*>(dlg->model());
+                auto* m = static_cast<MappingsModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
                 dlg->accept();
             });
@@ -378,21 +377,16 @@ void MainWindow::show_strings() {
                 ContextView* ctxview = this->context_view();
                 if(!ctxview) return;
 
-                auto* m = static_cast<SymbolsModel*>(dlg->model());
+                auto* m = static_cast<StringsModel*>(dlg->model());
                 ctxview->surface()->jump_to(m->address(index));
                 dlg->accept();
             });
 
-    auto* symbolsmodel =
-        new SymbolsFilterModel(ctxview->context(), RD_SYMBOL_STRING, true, dlg);
+    auto* stringsmodel = new StringsModel(ctxview->context(), dlg);
 
-    symbolsmodel->set_symbol_column_text("String");
-
-    dlg->set_model(symbolsmodel);
+    dlg->set_model(stringsmodel);
     dlg->set_stretch_last_column(false);
-    dlg->resize_column(2, QHeaderView::Stretch);
-    dlg->resize_column(3, QHeaderView::ResizeToContents);
-    dlg->hide_column(1);
+    dlg->resize_column(3, QHeaderView::Stretch);
     dlg->show();
 }
 
@@ -407,7 +401,7 @@ void MainWindow::show_exported() {
                 ContextView* ctxview = this->context_view();
                 if(!ctxview) return;
 
-                auto* m = static_cast<ExportedModel*>(dlg->model());
+                auto* m = static_cast<ExportedModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
                 dlg->accept();
             });
@@ -429,7 +423,7 @@ void MainWindow::show_imported() {
                 ContextView* ctxview = this->context_view();
                 if(!ctxview) return;
 
-                auto* m = static_cast<ImportedModel*>(dlg->model());
+                auto* m = static_cast<ImportedModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
                 dlg->accept();
             });

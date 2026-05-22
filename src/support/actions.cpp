@@ -292,7 +292,8 @@ void refs_to() {
 
     QObject::connect(dlg, &TableDialog::double_clicked, g_mainwindow,
                      [cv, dlg](const QModelIndex& index) {
-                         auto* m = static_cast<ReferencesModel*>(dlg->model());
+                         auto* m =
+                             static_cast<ReferencesModel*>(dlg->source_model());
                          cv->surface()->jump_to(m->address(index));
                          dlg->accept();
                      });
