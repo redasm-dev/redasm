@@ -19,8 +19,10 @@ QColor get_foreground_color(const RDSymbol& sym) {
 
 } // namespace
 
-SymbolsModel::SymbolsModel(RDContext* ctx, bool autoalign, QObject* parent)
-    : QAbstractListModel{parent}, m_context{ctx}, m_autoalign{autoalign} {
+SymbolsModel::SymbolsModel(RDContext* ctx, bool autoalign, int extracols,
+                           QObject* parent)
+    : QAbstractListModel{parent}, m_context{ctx}, m_extracols{extracols},
+      m_autoalign{autoalign} {
     m_colsymbol = "Symbol";
     this->resync();
 }
@@ -99,7 +101,9 @@ QVariant SymbolsModel::headerData(int section, Qt::Orientation orientation,
     return {};
 }
 
-int SymbolsModel::columnCount(const QModelIndex&) const { return 4; }
+int SymbolsModel::columnCount(const QModelIndex&) const {
+    return 4 + m_extracols;
+}
 
 int SymbolsModel::rowCount(const QModelIndex&) const {
     return rd_slice_length(m_symbols);

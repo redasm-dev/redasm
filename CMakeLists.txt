@@ -103,3 +103,15 @@ set_target_properties(${PROJECT_NAME}
         MACOSX_BUNDLE ON
 )
 
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/lsan.supp"
+        "${CMAKE_CURRENT_BINARY_DIR}/lsan.supp"
+        COPYONLY
+    )
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/asan.supp"
+        "${CMAKE_CURRENT_BINARY_DIR}/asan.supp"
+        COPYONLY
+    )
+endif()

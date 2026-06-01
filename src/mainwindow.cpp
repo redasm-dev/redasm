@@ -259,11 +259,15 @@ void MainWindow::enable_context_actions(bool e) { // NOLINT
     m_ui.actedit->setVisible(e);
     m_ui.actview->setVisible(e);
 
-    m_ui.acttbseparator->setVisible(e);
+    m_ui.acttbseparator1->setVisible(e);
+    m_ui.acttbseparator2->setVisible(e);
+
     m_ui.acttoolsflc->setVisible(e);
     m_ui.acttoolsproblems->setVisible(e);
     m_ui.actviewexported->setVisible(e);
     m_ui.actviewsegmentregs->setVisible(e);
+    m_ui.actviewsegments->setVisible(e);
+    m_ui.actviewmappings->setVisible(e);
     m_ui.actviewimported->setVisible(e);
     m_ui.actviewstrings->setVisible(e);
 

@@ -2,15 +2,16 @@
 #include <QRegularExpression>
 
 SymbolsFilterModel::SymbolsFilterModel(RDContext* ctx, bool autoalign,
-                                       QObject* parent)
+                                       int extracols, QObject* parent)
     : QSortFilterProxyModel{parent} {
-    this->setSourceModel(new SymbolsModel(ctx, autoalign, this));
+    this->setSourceModel(new SymbolsModel(ctx, autoalign, extracols, this));
     this->setFilterKeyColumn(2);
 }
 
 SymbolsFilterModel::SymbolsFilterModel(RDContext* ctx, usize filter,
-                                       bool autoalign, QObject* parent)
-    : SymbolsFilterModel{ctx, autoalign, parent} {
+                                       bool autoalign, int extracols,
+                                       QObject* parent)
+    : SymbolsFilterModel{ctx, autoalign, extracols, parent} {
     this->set_type_filter(filter);
 }
 

@@ -11,9 +11,9 @@ class SymbolsFilterModel: public QSortFilterProxyModel {
 
 public:
     explicit SymbolsFilterModel(RDContext* ctx, bool autoalign = true,
-                                QObject* parent = nullptr);
+                                int extracols = 0, QObject* parent = nullptr);
     explicit SymbolsFilterModel(RDContext* ctx, usize filter,
-                                bool autoalign = true,
+                                bool autoalign = true, int extracols = 0,
                                 QObject* parent = nullptr);
     [[nodiscard]] virtual RDAddress address(const QModelIndex& index) const;
     void resync();

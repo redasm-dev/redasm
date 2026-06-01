@@ -8,7 +8,7 @@ class SymbolsModel: public QAbstractListModel {
 
 public:
     explicit SymbolsModel(RDContext* ctx, bool autoalign = true,
-                          QObject* parent = nullptr);
+                          int extracols = 0, QObject* parent = nullptr);
     [[nodiscard]] RDAddress address(const QModelIndex& index) const;
     [[nodiscard]] RDContext* context() const { return m_context; }
     [[nodiscard]] RDSymbol symbol(const QModelIndex& index) const;
@@ -32,6 +32,7 @@ private:
     RDContext* m_context;
     RDSymbolSlice m_symbols{};
     QString m_colsymbol;
+    int m_extracols;
     bool m_autoalign;
     bool m_highlightaddress{false};
     bool m_highlightsymbol{false};

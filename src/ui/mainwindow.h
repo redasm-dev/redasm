@@ -25,7 +25,7 @@ struct MainWindow {
     QAction *actviewmemorymap, *actviewsegments, *actviewmappings,
         *actviewsegmentregs, *actviewstrings, *actviewimported,
         *actviewexported;
-    QAction* acttbseparator;
+    QAction *acttbseparator1, *acttbseparator2;
     ::LogView* logview;
 
     explicit MainWindow(QMainWindow* self) {
@@ -86,10 +86,10 @@ struct MainWindow {
             "Memory Map", QKeySequence{Qt::SHIFT | Qt::Key_F1});
 
         this->actviewmappings = this->mnuview->addAction(
-            "Mappings", QKeySequence{Qt::SHIFT | Qt::Key_F2});
+            FA_ICON(0xe697), "Mappings", QKeySequence{Qt::SHIFT | Qt::Key_F2});
 
         this->actviewsegments = this->mnuview->addAction(
-            "Segments", QKeySequence{Qt::SHIFT | Qt::Key_F3});
+            FA_ICON(0xf200), "Segments", QKeySequence{Qt::SHIFT | Qt::Key_F3});
 
         this->actviewsegmentregs = this->mnuview->addAction(
             "Segment Registers", QKeySequence{Qt::SHIFT | Qt::Key_F4});
@@ -111,7 +111,10 @@ struct MainWindow {
         toolbar->setFloatable(false);
         toolbar->setMovable(false);
         toolbar->addAction(this->actfileopen);
-        this->acttbseparator = toolbar->addSeparator();
+        this->acttbseparator1 = toolbar->addSeparator();
+        toolbar->addAction(this->actviewsegments);
+        toolbar->addAction(this->actviewmappings);
+        this->acttbseparator2 = toolbar->addSeparator();
         toolbar->addAction(this->actviewexported);
         toolbar->addAction(this->actviewimported);
         toolbar->addAction(this->actviewstrings);

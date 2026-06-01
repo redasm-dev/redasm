@@ -3,7 +3,7 @@
 GotoDialog::GotoDialog(RDContext* ctx, QWidget* parent)
     : QDialog{parent}, m_ui{this}, m_context{ctx} {
 
-    m_symbolsmodel = new SymbolsModel(ctx, true, m_ui.tvsymbols);
+    m_symbolsmodel = new SymbolsModel(ctx, true, 0, m_ui.tvsymbols);
     m_symbolsmodel->set_highlight_symbol(true);
 
     m_filtermodel = new QSortFilterProxyModel(m_ui.tvsymbols);
