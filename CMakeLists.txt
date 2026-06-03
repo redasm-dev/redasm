@@ -32,6 +32,9 @@ setup_compiler(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} 
     PRIVATE
+        res/windows/resources.rc
+
+    PRIVATE
         src/delegates/recentfiles.cpp
         src/dialogs/about.cpp
         src/dialogs/analyzer.cpp
