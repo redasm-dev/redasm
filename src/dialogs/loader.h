@@ -29,5 +29,5 @@ public:
 
 private:
     ui::LoaderDialog m_ui;
-    RDContextSlice m_contextslice{nullptr};
+    RDContextSlice m_contextslice{};
 };
