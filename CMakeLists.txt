@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.25)
 
 project(redasm-gui)
 
+include(GNUInstallDirs)
+
 if(NOT TARGET redasm::redasm)
     find_package(redasm REQUIRED)
 endif()
@@ -86,6 +88,7 @@ target_sources(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
       SHARED_OBJECT_EXT="${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      REDASM_PLUGIN_DIR="${CMAKE_INSTALL_FULL_LIBDIR}/redasm/plugins"
 )
 
 target_include_directories(${PROJECT_NAME}

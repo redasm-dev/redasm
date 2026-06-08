@@ -56,6 +56,10 @@ void configure_searchpaths() {
         append_unique(utils::search_paths, APP_DIR + "/plugins");
         append_unique(utils::kb_search_paths, (APP_DIR + "/kb").toUtf8());
 
+#if defined(REDASM_PLUGIN_DIR)
+        append_unique(utils::search_paths, QString::fromUtf8(REDASM_PLUGIN_DIR));
+#endif
+
         for(const QString& sp : QStandardPaths::standardLocations(QStandardPaths::AppDataLocation)) {
             append_unique(utils::search_paths, sp + "/plugins");
             append_unique(utils::kb_search_paths, (sp + "/kb").toUtf8());
