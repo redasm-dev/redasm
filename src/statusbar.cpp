@@ -78,13 +78,13 @@ void set_address(ISurface* surface) {
     const RDSegment* seg = rd_find_segment(ctx, *address);
 
     s += QString::fromWCharArray(L"<b>Address: </b>%1\u00A0\u00A0")
-             .arg(utils::to_hex_addr(*address, seg));
+             .arg(utils::to_hex(*address, seg));
 
     RDOffset offset;
 
     if(rd_to_offset(ctx, *address, &offset)) {
         s += QString::fromWCharArray(L"<b>Offset: </b>%1\u00A0\u00A0")
-                 .arg(utils::to_hex_addr(offset, seg));
+                 .arg(utils::to_hex(offset, seg));
     }
 
     if(seg) {

@@ -15,9 +15,9 @@ QVariant MappingsModel::data(const QModelIndex& index, int role) const {
         RDInputMapping m = rd_slice_at(m_mappings, index.row());
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(m.offset);
-            case 1: return utils::to_hex_addr(m.start_address);
-            case 2: return utils::to_hex_addr(m.end_address);
+            case 0: return utils::to_hex(m.offset);
+            case 1: return utils::to_hex(m.start_address);
+            case 2: return utils::to_hex(m.end_address);
             default: break;
         }
     }

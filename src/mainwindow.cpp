@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "dialogs/analyzer.h"
 #include "dialogs/decoder.h"
+#include "dialogs/devgraphs.h"
 #include "dialogs/flc.h"
 #include "dialogs/loader.h"
 #include "dialogs/memorymap.h"
@@ -75,9 +76,16 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow{parent}, m_ui{this} {
         dlgflc->show();
     });
 
-    connect(m_ui.acttoolsdecoder, &QAction::triggered, this, [&]() {
+    connect(m_ui.actdevdecoder, &QAction::triggered, this, [&]() {
         auto* dlgdecoder = new DecoderDialog(this);
         dlgdecoder->show();
+    });
+
+    connect(m_ui.actdevgraphs, &QAction::triggered, this, [&]() {
+        ContextView* ctxview = this->context_view();
+        if(!ctxview) return;
+        auto* dlggraphdots = new DevGraphsDialog(ctxview->context(), this);
+        dlggraphdots->show();
     });
 
     connect(m_ui.acttoolsproblems, &QAction::triggered, this,
@@ -261,9 +269,11 @@ void MainWindow::enable_context_actions(bool e) { // NOLINT
 
     m_ui.acttbseparator1->setVisible(e);
     m_ui.acttbseparator2->setVisible(e);
+    m_ui.acttbseparator3->setVisible(e);
 
     m_ui.acttoolsflc->setVisible(e);
     m_ui.acttoolsproblems->setVisible(e);
+    m_ui.actdevgraphs->setVisible(e);
     m_ui.actviewexported->setVisible(e);
     m_ui.actviewsegmentregs->setVisible(e);
     m_ui.actviewsegments->setVisible(e);

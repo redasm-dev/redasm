@@ -56,7 +56,7 @@ QVariant SymbolsModel::data(const QModelIndex& index, int role) const {
 
     if(role == Qt::DisplayRole) {
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(sym.address);
+            case 0: return utils::to_hex(sym.address);
             case 1: return this->get_symbol_kind(sym.kind);
             case 2: return rd_symbol_to_string(&sym, m_context);
 

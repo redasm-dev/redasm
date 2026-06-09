@@ -38,6 +38,7 @@ target_sources(${PROJECT_NAME}
         src/dialogs/analyzer.cpp
         src/dialogs/decoder.cpp
         src/dialogs/detail.cpp
+        src/dialogs/devgraphs.cpp
         src/dialogs/flc.cpp
         src/dialogs/goto.cpp
         src/dialogs/loader.cpp
@@ -80,6 +81,8 @@ target_sources(${PROJECT_NAME}
         src/views/dashboard.cpp
         src/views/log.cpp
         src/views/welcome.cpp
+        src/widgets/feedbackpushbutton.cpp
+        src/widgets/feedbacktoolbutton.cpp
         src/main.cpp
         src/mainwindow.cpp
         src/statusbar.cpp

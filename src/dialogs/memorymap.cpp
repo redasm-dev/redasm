@@ -15,8 +15,8 @@ MemoryMapDialog::MemoryMapDialog(const RDContext* ctx, QWidget* parent)
 
     for(usize i = 0; i < rd_slice_length(segments); i++) {
         const RDSegment* s = rd_slice_at(segments, i);
-        QString startaddr = utils::to_hex_addr(s->start_address, s);
-        QString endaddr = utils::to_hex_addr(s->end_address, s);
+        QString startaddr = utils::to_hex(s->start_address, s);
+        QString endaddr = utils::to_hex(s->end_address, s);
 
         m_ui.cbsegments->addItem(
             QString{"%1 (%2 - %3)"}.arg(s->name).arg(startaddr).arg(endaddr));

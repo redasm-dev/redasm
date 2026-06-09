@@ -19,8 +19,8 @@ QVariant StringsModel::data(const QModelIndex& index, int role) const {
         if(!rd_get_type(ctx, address, &t)) return {};
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(address, s);
-            case 1: return utils::to_hex_addr(t.count, s);
+            case 0: return utils::to_hex(address, s);
+            case 1: return utils::to_hex(t.count, s);
             case 2: return QString::fromUtf8(t.name);
 
             case 3: {

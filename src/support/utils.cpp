@@ -21,8 +21,6 @@ namespace {
 
 constexpr int LOGO_SIZE = 64;
 constexpr int LOGO_MARGIN = 5;
-constexpr int FEEDBACK_INTERVAL = 1000;
-const char* const FEEDBACK_IN_PROGRESS = "__redasm_feedback__";
 
 QPixmap copy_screenshot(QWidget* w) {
     auto* stackw = qobject_cast<QStackedWidget*>(w);
@@ -52,20 +50,9 @@ QPixmap copy_screenshot(QWidget* w) {
     return scrshot;
 }
 
-void confirm_feedback(QToolButton* tb) {
-    QIcon icon = tb->icon();
-    tb->setProperty(utils::FEEDBACK_IN_PROGRESS, true);
-    tb->setIcon(FA_ICON_COLOR(0xf00c, theme_provider::color(RD_THEME_SUCCESS)));
-
-    QTimer::singleShot(utils::FEEDBACK_INTERVAL, [tb, icon]() {
-        tb->setIcon(icon);
-        tb->setProperty(utils::FEEDBACK_IN_PROGRESS, QVariant{});
-    });
-}
-
 } // namespace
 
-QString to_hex_addr(RDAddress address, const RDSegment* seg) {
+QString to_hex(RDAddress address, const RDSegment* seg) {
     QString s = QString::number(address, 16).toUpper();
     if(seg) return s.rightJustified(static_cast<qsizetype>(seg->unit) * 2, '0');
     return s;
@@ -127,21 +114,17 @@ QMenu* create_surface_menu(ISurface* surface) {
     return menu;
 }
 
-QToolButton* create_screenshot_button(QWidget* w) {
-    auto* pb = new QToolButton(w);
-    pb->setIcon(FA_ICON(0xf030));
+FeedbackToolButton* create_screenshot_button(QWidget* w) {
+    auto* tbfeedback = new FeedbackToolButton(w);
+    tbfeedback->setIcon(FA_ICON(0xf030));
 
-    QObject::connect(pb, &QToolButton::clicked, w, [w, pb]() {
-        if(!pb->property(utils::FEEDBACK_IN_PROGRESS).isNull()) return;
-
+    QObject::connect(tbfeedback, &FeedbackToolButton::feedback, w, [w]() {
         QPixmap s = utils::copy_screenshot(w);
         if(s.isNull()) return;
-
         qApp->clipboard()->setPixmap(s);
-        utils::confirm_feedback(pb);
     });
 
-    return pb;
+    return tbfeedback;
 }
 
 QPixmap get_logo() {

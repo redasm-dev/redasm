@@ -16,7 +16,7 @@ QVariant ExportedModel::data(const QModelIndex& index, int role) const {
         const RDSegment* seg = rd_find_segment(m_context, addr);
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(addr, seg);
+            case 0: return utils::to_hex(addr, seg);
             case 1: return rd_get_name(m_context, addr);
 
             case 2: {

@@ -17,15 +17,16 @@ struct MainWindow {
     QStatusBar* statusbar;
     QStackedWidget* stackwidget;
     QMenu *mnufile, *mnuedit, *mnuview, *mnutools, *mnuwindow, *mnuhelp;
-    QMenu* mnurecents;
+    QMenu *mnurecents, *mnudev;
     QAction *actfileopen, *actfileclose, *actfileexit;
     QAction* actwinrestoredefault;
-    QAction *acttoolsflc, *acttoolsdecoder, *acttoolsproblems;
     QAction *actedit, *actview, *acttools;
+    QAction *acttoolsflc, *acttoolsproblems;
+    QAction *actdevdecoder, *actdevgraphs;
     QAction *actviewmemorymap, *actviewsegments, *actviewmappings,
         *actviewsegmentregs, *actviewstrings, *actviewimported,
         *actviewexported;
-    QAction *acttbseparator1, *acttbseparator2;
+    QAction *acttbseparator1, *acttbseparator2, *acttbseparator3;
     ::LogView* logview;
 
     explicit MainWindow(QMainWindow* self) {
@@ -68,19 +69,23 @@ struct MainWindow {
         this->actwinrestoredefault =
             this->mnuwindow->addAction("Restore Default");
 
+        this->acttoolsproblems = this->mnutools->addAction("&Problems");
+        this->acttoolsproblems->setVisible(false);
+
         this->acttoolsflc = this->mnutools->addAction(
             "&FLC", QKeySequence{Qt::CTRL | Qt::Key_L});
         this->acttoolsflc->setVisible(false);
+
+        this->acttbseparator3 = this->mnutools->addSeparator();
+
+        this->mnudev = this->mnutools->addMenu("Dev");
+        this->actdevdecoder = this->mnudev->addAction("&Decoder");
+        this->actdevgraphs = this->mnudev->addAction("&Graphs");
 
         this->mnuhelp->addAction(actions::get(actions::OPEN_ABOUT));
         this->mnuhelp->addSeparator();
         this->mnuhelp->addAction(actions::get(actions::OPEN_HOME));
         this->mnuhelp->addAction(actions::get(actions::OPEN_GITHUB));
-
-        this->acttoolsproblems = this->mnutools->addAction("&Problems");
-        this->acttoolsproblems->setVisible(false);
-
-        this->acttoolsdecoder = this->mnutools->addAction("&Decoder");
 
         this->actviewmemorymap = this->mnuview->addAction(
             "Memory Map", QKeySequence{Qt::SHIFT | Qt::Key_F1});

@@ -19,7 +19,7 @@ QVariant ImportedModel::data(const QModelIndex& index, int role) const {
         bool ok = rd_get_imported(m_context, addr, &imp);
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(addr, seg);
+            case 0: return utils::to_hex(addr, seg);
 
             case 1:
                 return ok && imp.ordinal.has_value

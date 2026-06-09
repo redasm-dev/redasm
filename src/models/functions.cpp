@@ -22,7 +22,8 @@ QVariant FunctionsModel::data(const QModelIndex& index, int role) const {
         RDAddress addr = rd_function_get_address(f);
 
         switch(index.column()) {
-            case 0: return rd_get_name(m_context, addr);
+            case 0: return QString::fromUtf8(rd_to_hexaddr(m_context, addr));
+            case 1: return QString::fromUtf8(rd_get_name(m_context, addr));
             default: break;
         }
     }
@@ -37,14 +38,15 @@ QVariant FunctionsModel::headerData(int section, Qt::Orientation orientation,
     if(orientation == Qt::Vertical || role != Qt::DisplayRole) return {};
 
     switch(section) {
-        case 0: return "Functions";
+        case 0: return "Address";
+        case 1: return "Functions";
         default: break;
     }
 
     return {};
 }
 
-int FunctionsModel::columnCount(const QModelIndex&) const { return 1; }
+int FunctionsModel::columnCount(const QModelIndex&) const { return 2; }
 
 int FunctionsModel::rowCount(const QModelIndex&) const {
     return static_cast<int>(rd_slice_length(m_functions));

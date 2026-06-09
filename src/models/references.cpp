@@ -43,7 +43,7 @@ QVariant ReferencesModel::data(const QModelIndex& index, int role) const {
         const RDXRef& r = rd_slice_at(m_refs, index.row());
 
         switch(index.column()) {
-            case 0: return utils::to_hex_addr(r.address);
+            case 0: return utils::to_hex(r.address);
             case 1: return rd_render_text(m_context, r.address);
             case 2: return ref_getdirection(m_address, r);
             case 3: return reftype_tostring(r);

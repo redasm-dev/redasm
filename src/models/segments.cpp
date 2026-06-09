@@ -29,9 +29,9 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
 
         switch(index.column()) {
             case 0: return s->name;
-            case 1: return utils::to_hex_addr(s->start_address, s);
-            case 2: return utils::to_hex_addr(s->end_address, s);
-            case 3: return utils::to_hex_addr(len, s);
+            case 1: return utils::to_hex(s->start_address, s);
+            case 2: return utils::to_hex(s->end_address, s);
+            case 3: return utils::to_hex(len, s);
             case 4: return QString::number(s->unit);
             case 5: return get_segment_type(s);
             default: break;

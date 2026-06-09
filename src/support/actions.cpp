@@ -126,7 +126,7 @@ void show_details() {
     bool has_offset = rd_to_offset(cv->context(), address, &offset);
 
     QString s = DETAIL_TEMPLATE.arg(rd_to_hexaddr(cv->context(), address))
-                    .arg(has_offset ? utils::to_hex_addr(offset) : "N/A");
+                    .arg(has_offset ? utils::to_hex(offset) : "N/A");
 
     RDInstruction instr;
 
@@ -274,7 +274,7 @@ void comment() {
     const char* cmt = rd_get_comment(cv->context(), *address);
 
     QString s = QInputDialog::getMultiLineText(
-        g_mainwindow, QString{"Comment @ %1"}.arg(utils::to_hex_addr(*address)),
+        g_mainwindow, QString{"Comment @ %1"}.arg(utils::to_hex(*address)),
         "Insert comment (or leave empty):", cmt ? cmt : QString{}, &ok);
 
     if(ok && rd_set_comment(cv->context(), *address, qUtf8Printable(s)))

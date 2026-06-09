@@ -75,7 +75,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     stack->addWidget(surfaceview);
     stack->addWidget(surfacegraph);
 
-    QToolButton* tbscreenshot = utils::create_screenshot_button(stack);
+    FeedbackToolButton* tbscreenshot = utils::create_screenshot_button(stack);
     current->add_widget(tbscreenshot);
 
     auto* cbrendermode =
