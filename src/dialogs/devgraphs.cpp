@@ -26,8 +26,11 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
     connect(m_ui.tvfunctions, &QTreeView::clicked, this,
             &DevGraphsDialog::show_dot);
 
-    connect(m_ui.ftbcopytests, &FeedbackPushButton::feedback, this,
-            &DevGraphsDialog::copy_tests);
+    connect(m_ui.ftbcopygraphhashes, &FeedbackPushButton::feedback, this,
+            &DevGraphsDialog::copy_graph_hashes);
+
+    connect(m_ui.ftbcopyfunctions, &FeedbackPushButton::feedback, this,
+            &DevGraphsDialog::copy_functions);
 
     connect(m_ui.ftbcopygraph, &FeedbackPushButton::feedback, this,
             [&]() { qApp->clipboard()->setText(m_currentgraph); });
@@ -38,7 +41,7 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
     });
 }
 
-void DevGraphsDialog::copy_tests() {
+void DevGraphsDialog::copy_graph_hashes() {
     QString s = "{\n";
 
     for(int i = 0; i < m_functionsmodel->rowCount({}); i++) {
@@ -51,6 +54,26 @@ void DevGraphsDialog::copy_tests() {
         s.append(QString{"  {0x%1, 0x%2},\n"}
                      .arg(utils::to_hex(address))
                      .arg(utils::to_hex(hash)));
+    }
+
+    s.append("};");
+    qApp->clipboard()->setText(s);
+}
+
+void DevGraphsDialog::copy_functions() {
+    QString s = "{\n";
+
+    for(int i = 0; i < m_functionsmodel->rowCount({}); i++) {
+        QModelIndex index = m_functionsmodel->index(i);
+        RDAddress address = m_functionsmodel->address(index);
+        const RDFunction* f = rd_find_function(m_context, address);
+        Q_ASSERT(f);
+        const char* name = rd_get_name(m_context, address);
+        Q_ASSERT(name);
+
+        s.append(QString{"  {0x%1, \"%2\"},\n"}
+                     .arg(utils::to_hex(address))
+                     .arg(QString::fromUtf8(name)));
     }
 
     s.append("};");

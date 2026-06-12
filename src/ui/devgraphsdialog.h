@@ -11,7 +11,8 @@
 namespace ui {
 
 struct DevGraphsDialog {
-    FeedbackPushButton *ftbcopytests, *ftbcopyhash, *ftbcopygraph;
+    FeedbackPushButton *ftbcopygraphhashes, *ftbcopyhash, *ftbcopyfunctions,
+        *ftbcopygraph;
     QTreeView* tvfunctions;
     QPlainTextEdit* ptedot;
 
@@ -24,13 +25,20 @@ struct DevGraphsDialog {
         this->tvfunctions->setUniformRowHeights(true);
         this->tvfunctions->setRootIsDecorated(false);
 
-        this->ftbcopytests = new FeedbackPushButton();
-        this->ftbcopytests->setText("Copy Tests");
-        this->ftbcopytests->set_feedback_text("Copied");
+        this->ftbcopygraphhashes = new FeedbackPushButton();
+        this->ftbcopygraphhashes->setText("Copy Graph Hashes");
+        this->ftbcopygraphhashes->set_feedback_text("Copied");
+        this->ftbcopyfunctions = new FeedbackPushButton();
+        this->ftbcopyfunctions->setText("Copy Functions");
+        this->ftbcopyfunctions->set_feedback_text("Copied");
+
+        auto* hbox = new QHBoxLayout();
+        hbox->addWidget(this->ftbcopygraphhashes);
+        hbox->addWidget(this->ftbcopyfunctions);
 
         auto* vbox_left = new QVBoxLayout(new QWidget());
         vbox_left->addWidget(this->tvfunctions, 1);
-        vbox_left->addWidget(this->ftbcopytests);
+        vbox_left->addLayout(hbox);
 
         this->ptedot = new QPlainTextEdit();
         this->ptedot->setUndoRedoEnabled(false);
@@ -43,7 +51,7 @@ struct DevGraphsDialog {
         this->ftbcopygraph->setText("Copy Graph");
         this->ftbcopygraph->set_feedback_text("Copied");
 
-        auto* hbox = new QHBoxLayout();
+        hbox = new QHBoxLayout();
         hbox->addWidget(this->ftbcopyhash);
         hbox->addWidget(this->ftbcopygraph);
 

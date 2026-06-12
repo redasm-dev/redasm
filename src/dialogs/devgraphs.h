@@ -12,7 +12,8 @@ public:
 
 private Q_SLOTS:
     void show_dot(const QModelIndex& index);
-    void copy_tests();
+    void copy_graph_hashes();
+    void copy_functions();
 
 private:
     ui::DevGraphsDialog m_ui;
