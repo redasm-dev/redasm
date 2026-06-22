@@ -19,12 +19,12 @@ public:
     void set_description(const QString& descr);
     void set_model(QAbstractItemModel* m);
     void set_button_box_visible(bool b);
-    void set_search_box_visible(bool b);
     void set_header_visible(bool b);
 
 private Q_SLOTS:
     void on_table_double_clicked(const QModelIndex& index);
     void on_table_clicked(const QModelIndex& index);
+    void on_copy_feedback();
 
 protected:
     void closeEvent(QCloseEvent* e) override;

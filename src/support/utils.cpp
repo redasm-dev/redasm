@@ -4,6 +4,7 @@
 #include "support/themeprovider.h"
 #include "views/surface/graph/graph.h"
 #include "views/surface/listing.h"
+#include <QAbstractItemModel>
 #include <QClipboard>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -186,6 +187,43 @@ void configure_hex_input(QLineEdit* le) {
     const QRegularExpression H{"[a-fA-F0-9]*"};
     le->setValidator(new QRegularExpressionValidator(H, le));
     le->setMaxLength(sizeof(u64) * 2);
+}
+
+QString model_to_csv(const QAbstractItemModel* model, bool with_header) {
+    QString csv;
+    int rows = model->rowCount();
+    int cols = model->columnCount();
+
+    auto escape_field = [](const QString& field) -> QString {
+        QString f = field;
+        if(f.contains(',') || f.contains('"') || f.contains('\n')) {
+            f.replace('"', "\"\"");
+            return '"' + f + '"';
+        }
+        return f;
+    };
+
+    if(with_header) {
+        QStringList header_fields;
+        for(int c = 0; c < cols; ++c)
+            header_fields << escape_field(
+                model->headerData(c, Qt::Horizontal).toString());
+        csv += header_fields.join(',') + '\n';
+    }
+
+    for(int r = 0; r < rows; ++r) {
+        QStringList fields;
+
+        for(int c = 0; c < cols; ++c) {
+            QModelIndex idx = model->index(r, c);
+            fields << escape_field(
+                model->data(idx, Qt::DisplayRole).toString());
+        }
+
+        csv += fields.join(',') + '\n';
+    }
+
+    return csv;
 }
 
 } // namespace utils

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "support/fontawesome.h"
+#include "widgets/feedbacktoolbutton.h"
 #include <QBoxLayout>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -12,6 +14,7 @@ namespace ui {
 struct TableDialog {
     QDialogButtonBox* buttonbox;
     QLineEdit* lesearch;
+    FeedbackToolButton* ftbcopy;
     QLabel* lbldescription;
     QTreeView* tvtable;
 
@@ -21,8 +24,15 @@ struct TableDialog {
 
         this->tvtable = new QTreeView();
         this->lbldescription = new QLabel();
+
         this->lesearch = new QLineEdit();
         this->lesearch->setPlaceholderText("Search…");
+        this->ftbcopy = new FeedbackToolButton();
+        this->ftbcopy->setIcon(FA_ICON(0xf0c5));
+
+        auto* hbox = new QHBoxLayout();
+        hbox->addWidget(this->lesearch, 1);
+        hbox->addWidget(this->ftbcopy, 1);
 
         this->buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok |
                                                QDialogButtonBox::Cancel);
@@ -32,7 +42,7 @@ struct TableDialog {
                          &QDialog::reject);
 
         auto* vbox = new QVBoxLayout(self);
-        vbox->addWidget(this->lesearch);
+        vbox->addLayout(hbox);
         vbox->addWidget(this->lbldescription);
         vbox->addWidget(this->tvtable);
         vbox->addWidget(this->buttonbox);

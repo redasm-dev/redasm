@@ -7,6 +7,7 @@
 #include <redasm/redasm.h>
 
 class MainWindow;
+class QAbstractItemModel;
 class QToolButton;
 class QKeyEvent;
 class QLineEdit;
@@ -27,5 +28,6 @@ QPixmap get_about_logo();
 QPixmap get_logo();
 bool handle_key_press(ISurface* surface, QKeyEvent* e);
 void configure_hex_input(QLineEdit* le);
+QString model_to_csv(const QAbstractItemModel* model, bool with_header);
 
 } // namespace utils

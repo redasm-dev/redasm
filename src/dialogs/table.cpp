@@ -1,4 +1,7 @@
 #include "table.h"
+#include "support/utils.h"
+#include <QApplication>
+#include <QClipboard>
 #include <QSortFilterProxyModel>
 
 TableDialog::TableDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
@@ -16,6 +19,9 @@ TableDialog::TableDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
                     static_cast<QSortFilterProxyModel*>(m_ui.tvtable->model());
                 sfmodel->setFilterFixedString(s);
             });
+
+    connect(m_ui.ftbcopy, &FeedbackToolButton::feedback, this,
+            &TableDialog::on_copy_feedback);
 }
 
 TableDialog::TableDialog(const QString& title, QWidget* parent)
@@ -68,10 +74,6 @@ void TableDialog::set_button_box_visible(bool b) { // NOLINT
     m_ui.buttonbox->setVisible(b);
 }
 
-void TableDialog::set_search_box_visible(bool b) { // NOLINT
-    m_ui.lesearch->setVisible(b);
-}
-
 void TableDialog::set_header_visible(bool b) { // NOLINT
     m_ui.tvtable->setHeaderHidden(!b);
 }
@@ -84,6 +86,12 @@ void TableDialog::on_table_double_clicked(const QModelIndex& index) {
 void TableDialog::on_table_clicked(const QModelIndex& index) {
     auto* sfmodel = static_cast<QSortFilterProxyModel*>(m_ui.tvtable->model());
     Q_EMIT clicked(sfmodel->mapToSource(index));
+}
+
+void TableDialog::on_copy_feedback() { // NOLINT
+    QString csv = utils::model_to_csv(this->model(), true);
+    if(csv.isEmpty()) return;
+    qApp->clipboard()->setText(csv);
 }
 
 void TableDialog::closeEvent(QCloseEvent* e) {
