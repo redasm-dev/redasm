@@ -121,7 +121,11 @@ void LoaderDialog::update_open_mode() {
         qFatal("cannot set an open mode");
 
     m_ui.gbloader->setEnabled(m_ui.rbnewanalysis->isChecked());
-    m_ui.gbaddressing->setEnabled(m_ui.rbnewanalysis->isChecked());
+
+    const RDLoaderPlugin* l = rd_testresult_get_loader_plugin(this->sel_test);
+
+    m_ui.gbaddressing->setEnabled(m_ui.rbnewanalysis->isChecked() &&
+                                  (l && l->flags & RD_LF_MANUAL));
 }
 
 void LoaderDialog::update_entry_point() {
