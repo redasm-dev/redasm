@@ -2,6 +2,7 @@
 #include "dialogs/about.h"
 #include "dialogs/detail.h"
 #include "dialogs/goto.h"
+#include "dialogs/patch.h"
 #include "dialogs/settings.h"
 #include "dialogs/table.h"
 #include "mainwindow.h"
@@ -340,6 +341,31 @@ void op_as_immediate() {
         cv->surface()->invalidate();
 }
 
+void patch_instruction() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    auto celldata = cv->surface()->get_cell_data_under_cursor();
+    if(!celldata || !celldata->is_instruction) return;
+
+    auto address = cv->surface()->get_current_address();
+    if(!address) return;
+
+    auto* dlgpatch = new PatchDialog(*address, g_mainwindow);
+
+    QObject::connect(dlgpatch, &PatchDialog::accepted, g_mainwindow,
+                     [&, cv, dlgpatch, addr = *address]() {
+                         bool ok = rd_patch_instruction(
+                             cv->context(), addr,
+                             qUtf8Printable(dlgpatch->instruction_text()),
+                             dlgpatch->fill_nop());
+
+                         if(ok) cv->surface()->invalidate();
+                     });
+
+    dlgpatch->show();
+}
+
 void rename() {
     ContextView* cv = g_mainwindow->context_view();
     if(!cv) return;
@@ -392,6 +418,10 @@ void init(QMainWindow* mw) {
     g_actions[Type::OP_AS_IMMEDIATE] =
         mw->addAction("As Immediate", QKeySequence{Qt::Key_I}, mw,
                       []() { actions::op_as_immediate(); });
+
+    g_actions[Type::PATCH_INSTRUCTION] = mw->addAction(
+        "Patch Instruction", QKeySequence{Qt::SHIFT | Qt::Key_Space}, mw,
+        []() { actions::patch_instruction(); });
 
     g_actions[Type::OPEN_DETAILS] = mw->addAction(
         FA_ICON(0x3f), "Details", mw, []() { actions::show_details(); });

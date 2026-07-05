@@ -7,8 +7,9 @@ class SurfaceGraphNode: public GraphViewNode {
     Q_OBJECT
 
 public:
-    explicit SurfaceGraphNode(RDSurfaceGraph* surface, const RDFunctionChunk& b,
-                              RDGraphNode n, QWidget* parent = nullptr);
+    explicit SurfaceGraphNode(RDSurfaceGraph* surface,
+                              const RDFunctionChunk* chunk, RDGraphNode n,
+                              QWidget* parent = nullptr);
     [[nodiscard]] bool contains_address(RDAddress address) const;
     [[nodiscard]] int current_row() const override;
     [[nodiscard]] QSize size() const override;
@@ -30,7 +31,7 @@ Q_SIGNALS:
     void follow_requested();
 
 private:
-    RDFunctionChunk m_block;
+    const RDFunctionChunk* m_chunk;
     RDSurfaceGraph* m_surface;
     int m_maxwidth{};
 };

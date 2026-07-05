@@ -148,11 +148,11 @@ void SurfaceGraph::update_node(GraphViewNode* item) {
 
 GraphViewNode* SurfaceGraph::create_node(RDGraphNode n, const RDGraph*) {
     const RDFunction* f = rd_surfacegraph_get_function(m_surface);
-    RDFunctionChunk b;
+    const RDFunctionChunk* chunk = rd_function_get_chunk(f, n);
 
-    if(rd_function_get_chunk(f, n, &b)) {
-        auto* g = new SurfaceGraphNode(m_surface, b, n, this);
-        g->setObjectName(QString::number(b.start, 16));
+    if(chunk) {
+        auto* g = new SurfaceGraphNode(m_surface, chunk, n, this);
+        g->setObjectName(QString::number(chunk->start, 16));
 
         connect(g, &SurfaceGraphNode::follow_requested, this, [&]() {
             RDAddress address;

@@ -78,6 +78,7 @@ QMenu* create_surface_menu(ISurface* surface) {
     QAction* actcomment = actions::get(actions::COMMENT);
     QAction* act_op_as_addr = actions::get(actions::OP_AS_ADDRESS);
     QAction* act_op_as_imm = actions::get(actions::OP_AS_IMMEDIATE);
+    QAction* act_patch = actions::get(actions::PATCH_INSTRUCTION);
 
     auto* menu = new QMenu(surface->to_widget());
     menu->addAction(actcopy);
@@ -87,6 +88,7 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addAction(actcomment);
     menu->addAction(act_op_as_addr);
     menu->addAction(act_op_as_imm);
+    menu->addAction(act_patch);
     menu->addSeparator();
     menu->addAction(actions::get(actions::GOTO));
     menu->addSeparator();
@@ -111,6 +113,8 @@ QMenu* create_surface_menu(ISurface* surface) {
 
         act_op_as_imm->setVisible(celldata && celldata->operand.index != -1 &&
                                   celldata->operand.value.kind == RD_OP_ADDR);
+
+        act_patch->setVisible(celldata && celldata->is_instruction);
     });
 
     return menu;

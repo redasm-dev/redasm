@@ -13,14 +13,14 @@ constexpr int DROP_SHADOW_SIZE = 6;
 }
 
 SurfaceGraphNode::SurfaceGraphNode(RDSurfaceGraph* surface,
-                                   const RDFunctionChunk& b, RDGraphNode n,
+                                   const RDFunctionChunk* chunk, RDGraphNode n,
                                    QWidget* parent)
-    : GraphViewNode{n, parent}, m_block{b}, m_surface{surface} {
+    : GraphViewNode{n, parent}, m_chunk{chunk}, m_surface{surface} {
     this->update_metrics();
 }
 
 bool SurfaceGraphNode::contains_address(RDAddress address) const {
-    return address >= m_block.start && address < m_block.end;
+    return address >= m_chunk->start && address < m_chunk->end;
 }
 
 int SurfaceGraphNode::current_row() const {
@@ -98,11 +98,11 @@ void SurfaceGraphNode::get_surface_pos(const QPointF& pt,
 }
 
 int SurfaceGraphNode::start_row() const {
-    return rd_surfacegraph_index_of(m_surface, m_block.start);
+    return rd_surfacegraph_index_of(m_surface, m_chunk->start);
 }
 
 int SurfaceGraphNode::end_row() const {
-    return rd_surfacegraph_last_index_of(m_surface, m_block.end - 1);
+    return rd_surfacegraph_last_index_of(m_surface, m_chunk->end - 1);
 }
 
 void SurfaceGraphNode::render(QPainter* painter, usize state) {
