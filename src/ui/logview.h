@@ -27,7 +27,7 @@ struct LogView {
 
         auto* hbox = new QHBoxLayout();
         hbox->setContentsMargins(4, 1, 4, 1);
-        hbox->setSpacing(2);
+        hbox->setSpacing(4);
         hbox->addStretch();
         hbox->addWidget(this->tblevels);
         hbox->addWidget(this->tbclear);
