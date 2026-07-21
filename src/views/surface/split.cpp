@@ -11,6 +11,13 @@
 
 namespace {
 
+// default is NORMAL, which is 1
+constexpr std::array<RDRenderMode, 3> RENDER_MODES = {
+    RD_RM_FLAGS,
+    RD_RM_NORMAL,
+    RD_RM_RDIL,
+};
+
 ISurface* _splitwidget_getcurrentsurface(SplitWidget* split) {
     if(!split) return nullptr;
 
@@ -89,13 +96,10 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     cbrendermode->setCurrentIndex(1); // NORMAL by default
 
     QObject::connect(cbrendermode, &QComboBox::currentIndexChanged, this,
-                     [cbrendermode, current](int idx) {
+                     [current](int idx) {
                          ISurface* s = _splitwidget_getcurrentsurface(current);
                          if(s) {
-                             RDRenderMode rm = static_cast<RDRenderMode>(
-                                 cbrendermode->itemData(idx).toUInt());
-
-                             s->set_mode(rm);
+                             s->set_mode(RENDER_MODES[idx]);
                              s->to_widget()->setFocus();
                          }
                      });
@@ -140,7 +144,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
                 stack->setCurrentWidget(surfacegraph);
                 surfacegraph->set_mode(
-                    static_cast<RDRenderMode>(cbrendermode->currentIndex()));
+                    RENDER_MODES[cbrendermode->currentIndex()]);
                 surfacegraph->jump_to(*address);
             });
 
@@ -151,7 +155,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
                 stack->setCurrentWidget(surfaceview);
                 surfaceview->listing()->set_mode(
-                    static_cast<RDRenderMode>(cbrendermode->currentIndex()));
+                    RENDER_MODES[cbrendermode->currentIndex()]);
                 surfaceview->listing()->jump_to(*address);
             });
 
