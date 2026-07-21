@@ -81,14 +81,21 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     auto* cbrendermode =
         static_cast<QComboBox*>(current->add_widget(new QComboBox()));
 
+    cbrendermode->addItem("FLAGS", RD_RM_FLAGS);
+    cbrendermode->addItem("NORMAL", RD_RM_NORMAL);
+    cbrendermode->addItem("RDIL", RD_RM_RDIL);
+
     cbrendermode->setFrame(false);
-    cbrendermode->addItems(QStringList{"NORMAL", "RDIL", "FLAGS"});
+    cbrendermode->setCurrentIndex(1); // NORMAL by default
 
     QObject::connect(cbrendermode, &QComboBox::currentIndexChanged, this,
-                     [current](int idx) {
+                     [cbrendermode, current](int idx) {
                          ISurface* s = _splitwidget_getcurrentsurface(current);
                          if(s) {
-                             s->set_mode(static_cast<RDRenderMode>(idx));
+                             RDRenderMode rm = static_cast<RDRenderMode>(
+                                 cbrendermode->itemData(idx).toUInt());
+
+                             s->set_mode(rm);
                              s->to_widget()->setFocus();
                          }
                      });
