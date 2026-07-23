@@ -355,8 +355,12 @@ void MainWindow::open_project(const QString& filepath) {
 
             case RD_ACCEPT_FAIL_WRITE: {
                 QString newpath = QFileDialog::getExistingDirectory(
-                    this, tr("destination is not writable, select another "
-                             "directory…"));
+                    this,
+                    tr("destination is not writable, select another "
+                       "directory…"),
+                    QString{},
+                    QFileDialog::ShowDirsOnly |
+                        QFileDialog::DontUseNativeDialog);
 
                 if(newpath.isEmpty()) {
                     rd_reject();
@@ -404,8 +408,12 @@ void MainWindow::open_file(const QString& filepath) {
 
                 case RD_ACCEPT_FAIL_WRITE: {
                     QString newpath = QFileDialog::getExistingDirectory(
-                        this, tr("destination is not writable, select another "
-                                 "directory…"));
+                        this,
+                        tr("destination is not writable, select another "
+                           "directory…"),
+                        QString{},
+                        QFileDialog::ShowDirsOnly |
+                            QFileDialog::DontUseNativeDialog);
 
                     if(newpath.isEmpty()) {
                         rd_reject();
