@@ -39,7 +39,7 @@ QVariant FunctionsModel::headerData(int section, Qt::Orientation orientation,
 
     switch(section) {
         case 0: return "Address";
-        case 1: return "Functions";
+        case 1: return "Function";
         default: break;
     }
 

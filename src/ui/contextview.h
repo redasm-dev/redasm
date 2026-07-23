@@ -19,7 +19,7 @@ struct ContextView {
         this->splitview = new SurfaceSplitView(ctx); // FIXME: ctx leaking in ui
 
         this->tvfunctions = new QTreeView();
-        this->tvfunctions->header()->setStretchLastSection(true);
+        this->tvfunctions->header()->setStretchLastSection(false);
         this->tvfunctions->setUniformRowHeights(true);
         this->tvfunctions->setRootIsDecorated(false);
         this->tvfunctions->setFrameShape(QFrame::NoFrame);
