@@ -16,8 +16,7 @@ ContextView::ContextView(RDContext* ctx, QWidget* parent)
     m_ui.tvfunctions->header()->moveSection(0, 1);
     m_ui.tvfunctions->header()->setSectionResizeMode(
         0, QHeaderView::ResizeToContents);
-    m_ui.tvfunctions->header()->setSectionResizeMode(
-        1, QHeaderView::ResizeToContents);
+    m_ui.tvfunctions->header()->setSectionResizeMode(1, QHeaderView::Stretch);
 
     m_notify_timer.start();
     statusbar::set_busy_status();
