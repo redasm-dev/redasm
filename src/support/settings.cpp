@@ -104,5 +104,9 @@ QFont REDasmSettings::load_font() {
 
     if(!is_monospace) f = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     f.setPixelSize(settings.current_font_size());
+
+    f.setStyleStrategy(static_cast<QFont::StyleStrategy>(
+        QFont::PreferNoShaping | QFont::NoFontMerging));
+
     return f;
 }
