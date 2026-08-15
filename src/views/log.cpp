@@ -1,6 +1,7 @@
 #include "log.h"
 #include "support/themeprovider.h"
 #include <QFontDatabase>
+#include <QScrollBar>
 
 LogView::LogView(QWidget* parent): QWidget{parent}, m_ui{this} {
     this->setVisible(false);
@@ -17,8 +18,8 @@ LogView::LogView(QWidget* parent): QWidget{parent}, m_ui{this} {
     this->add_log_level("FAIL", RD_LOGLEVEL_FAIL);
 
     QFont f = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    m_ui.telogs->setFont(f);
-    m_ui.telogs->document()->setDocumentMargin(0);
+    m_ui.ptelogs->setFont(f);
+    m_ui.ptelogs->document()->setDocumentMargin(0);
 
     this->update_log_levels();
 
@@ -31,7 +32,7 @@ LogView::LogView(QWidget* parent): QWidget{parent}, m_ui{this} {
 void LogView::clear() {
     this->setVisible(false);
     m_ui.lefilter->clear();
-    m_ui.telogs->clear();
+    m_ui.ptelogs->clear();
     m_entries.clear();
 }
 
@@ -120,14 +121,16 @@ void LogView::update_log_levels() {
 }
 
 void LogView::update_log() {
-    m_ui.telogs->clear();
+    m_ui.ptelogs->clear();
 
     for(const LogEntry& e : m_entries) {
         if(this->accept_log(e)) this->append_log(e, false);
     }
 
-    m_ui.telogs->moveCursor(QTextCursor::End);
-    m_ui.telogs->ensureCursorVisible();
+    m_ui.ptelogs->moveCursor(QTextCursor::End);
+
+    QScrollBar* sb = m_ui.ptelogs->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
 bool LogView::accept_log(const LogEntry& e) const {
@@ -141,11 +144,11 @@ bool LogView::accept_log(const LogEntry& e) const {
 }
 
 void LogView::append_log(const LogEntry& e, bool update) {
-    this->setVisible(true);
+    if(!this->isVisible()) this->setVisible(true);
 
-    QTextCursor cursor = m_ui.telogs->textCursor();
+    QTextCursor cursor = m_ui.ptelogs->textCursor();
     cursor.movePosition(QTextCursor::End);
-    if(!m_ui.telogs->document()->isEmpty()) cursor.insertBlock();
+    if(!m_ui.ptelogs->document()->isEmpty()) cursor.insertBlock();
 
     QTextCharFormat defaultfmt, tagfmt;
     tagfmt.setForeground(theme_provider::color(RD_THEME_COMMENT));
@@ -172,8 +175,10 @@ void LogView::append_log(const LogEntry& e, bool update) {
 
     if(!update) return;
 
-    m_ui.telogs->moveCursor(QTextCursor::End);
-    m_ui.telogs->ensureCursorVisible();
+    m_ui.ptelogs->moveCursor(QTextCursor::End);
+
+    QScrollBar* sb = m_ui.ptelogs->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
 void LogView::log(RDLogLevel level, const QString& tag, const QString& msg) {

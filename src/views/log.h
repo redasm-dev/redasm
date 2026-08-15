@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/logview.h"
+#include <QTimer>
 #include <redasm/redasm.h>
 
 class LogView: public QWidget {
