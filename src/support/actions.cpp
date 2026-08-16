@@ -291,14 +291,14 @@ void comment() {
     if(!address) return;
 
     bool ok = false;
-    const char* cmt = rd_get_comment(cv->context(), *address);
+    const char* cmt = rd_get_comment_inline(cv->context(), *address);
 
     QString s = input_dialog::get_multi_line_text(
         g_mainwindow, QString{"Comment @ %1"}.arg(utils::to_hex(*address)),
         "Insert comment (or leave empty), CTRL+ENTER to accept:",
         cmt ? cmt : QString{}, &ok);
 
-    if(ok && rd_set_comment(cv->context(), *address, qUtf8Printable(s)))
+    if(ok && rd_set_comment_inline(cv->context(), *address, qUtf8Printable(s)))
         cv->invalidate();
 }
 
