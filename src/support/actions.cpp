@@ -51,6 +51,7 @@ const QString OP_TEMPLATE = QString{R"(
 
 QString optype_tostring(const RDOperand* op) {
     switch(op->kind) {
+        case RD_OP_STUB: return "OP_STUB";
         case RD_OP_CNST: return "OP_CNST";
         case RD_OP_REG: return "OP_REG";
         case RD_OP_IMM: return "OP_IMM";
@@ -166,6 +167,8 @@ void show_details() {
                     .arg(rd_to_hexaddr(cv->context(), op->userdata2));
 
             switch(op->kind) {
+                case RD_OP_STUB: break;
+
                 case RD_OP_CNST: {
                     strop.append(
                         QString("<b>cnst:</b> %1<br>")
