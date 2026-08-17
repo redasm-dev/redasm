@@ -6,6 +6,7 @@ on:
 
 jobs:
   notify:
+    if: github.repository == 'redasm-dev/${{ github.event.repository.name }}'
     runs-on: ubuntu-latest
 
     steps:
