@@ -581,12 +581,12 @@ void init(QMainWindow* mw) {
         []() { actions::show_goto(); });
 
     g_actions[Type::COPY] =
-        actions::add_detached_action("Copy", QKeySequence{Qt::CTRL | Qt::Key_C},
-                                     mw, []() { actions::copy(); });
+        mw->addAction("Copy", QKeySequence{Qt::CTRL | Qt::Key_C}, mw,
+                      []() { actions::copy(); });
 
-    g_actions[Type::SELECT_ALL] = actions::add_detached_action(
-        "Select All", QKeySequence{Qt::CTRL | Qt::Key_A}, mw,
-        []() { actions::select_all(); });
+    g_actions[Type::SELECT_ALL] =
+        mw->addAction("Select All", QKeySequence{Qt::CTRL | Qt::Key_A}, mw,
+                      []() { actions::select_all(); });
 
     g_actions[Type::REFS_TO] = actions::add_detached_action(
         "Cross References To…", QKeySequence{Qt::Key_X}, mw,
@@ -621,10 +621,10 @@ void init(QMainWindow* mw) {
         FA_ICON(0x46), "Create function", Qt::Key_F, mw,
         []() { actions::create_function(); });
 
-    g_actions[Type::PATCH_INSTRUCTION] = actions::add_detached_action(
-        FA_ICON(0xf462), "Patch Instruction",
-        QKeySequence{Qt::SHIFT | Qt::Key_Space}, mw,
-        []() { actions::patch_instruction(); });
+    g_actions[Type::PATCH_INSTRUCTION] =
+        mw->addAction(FA_ICON(0xf462), "Patch Instruction",
+                      QKeySequence{Qt::SHIFT | Qt::Key_Space}, mw,
+                      []() { actions::patch_instruction(); });
 
     g_actions[Type::REANALYZE] =
         mw->addAction("Reanalyze", mw, []() { actions::reanalyze(); });
