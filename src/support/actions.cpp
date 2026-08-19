@@ -305,7 +305,7 @@ void comment() {
         cv->invalidate();
 }
 
-void refs_to() {
+void xrefs_to() {
     ContextView* cv = g_mainwindow->context_view();
     if(!cv) return;
 
@@ -590,7 +590,7 @@ void init(QMainWindow* mw) {
 
     g_actions[Type::REFS_TO] = actions::add_detached_action(
         "Cross References To…", QKeySequence{Qt::Key_X}, mw,
-        []() { actions::refs_to(); });
+        []() { actions::xrefs_to(); });
 
     g_actions[Type::RENAME] = actions::add_detached_action(
         "Rename", QKeySequence(Qt::Key_N), mw, []() { actions::rename(); });
