@@ -73,6 +73,12 @@ bool SurfaceGraph::invalidate() {
     return true;
 }
 
+void SurfaceGraph::refresh_content() {
+    rd_surfacegraph_render(m_surface); // content only
+    this->viewport()->update();        // repaint, don't relayout
+    statusbar::set_address(this);
+}
+
 void SurfaceGraph::set_mode(RDRenderMode m) {
     rd_surfacegraph_set_mode(m_surface, m);
     this->invalidate();
@@ -183,7 +189,7 @@ GraphViewNode* SurfaceGraph::create_node(RDGraphNode n, const RDGraph*) {
         });
 
         connect(g, &SurfaceGraphNode::invalidated, this,
-                &SurfaceGraph::invalidate);
+                &SurfaceGraph::refresh_content);
         return g;
     }
 

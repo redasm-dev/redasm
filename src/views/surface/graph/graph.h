@@ -57,6 +57,7 @@ private:
     SurfaceGraphNode* find_node(RDAddress address);
     SurfaceGraphNode* find_node_at_cursor();
     void show_popup(const QPoint& pt);
+    void refresh_content();
 
 Q_SIGNALS:
     void history_updated();
