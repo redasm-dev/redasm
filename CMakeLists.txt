@@ -149,9 +149,10 @@ endif()
 
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT APPLE)
     install(FILES res/redasm.desktop
             DESTINATION share/applications
     )
