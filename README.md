@@ -1,6 +1,6 @@
 <div align="center">
 
-  ![REDasm open source disassembler logo](https://github.com/user-attachments/assets/0dcf459c-7a9d-4093-9d8c-19d44af6e490)
+  ![REDasm open source disassembler logo](https://github.com/user-attachments/assets/5a7005f7-43de-45d7-97ba-e14996dc0ed0)
 
   ![License GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-critical?style=flat-square)
   ![Version 4.0.0](https://img.shields.io/badge/version-4.0.0-blue?style=flat-square)
