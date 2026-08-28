@@ -64,6 +64,10 @@ void _generate_function_tdef_code(QTextEdit* te, const RDTypeDef* tdef,
     QTextDocument* doc = te->document();
     QTextCursor cur(doc);
 
+    const char* callconv = rd_typedef_get_callconv(tdef);
+    if(callconv)
+        cur.insertText(QString{"%1 "}.arg(QString::fromUtf8(callconv)));
+
     RDType ret;
     if(rd_typedef_get_ret(tdef, &ret)) {
         cur.insertText(
@@ -93,6 +97,8 @@ void _generate_function_tdef_code(QTextEdit* te, const RDTypeDef* tdef,
 
         cur.insertText("\n)");
     }
+
+    if(rd_typedef_is_proto(tdef)) cur.insertText("  // prototype");
 }
 
 } // namespace
