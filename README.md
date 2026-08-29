@@ -12,7 +12,7 @@
 
 </div>
 
-REDasm is a disassembler and binary analysis tool for Windows and Linux,
+REDasm is a cross platform disassembler and binary analysis tool,
 built for both hobbyists and professional reverse engineers.  
 It supports various CPU architectures and executable formats
 (see [Supported Formats and Architectures](#supported-formats-and-architectures)).  
@@ -44,7 +44,7 @@ function recovery.
 
 - **Open by default**: GPL core & plugins, public C API. Everything can be read,
   modified and rebuilt.
-- **Native, self-contained core**: [libredasm](https://github.com/redasm-dev/core) is written in C17 and 
+- **Native, self-contained**: [core](https://github.com/redasm-dev/core) is written in C17 and 
   doesn't depends on VM, runtime or interpreter. 
 - **No platform lock-in**: Windows and Linux are what's actively developed and tested;
   support for other platforms is open to anyone willing to contribute the changes they need.
@@ -129,6 +129,9 @@ Pre-built binaries are published on the [Releases page](https://github.com/redas
 - **Linux**: AppImage, runs on any reasonably recent distribution.
 - **Windows**: portable build, no installation required.
 
+Other platforms aren't officially packaged yet.  
+See the [Supported Platforms](#supported-platforms) section above for what's CI-verified today.
+
 Nightly builds are produced automatically from `master` and are GPG signed.  
 They track development closely and **may be unstable**.
 
@@ -154,12 +157,6 @@ and redistribute it under the terms of the license.
 **Does REDasm have a decompiler?**  
 Not yet. The foundations like RDIL, function boundaries, basic blocks, the type system are already in
 place, but decompilation is a long-term goal, some important features are still missing.
-
-**Which platforms are supported?**  
-Windows and Linux.  
-Those are the platforms that can be actively tested, so they are the ones that get support.  
-Nothing in the codebase is tied to them, though, if you need REDasm on another platform, 
-open an issue or send the changes required, and support can be extended from there.
 
 **Can I script REDasm?**  
 A Python plugin API is on the roadmap.  
