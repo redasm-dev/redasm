@@ -31,6 +31,7 @@ function recovery.
 
 - [Design Principles](#design-principles)
 - [Features](#features)
+- [Supported Platforms](#supported-platforms)
 - [Supported Formats and Architectures](#supported-formats-and-architectures)
 - [Download](#download)
 - [Contributing](#contributing)
@@ -68,9 +69,29 @@ function recovery.
 - **Patching** and export of analysis data.
 - Light and dark **themes**.
 
+## Supported Platforms
+
+Maturity levels:
+- **S**: actively developed & tested (manual + automated), official prebuilt binaries.
+- **A**: CI-verified, compiles and full automated test suite passes, no manual/GUI testing, no official binaries.
+- **B**: CI-verified to compile only, no test guarantees.
+
+| Platform | Description | Status |
+|---|---|:---:|
+| **Windows** | Windows 10+, MSVC / Visual Studio 2022 | **S** |
+| **Linux** | Ubuntu 24.04 / Debian 13 reference, GCC 12+ | **S** |
+| **FreeBSD** | 15.1, via CI (compiles + full test suite passes) | **A** |
+| **MacOS** | via CI (compiles + full test suite passes) | **A** |
+| **Haiku** | R1/beta6, via CI (compiles only: automated test suite is disabled because it hangs indefinitely at the `tier0` suite; root cause not identified) | **B** |
+
 ## Supported Formats and Architectures
 
-Maturity levels: **S** production ready · **A** highly stable · **B** functional · **C** basic / stub · **D** wip / experimental
+Maturity levels:
+- **S**: production ready.
+- **A**: highly stable.
+- **B**: functional.
+- **C**: basic / stub.
+- **D**: wip / experimental.
 
 ### Loaders (executable formats)
 
