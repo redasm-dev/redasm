@@ -286,6 +286,38 @@ void show_details() {
     dlg->show();
 }
 
+void switch_listing() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    cv->handle_view_requested(ISurface::ViewRequest::LISTING,
+                              cv->surface()->get_current_address());
+}
+
+void switch_graph() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    cv->handle_view_requested(ISurface::ViewRequest::GRAPH,
+                              cv->surface()->get_current_address());
+}
+
+void switch_hex() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    RDAddress addr;
+
+    if(auto u_addr = cv->surface()->get_address_under_cursor(); u_addr)
+        addr = *u_addr;
+    else if(auto c_addr = cv->surface()->get_current_address(); c_addr)
+        addr = *c_addr;
+    else
+        return;
+
+    cv->handle_view_requested(ISurface::ViewRequest::HEX, addr);
+}
+
 void comment() {
     ContextView* cv = g_mainwindow->context_view();
     if(!cv) return;
@@ -631,6 +663,17 @@ void init(QMainWindow* mw) {
 
     g_actions[Type::OPEN_DETAILS] = mw->addAction(
         FA_ICON(0x3f), "Details", mw, []() { actions::show_details(); });
+
+    g_actions[Type::SWITCH_TO_HEX] = mw->addAction(
+        FA_ICON(0xe69b), "Hex Dump", mw, []() { actions::switch_hex(); });
+
+    g_actions[Type::SWITCH_TO_LISTING] =
+        actions::add_detached_action(FA_ICON(0xf550), "Listing", Qt::Key_Space,
+                                     mw, []() { actions::switch_listing(); });
+
+    g_actions[Type::SWITCH_TO_GRAPH] =
+        actions::add_detached_action(FA_ICON(0xf542), "Graph", Qt::Key_Space,
+                                     mw, []() { actions::switch_graph(); });
 
     g_actions[Type::OPEN_HOME] =
         mw->addAction(FA_ICON(0xf015), "Home", mw, []() {

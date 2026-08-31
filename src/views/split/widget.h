@@ -17,7 +17,7 @@ public:
     [[nodiscard]] QWidget* widget() const { return m_widget; }
     QAction* add_button(const QIcon& icon);
     QAction* add_button(QAction* action);
-    QWidget* add_widget(QWidget* w);
+    QAction* add_widget(QWidget* w);
     void add_spacer();
     void create_default_buttons();
     void create_title();

@@ -4,6 +4,7 @@
 #include "support/utils.h"
 #include "views/split/widget.h"
 #include "views/surface/graph/graph.h"
+#include "views/surface/hex.h"
 #include "views/surface/view.h"
 #include <QComboBox>
 #include <QToolButton>
@@ -25,6 +26,8 @@ ISurface* _splitwidget_getcurrentsurface(SplitWidget* split) {
     if(stackw) {
         if(auto* w = qobject_cast<SurfaceView*>(stackw->currentWidget()); w)
             return w->listing();
+        if(auto* w = qobject_cast<HexView*>(stackw->currentWidget()); w)
+            return w;
 
         return qobject_cast<ISurface*>(stackw->currentWidget());
     }
@@ -77,16 +80,19 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     auto* stack = new QStackedWidget();
     auto* surfaceview = new SurfaceView(m_context);
     auto* surfacegraph = new SurfaceGraph(m_context);
+    auto* hexview = new HexView(m_context);
+
     stack->addWidget(surfaceview);
     stack->addWidget(surfacegraph);
+    stack->addWidget(hexview);
 
     FeedbackToolButton* tbscreenshot = utils::create_screenshot_button(stack);
     current->add_widget(tbscreenshot);
 
     current->add_spacer();
 
-    auto* cbrendermode =
-        static_cast<QComboBox*>(current->add_widget(new QComboBox()));
+    auto* cbrendermode = new QComboBox();
+    QAction* act_cbrendermode = current->add_widget(cbrendermode);
 
     cbrendermode->addItem("FLAGS", RD_RM_FLAGS);
     cbrendermode->addItem("NORMAL", RD_RM_NORMAL);
@@ -94,6 +100,46 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
     cbrendermode->setFrame(false);
     cbrendermode->setCurrentIndex(1); // NORMAL by default
+
+    auto do_switch_view = [=](ISurface::ViewRequest req,
+                              std::optional<RDAddress> address) {
+        ISurface* s = _splitwidget_getcurrentsurface(current);
+        if(!s) return;
+
+        switch(req) {
+            case ISurface::ViewRequest::LISTING: {
+                stack->setCurrentWidget(surfaceview);
+                act_cbrendermode->setVisible(true);
+
+                surfaceview->listing()->set_mode(
+                    RENDER_MODES[cbrendermode->currentIndex()]);
+
+                if(address) surfaceview->listing()->jump_to(*address);
+                break;
+            }
+
+            case ISurface::ViewRequest::GRAPH: {
+                stack->setCurrentWidget(surfacegraph);
+                act_cbrendermode->setVisible(true);
+
+                surfacegraph->set_mode(
+                    RENDER_MODES[cbrendermode->currentIndex()]);
+
+                if(address) surfacegraph->jump_to(*address);
+                break;
+            }
+
+            case ISurface::ViewRequest::HEX: {
+                stack->setCurrentWidget(hexview);
+                act_cbrendermode->setVisible(false);
+
+                if(address) hexview->jump_to(*address);
+                break;
+            }
+
+            default: break;
+        }
+    };
 
     QObject::connect(cbrendermode, &QComboBox::currentIndexChanged, this,
                      [current](int idx) {
@@ -137,26 +183,19 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                 }
             });
 
-    connect(surfaceview, &SurfaceView::switch_view, this,
-            [stack, surfaceview, surfacegraph, cbrendermode]() {
-                auto address = surfaceview->listing()->get_current_address();
-                if(!address) return;
-
-                stack->setCurrentWidget(surfacegraph);
-                surfacegraph->set_mode(
-                    RENDER_MODES[cbrendermode->currentIndex()]);
-                surfacegraph->jump_to(*address);
+    connect(surfaceview->listing(), &SurfaceListing::view_requested, this,
+            [=](ISurface::ViewRequest req, std::optional<RDAddress> address) {
+                do_switch_view(req, address);
             });
 
-    connect(surfacegraph, &SurfaceGraph::switch_view, this,
-            [stack, surfaceview, surfacegraph, cbrendermode]() {
-                auto address = surfacegraph->get_current_address();
-                if(!address) return;
+    connect(surfacegraph, &SurfaceGraph::view_requested, this,
+            [=](ISurface::ViewRequest req, std::optional<RDAddress> address) {
+                do_switch_view(req, address);
+            });
 
-                stack->setCurrentWidget(surfaceview);
-                surfaceview->listing()->set_mode(
-                    RENDER_MODES[cbrendermode->currentIndex()]);
-                surfaceview->listing()->jump_to(*address);
+    connect(hexview, &HexView::view_requested, this,
+            [=](ISurface::ViewRequest req, std::optional<RDAddress> address) {
+                do_switch_view(req, address);
             });
 
     connect(actback, &QAction::triggered, this, [current]() {

@@ -207,9 +207,6 @@ void SurfaceGraph::keyPressEvent(QKeyEvent* e) {
         else if(e->matches(QKeySequence::MoveToPreviousLine)) {
             if(row > 0) this->set_position(row - 1, col);
         }
-        else if(e->key() == Qt::Key_Space) {
-            Q_EMIT switch_view();
-        }
         else
             GraphView::keyPressEvent(e);
 

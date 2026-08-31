@@ -8,6 +8,13 @@ using ISurfaceRange = std::pair<RDAddress, RDAddress>;
 
 class ISurface {
 public:
+    enum class ViewRequest {
+        LISTING,
+        GRAPH,
+        HEX,
+    };
+
+public:
     // clang-format off
     virtual ~ISurface() = default;
     virtual void clear_history() = 0;

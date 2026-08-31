@@ -80,6 +80,7 @@ target_sources(${PROJECT_NAME}
         src/views/split/widget.cpp
         src/views/surface/graph/graph.cpp
         src/views/surface/graph/node.cpp
+        src/views/surface/hex.cpp
         src/views/surface/listing.cpp
         src/views/surface/path.cpp
         src/views/surface/popup.cpp

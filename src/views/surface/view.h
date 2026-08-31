@@ -13,7 +13,7 @@ public:
 
 Q_SIGNALS:
     void history_updated();
-    void switch_view();
+    void open_hexdump();
 
 private:
     SurfacePath* m_surfacepath;

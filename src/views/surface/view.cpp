@@ -21,7 +21,4 @@ SurfaceView::SurfaceView(RDContext* ctx, QWidget* parent): QSplitter{parent} {
 
     connect(m_surfacelisting, &SurfaceListing::history_updated, this,
             &SurfaceView::history_updated);
-
-    connect(m_surfacelisting, &SurfaceListing::switch_view, this,
-            &SurfaceView::switch_view);
 }

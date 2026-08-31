@@ -73,9 +73,8 @@ QAction* SplitWidget::add_button(QAction* action) {
     return action;
 }
 
-QWidget* SplitWidget::add_widget(QWidget* w) {
-    m_tbactions->addWidget(w);
-    return w;
+QAction* SplitWidget::add_widget(QWidget* w) {
+    return m_tbactions->addWidget(w);
 }
 
 void SplitWidget::add_spacer() {

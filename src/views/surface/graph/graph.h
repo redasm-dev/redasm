@@ -60,8 +60,9 @@ private:
     void refresh_content();
 
 Q_SIGNALS:
+    void view_requested(ISurface::ViewRequest req,
+                        std::optional<RDAddress> address = std::nullopt);
     void history_updated();
-    void switch_view();
 
 private:
     RDContext* m_context;

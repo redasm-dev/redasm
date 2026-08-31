@@ -1,5 +1,8 @@
 #include "context.h"
 #include "statusbar.h"
+#include "views/surface/graph/graph.h"
+#include "views/surface/hex.h"
+#include "views/surface/listing.h"
 #include <QTimer>
 
 // static constexpr int BURST_BUDGET_MS = 16; // Fastest
@@ -108,4 +111,17 @@ void ContextView::check_status() {
 
 void ContextView::invalidate() { // NOLINT
     this->surface()->invalidate();
+}
+
+void ContextView::handle_view_requested(ISurface::ViewRequest req, // NOLINT
+                                        std::optional<RDAddress> address) {
+    QWidget* w = this->surface()->to_widget();
+    if(!w) return;
+
+    if(auto* l = qobject_cast<SurfaceListing*>(w); l)
+        Q_EMIT l->view_requested(req, address);
+    else if(auto* g = qobject_cast<SurfaceGraph*>(w); g)
+        Q_EMIT g->view_requested(req, address);
+    else if(auto* h = qobject_cast<HexView*>(w); h)
+        Q_EMIT h->view_requested(req, address);
 }

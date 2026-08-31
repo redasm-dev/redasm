@@ -64,9 +64,10 @@ private:
     void show_popup(const QPoint& pt);
 
 Q_SIGNALS:
+    void view_requested(ISurface::ViewRequest req,
+                        std::optional<RDAddress> address = std::nullopt);
     void history_updated();
     void render_completed();
-    void switch_view();
 
 private:
     SurfacePopup* m_popup;

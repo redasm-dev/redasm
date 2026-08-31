@@ -3,6 +3,7 @@
 #include "support/fontawesome.h"
 #include "support/themeprovider.h"
 #include "views/surface/graph/graph.h"
+#include "views/surface/hex.h"
 #include "views/surface/listing.h"
 #include <QAbstractItemModel>
 #include <QClipboard>
@@ -12,6 +13,7 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QScrollBar>
 #include <QStackedWidget>
 #include <QTimer>
 #include <QToolButton>
@@ -21,10 +23,12 @@ namespace utils {
 namespace {
 
 constexpr int LOGO_SIZE = 64;
-constexpr int LOGO_MARGIN = 5;
+constexpr int LOGO_MARGIN_X = 10;
+constexpr int LOGO_MARGIN_Y = 5;
 
 QPixmap copy_screenshot(QWidget* w) {
     auto* stackw = qobject_cast<QStackedWidget*>(w);
+    int crop_x = -1, crop_y = -1;
 
     if(stackw) { // Try to grab surfaces
         if(auto* l = stackw->findChild<SurfaceListing*>(); l && l->isVisible())
@@ -33,15 +37,26 @@ QPixmap copy_screenshot(QWidget* w) {
                 g && g->isVisible()) {
             w = g->viewport();
         }
+        else if(auto* h = stackw->findChild<HexView*>(); h && h->isVisible()) {
+            w = h->viewport();
+
+            if(h->viewport()->verticalScrollBar()->isVisible())
+                crop_x = h->viewport()->verticalScrollBar()->width();
+
+            if(h->viewport()->horizontalScrollBar()->isVisible())
+                crop_y = h->viewport()->horizontalScrollBar()->height();
+        }
     }
 
-    QPixmap logo = utils::get_logo(), scrshot = w->grab();
+    QPixmap logo = utils::get_logo();
+    QPixmap scrshot = w->grab(
+        QRect{QPoint{0, 0}, QSize{w->width() - crop_x, w->height() - crop_y}});
 
     logo = logo.scaled(utils::LOGO_SIZE, utils::LOGO_SIZE, Qt::KeepAspectRatio,
                        Qt::SmoothTransformation);
 
-    int x = scrshot.width() - logo.width() - utils::LOGO_MARGIN;
-    int y = scrshot.height() - logo.height() - utils::LOGO_MARGIN;
+    int x = scrshot.width() - logo.width() - utils::LOGO_MARGIN_X;
+    int y = scrshot.height() - logo.height() - utils::LOGO_MARGIN_Y;
 
     QPainter painter(&scrshot);
     painter.setOpacity(0.5);
@@ -77,6 +92,9 @@ QString confidence_text(RDConfidence c) {
 }
 
 QMenu* create_surface_menu(ISurface* surface) {
+    auto* listing = qobject_cast<SurfaceListing*>(surface->to_widget());
+    auto* graph = qobject_cast<SurfaceGraph*>(surface->to_widget());
+
     QAction* actcopy = actions::get(actions::COPY);
     QAction* actrefs = actions::get(actions::REFS_TO);
     QAction* actrename = actions::get(actions::RENAME);
@@ -86,6 +104,9 @@ QMenu* create_surface_menu(ISurface* surface) {
     QAction* act_undefine = actions::get(actions::DO_UNDEFINE);
     QAction* act_code = actions::get(actions::DO_CODE);
     QAction* act_data = actions::get(actions::DO_DATA);
+    QAction* act_switch_to_listing = actions::get(actions::SWITCH_TO_LISTING);
+    QAction* act_switch_to_graph = actions::get(actions::SWITCH_TO_GRAPH);
+    QAction* act_open_hex = actions::get(actions::SWITCH_TO_HEX);
     QAction* act_create_function = actions::get(actions::CREATE_FUNCTION);
     QAction* act_patch = actions::get(actions::PATCH_INSTRUCTION);
 
@@ -100,6 +121,10 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addAction(act_undefine);
     menu->addAction(act_code);
     menu->addAction(act_data);
+    menu->addSeparator();
+    if(listing) menu->addAction(act_switch_to_graph);
+    if(graph) menu->addAction(act_switch_to_listing);
+    menu->addAction(act_open_hex);
     menu->addSeparator();
     menu->addAction(act_patch);
     menu->addAction(act_create_function);
@@ -116,9 +141,18 @@ QMenu* create_surface_menu(ISurface* surface) {
 
     QObject::connect(menu, &QMenu::aboutToShow, surface->to_widget(), [=]() {
         auto cursor_addr = surface->get_address_under_cursor();
+        auto curr_addr = surface->get_current_address();
+
+        if(cursor_addr.has_value()) {
+            act_open_hex->setText(
+                QString{"Hex Dump @ %1"}.arg(utils::to_hex(*cursor_addr)));
+        }
+        else if(curr_addr.has_value())
+            act_open_hex->setText("Hex Dump");
 
         actcopy->setVisible(surface->has_selection());
         actrename->setVisible(cursor_addr.has_value());
+        act_open_hex->setVisible(curr_addr.has_value());
 
         actrefs->setVisible(cursor_addr.has_value() &&
                             !rd_slice_is_empty(rd_get_xrefs_to(
@@ -146,13 +180,12 @@ QMenu* create_surface_menu(ISurface* surface) {
         act_op_as_imm->setVisible(celldata && celldata->operand.index != -1 &&
                                   celldata->operand.value.kind == RD_OP_ADDR);
 
-        auto curr_address = surface->get_current_address();
-        flags_found = curr_address.has_value() &&
-                      rd_get_flags(surface->context(), *curr_address, &f);
+        flags_found = curr_addr.has_value() &&
+                      rd_get_flags(surface->context(), *curr_addr, &f);
 
         if(flags_found) {
             const RDSegment* seg =
-                rd_find_segment(surface->context(), *curr_address);
+                rd_find_segment(surface->context(), *curr_addr);
 
             act_undefine->setVisible(seg && !rd_flags_has_unknown(f));
             act_data->setVisible(seg && !rd_flags_has_data(f));

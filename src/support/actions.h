@@ -24,6 +24,9 @@ enum Type : quint8 {
     REANALYZE,
 
     OPEN_DETAILS,
+    SWITCH_TO_HEX,
+    SWITCH_TO_LISTING,
+    SWITCH_TO_GRAPH,
 
     OPEN_HOME,
     OPEN_GITHUB,

@@ -16,6 +16,8 @@ public:
     void show_segment_regs();
     void schedule_step();
     void invalidate();
+    void handle_view_requested(ISurface::ViewRequest req,
+                               std::optional<RDAddress> address = std::nullopt);
 
     [[nodiscard]] RDContext* context() const { return m_context; }
 
