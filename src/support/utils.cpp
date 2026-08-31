@@ -49,8 +49,8 @@ QPixmap copy_screenshot(QWidget* w) {
     }
 
     QPixmap logo = utils::get_logo();
-    QPixmap scrshot = w->grab(
-        QRect{QPoint{0, 0}, QSize{w->width() - crop_x, w->height() - crop_y}});
+    QPixmap scrshot =
+        w->grab(QRect{0, 0, w->width() - crop_x, w->height() - crop_y});
 
     logo = logo.scaled(utils::LOGO_SIZE, utils::LOGO_SIZE, Qt::KeepAspectRatio,
                        Qt::SmoothTransformation);
