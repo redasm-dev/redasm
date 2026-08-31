@@ -43,7 +43,7 @@ QPushButton* create_status_button(int size, QWidget* parent) {
 void set_status_text(const QString& s) { g_lblstatuslabel->setText(s); }
 
 void set_address(ISurface* surface) {
-    if(g_busy) return;
+    if(g_busy || !surface->to_widget()->isVisible()) return;
 
     auto address = surface->get_current_address();
 
