@@ -44,10 +44,6 @@ void compile_config(QTextBrowser* txb) {
 void compile_modules(QTextBrowser* txb) {
     const QString CONTENT = R"(
 <table>
-    <tr>
-        <th valign="middle">Path</th>
-        <th valign="middle">Version</th>
-    </tr>
     %1
 </table>
 )";
@@ -58,15 +54,8 @@ void compile_modules(QTextBrowser* txb) {
     const RDModule** it;
     rd_slice_each(it, modules) {
         const RDModule* m = *it;
-
-        QString row = R"(
-                <tr>
-                    <td valign="middle">%1</td>
-                    <td valign="middle">%2</td>
-                </tr>
-            )";
-
-        html.append(row.arg(m->path).arg(m->version));
+        QString row = R"(<tr><td>%1</td></tr>)";
+        html.append(row.arg(m->path));
     }
 
     txb->setLineWrapMode(QTextBrowser::NoWrap);
