@@ -9,7 +9,7 @@ void compile_config(QTextBrowser* txb) {
     const QString VERSION_CONTENT = R"(
 <div><b>Qt Version:</b> %1</div>
 <div><b>Core Version:</b> %2</div>
-<div><b>RDAPI Level:</b> %3</div><br>
+<div><b>RDAPI Version:</b> %3</div><br>
 )";
 
     const QString SEARCH_PATHS_CONTENT = R"(
@@ -20,7 +20,7 @@ void compile_config(QTextBrowser* txb) {
     txb->setLineWrapMode(QTextBrowser::NoWrap);
     txb->insertHtml(VERSION_CONTENT.arg(QT_VERSION_STR)
                         .arg(rd_version_build())
-                        .arg(RD_API_LEVEL));
+                        .arg(QString::number(RD_API_VERSION, 16)));
 
     if(!utils::search_paths.isEmpty()) {
         QString lines;
@@ -44,6 +44,10 @@ void compile_config(QTextBrowser* txb) {
 void compile_modules(QTextBrowser* txb) {
     const QString CONTENT = R"(
 <table>
+    <tr>
+        <th>Path</th>
+        <th>API Version</th>
+    </tr>
     %1
 </table>
 )";
@@ -54,8 +58,12 @@ void compile_modules(QTextBrowser* txb) {
     const RDModule** it;
     rd_slice_each(it, modules) {
         const RDModule* m = *it;
-        QString row = R"(<tr><td>%1</td></tr>)";
-        html.append(row.arg(m->path));
+        QString row = R"(
+            <tr>
+                <td>%1</td>
+                <td>%2</td>
+            </tr>)";
+        html.append(row.arg(m->path).arg(QString::number(m->api_version, 16)));
     }
 
     txb->setLineWrapMode(QTextBrowser::NoWrap);
