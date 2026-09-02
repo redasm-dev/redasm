@@ -1,6 +1,6 @@
 <div align="center">
-
-  ![REDasm open source disassembler logo](https://github.com/user-attachments/assets/5a7005f7-43de-45d7-97ba-e14996dc0ed0)
+  
+  ![REDasm logo](https://github.com/user-attachments/assets/5a7005f7-43de-45d7-97ba-e14996dc0ed0)
 
   ![License GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-critical?style=flat-square)
   ![Version 4.0.0](https://img.shields.io/badge/version-4.0.0-blue?style=flat-square)
@@ -21,7 +21,7 @@ function recovery.
 
 <div align="center">
 
-  ![REDasm disassembler user interface showing the disassembly listing and graph view](https://github.com/user-attachments/assets/46eb03e4-1791-4216-85d8-82fef8056fc0)
+  ![REDasm screenshot](https://github.com/user-attachments/assets/e9beae42-7999-4945-bf51-5b4bd62dae16)
 
 </div>
 
