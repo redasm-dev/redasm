@@ -7,7 +7,8 @@ class FlagsBuffer: public QHexBuffer {
     Q_OBJECT
 
 public:
-    explicit FlagsBuffer(const RDSegment* segment, QObject* parent = nullptr);
+    explicit FlagsBuffer(RDContext* ctx, const RDSegment* segment,
+                         QObject* parent = nullptr);
     [[nodiscard]] const RDFlagsBuffer* flags() const;
     [[nodiscard]] quint64 base_address() const;
 
@@ -16,6 +17,7 @@ public:
     [[nodiscard]] bool accept(qint64 idx) const override;
     void insert(qint64 offset, const QByteArray& data) override;
     void remove(qint64 offset, int length) override;
+    void replace(qint64 offset, const QByteArray& data) override;
     QByteArray read(qint64 offset, int length) override;
     bool read(QIODevice* iodevice) override;
     void write(QIODevice* iodevice) override;
@@ -23,6 +25,7 @@ public:
     qint64 lastIndexOf(const QByteArray& ba, qint64 from) override;
 
 private:
+    RDContext* m_context;
     const RDFlagsBuffer* m_flags;
     const RDSegment* m_segment;
 };

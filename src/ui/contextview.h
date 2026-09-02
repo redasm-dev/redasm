@@ -1,5 +1,6 @@
 #pragma once
 
+#include "support/scheduler.h"
 #include "views/surface/split.h"
 #include <QHeaderView>
 #include <QSplitter>
@@ -15,8 +16,9 @@ struct ContextView {
     SurfaceSplitView* splitview;
     QTreeView* tvfunctions;
 
-    explicit ContextView(RDContext* ctx, QWidget* self) {
-        this->splitview = new SurfaceSplitView(ctx); // FIXME: ctx leaking in ui
+    explicit ContextView(RDContext* ctx, Scheduler* scheduler, QWidget* self) {
+        this->splitview =
+            new SurfaceSplitView(ctx, scheduler); // FIXME: model leaking in ui
 
         this->tvfunctions = new QTreeView();
         this->tvfunctions->header()->setStretchLastSection(false);

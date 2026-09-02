@@ -67,14 +67,15 @@ SurfaceGraph* _splitwidget_findsurfacegraph(SplitWidget* split) {
 
 } // namespace
 
-SurfaceSplitDelegate::SurfaceSplitDelegate(RDContext* ctx, QObject* parent)
-    : SplitDelegate{parent}, m_context{ctx} {}
+SurfaceSplitDelegate::SurfaceSplitDelegate(RDContext* ctx, Scheduler* scheduler,
+                                           QObject* parent)
+    : SplitDelegate{parent}, m_context{ctx}, m_scheduler{scheduler} {}
 
 QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                                              SplitWidget* split) {
-    QAction* actback = current->add_button(
+    QAction* act_back = current->add_button(
         FA_ICON_COLOR(0xf053, theme_provider::color(RD_THEME_SUCCESS)));
-    QAction* actforward = current->add_button(
+    QAction* act_forward = current->add_button(
         FA_ICON_COLOR(0xf054, theme_provider::color(RD_THEME_SUCCESS)));
 
     auto* stack = new QStackedWidget();
@@ -85,6 +86,14 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     stack->addWidget(surfaceview);
     stack->addWidget(surfacegraph);
     stack->addWidget(hexview);
+
+    // subscribe all views to scheduler
+    connect(m_scheduler, &Scheduler::yield_requested, surfaceview->listing(),
+            &SurfaceListing::invalidate);
+    connect(m_scheduler, &Scheduler::yield_requested, surfacegraph,
+            &SurfaceGraph::invalidate);
+    connect(m_scheduler, &Scheduler::yield_requested, hexview,
+            &HexView::invalidate);
 
     FeedbackToolButton* tbscreenshot = utils::create_screenshot_button(stack);
     current->add_widget(tbscreenshot);
@@ -103,12 +112,20 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
     auto do_switch_view = [=](ISurface::ViewRequest req,
                               std::optional<RDAddress> address) {
-        ISurface* s = _splitwidget_getcurrentsurface(current);
-        if(!s) return;
+        ISurface* from = _splitwidget_getcurrentsurface(current);
+        if(!from) return;
+
+        // discard any edits if coming from HexView
+        if(auto* h = qobject_cast<HexView*>(from->to_widget()); h) {
+            h->clear_changes();
+            m_scheduler->schedule();
+        }
 
         switch(req) {
             case ISurface::ViewRequest::LISTING: {
                 stack->setCurrentWidget(surfaceview);
+                act_back->setVisible(true);
+                act_forward->setVisible(true);
                 act_cbrendermode->setVisible(true);
 
                 surfaceview->listing()->set_mode(
@@ -120,6 +137,8 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
             case ISurface::ViewRequest::GRAPH: {
                 stack->setCurrentWidget(surfacegraph);
+                act_back->setVisible(true);
+                act_forward->setVisible(true);
                 act_cbrendermode->setVisible(true);
 
                 surfacegraph->set_mode(
@@ -131,6 +150,8 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
             case ISurface::ViewRequest::HEX: {
                 stack->setCurrentWidget(hexview);
+                act_back->setVisible(false);
+                act_forward->setVisible(false);
                 act_cbrendermode->setVisible(false);
 
                 if(address) hexview->jump_to(*address);
@@ -151,8 +172,8 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                      });
 
     // Initialize Actions
-    actback->setEnabled(surfaceview->listing()->can_go_back());
-    actforward->setEnabled(surfaceview->listing()->can_go_forward());
+    act_back->setEnabled(surfaceview->listing()->can_go_back());
+    act_forward->setEnabled(surfaceview->listing()->can_go_forward());
 
     // Sync view location
     if(ISurface* v = _splitwidget_findsurfacelisting(split); v) {
@@ -167,19 +188,19 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     }
 
     connect(surfaceview, &SurfaceView::history_updated,
-            [surfaceview, actback, actforward]() {
+            [surfaceview, act_back, act_forward]() {
                 if(surfaceview->isVisible()) { // Ignore spurious signals
-                    actback->setEnabled(surfaceview->listing()->can_go_back());
-                    actforward->setEnabled(
+                    act_back->setEnabled(surfaceview->listing()->can_go_back());
+                    act_forward->setEnabled(
                         surfaceview->listing()->can_go_forward());
                 }
             });
 
     connect(surfacegraph, &SurfaceGraph::history_updated,
-            [surfacegraph, actback, actforward]() {
+            [surfacegraph, act_back, act_forward]() {
                 if(surfacegraph->isVisible()) { // Ignore spurious signals
-                    actback->setEnabled(surfacegraph->can_go_back());
-                    actforward->setEnabled(surfacegraph->can_go_forward());
+                    act_back->setEnabled(surfacegraph->can_go_back());
+                    act_forward->setEnabled(surfacegraph->can_go_forward());
                 }
             });
 
@@ -198,11 +219,11 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                 do_switch_view(req, address);
             });
 
-    connect(actback, &QAction::triggered, this, [current]() {
+    connect(act_back, &QAction::triggered, this, [current]() {
         if(ISurface* s = _splitwidget_getcurrentsurface(current)) s->go_back();
     });
 
-    connect(actforward, &QAction::triggered, this, [current]() {
+    connect(act_forward, &QAction::triggered, this, [current]() {
         if(ISurface* s = _splitwidget_getcurrentsurface(current))
             s->go_forward();
     });
@@ -211,8 +232,9 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     return stack;
 }
 
-SurfaceSplitView::SurfaceSplitView(RDContext* ctx, QWidget* parent)
-    : SplitView{new SurfaceSplitDelegate(ctx), parent} {}
+SurfaceSplitView::SurfaceSplitView(RDContext* ctx, Scheduler* scheduler,
+                                   QWidget* parent)
+    : SplitView{new SurfaceSplitDelegate(ctx, scheduler), parent} {}
 
 ISurface* SurfaceSplitView::surface() const {
     return _splitwidget_getcurrentsurface(this->current_split());

@@ -64,6 +64,10 @@ QAction* SplitWidget::action(int idx) const {
     return actions.at(idx);
 }
 
+QAction* SplitWidget::add_button(const QString& text) {
+    return this->add_button(new QAction(text, m_tbactions));
+}
+
 QAction* SplitWidget::add_button(const QIcon& icon) {
     return this->add_button(new QAction(icon, QString{}, m_tbactions));
 }

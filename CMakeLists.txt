@@ -69,6 +69,7 @@ target_sources(${PROJECT_NAME}
         src/models/typedefsfilter.cpp
         src/support/actions.cpp
         src/support/fontawesome.cpp
+        src/support/scheduler.cpp
         src/support/settings.cpp
         src/support/surfacerenderer.cpp
         src/support/syntaxhighlighter.cpp

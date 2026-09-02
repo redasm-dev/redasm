@@ -3,7 +3,7 @@
 #include "support/surfacerenderer.h"
 #include "support/utils.h"
 
-MemoryMapDialog::MemoryMapDialog(const RDContext* ctx, QWidget* parent)
+MemoryMapDialog::MemoryMapDialog(RDContext* ctx, QWidget* parent)
     : QDialog{parent}, m_ui{this}, m_context{ctx} {
 
     m_flagsdelegate = new FlagsDelegate(m_ui.hexview);
@@ -33,7 +33,7 @@ void MemoryMapDialog::show_memory(int idx) {
     const RDSegment* s = rd_slice_at(segments, idx);
 
     QHexDocument* olddoc = m_ui.hexview->hexDocument();
-    auto* flagsbuffer = new FlagsBuffer(s);
+    auto* flagsbuffer = new FlagsBuffer(m_context, s);
     m_flagsdelegate->set_flags_buffer(flagsbuffer->flags());
 
     QHexDocument* hexdocument = QHexDocument::fromBuffer(flagsbuffer);

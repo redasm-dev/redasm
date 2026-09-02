@@ -2,9 +2,9 @@
 
 #include "dialogs/segmentregs.h"
 #include "models/functions.h"
+#include "support/scheduler.h"
 #include "ui/contextview.h"
 #include "views/surface/isurface.h"
-#include <QElapsedTimer>
 #include <redasm/redasm.h>
 
 class ContextView: public QWidget {
@@ -28,17 +28,14 @@ public:
 public Q_SLOTS:
     void toggle_pause();
 
-private:
+private Q_SLOTS:
     void check_status();
 
 private:
+    Scheduler* m_scheduler;
     ui::ContextView m_ui;
     RDContext* m_context{nullptr};
-    RDWorkerStatus m_status{};
-    bool m_pause{false};
     FunctionsModel* m_functionsmodel;
-    QElapsedTimer m_burst_timer;
-    QElapsedTimer m_notify_timer;
 
 private:
     SegmentRegsDialog* m_dlg_sregs{nullptr};

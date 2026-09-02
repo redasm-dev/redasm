@@ -29,12 +29,38 @@ void hexview_setup_options(QHexView* hexview, RDContext* ctx) {
 
 } // namespace
 
+HexViewDelegate::HexViewDelegate(QObject* parent): QHexDelegate(parent) {}
+
+void HexViewDelegate::set_flags_buffer(const RDFlagsBuffer* flags) {
+    m_flags = flags;
+}
+
+bool HexViewDelegate::renderByte(quint64 offset, quint8 b,
+                                 QHexCharFormat& outcf,
+                                 const QHexView* hexview) const {
+    Q_UNUSED(b);
+    Q_UNUSED(hexview);
+
+    if(!m_flags) return false;
+
+    auto idx = static_cast<usize>(offset);
+
+    if(rd_flagsbuffer_has_patch(m_flags, idx))
+        outcf.foreground = theme_provider::color(RD_THEME_FAIL);
+    else
+        return false;
+
+    return true;
+}
+
 HexView::HexView(RDContext* ctx, QWidget* parent)
     : QWidget{parent}, m_context{ctx} {
 
+    m_delegate = new HexViewDelegate(this);
+
     m_hexview = new QHexView{};
-    m_hexview->setReadOnly(true);
     m_hexview->setFont(surface_renderer::get_font());
+    m_hexview->setDelegate(m_delegate);
     hexview_setup_options(m_hexview, ctx);
 
     auto* vbox = new QVBoxLayout(this);
@@ -46,7 +72,11 @@ HexView::HexView(RDContext* ctx, QWidget* parent)
             [&]() { statusbar::set_address(this); });
 }
 
+void HexView::clear_changes() { m_hexview->clearChanges(); }
+
 void HexView::clear_history() {}
+bool HexView::can_go_back() const { return false; }
+bool HexView::can_go_forward() const { return false; }
 
 void HexView::jump_to_ep() {
     RDAddress ep;
@@ -61,17 +91,20 @@ void HexView::jump_to(RDAddress address) {
 
     if(m_segment != seg) {
         QHexDocument* olddoc = m_hexview->hexDocument();
-        auto* flagsbuffer = new FlagsBuffer(seg);
+        auto* flagsbuffer = new FlagsBuffer(m_context, seg);
 
         m_segment = seg;
 
         QHexDocument* hexdocument = QHexDocument::fromBuffer(flagsbuffer);
+        m_delegate->set_flags_buffer(flagsbuffer->flags());
+
         m_hexview->setDocument(hexdocument);
         m_hexview->setBaseAddress(flagsbuffer->base_address());
-        m_hexview->hexCursor()->moveAddress(static_cast<quint64>(address));
 
         if(olddoc) olddoc->deleteLater();
     }
+
+    m_hexview->hexCursor()->moveAddress(static_cast<quint64>(address));
 }
 
 void HexView::set_mode(RDRenderMode m) { RD_UNUSED(m); }
@@ -82,7 +115,6 @@ bool HexView::invalidate() {
 }
 
 bool HexView::go_back() { return false; }
-
 bool HexView::go_forward() { return false; }
 
 // QHexView has its own moving algorithm
@@ -110,9 +142,6 @@ RDRenderMode HexView::get_mode() const { return RD_RM_NORMAL; }
 // QHexView has its own clipboard algorithm
 bool HexView::has_selection() const { return false; }
 QString HexView::get_selected_text() const { return {}; }
-
-bool HexView::can_go_back() const { return false; }
-bool HexView::can_go_forward() const { return false; }
 
 std::optional<ISurfaceRange> HexView::get_selected_range() const {
     auto base = static_cast<RDAddress>(m_hexview->baseAddress());
@@ -152,6 +181,9 @@ void HexView::create_popup_menu() {
 
     m_popupmenu->addAction(hexview_new_separator(this));
     m_popupmenu->addAction(actions::get(actions::SWITCH_TO_LISTING));
+
+    // attach to widget for shortcuts handling
+    this->addAction(actions::get(actions::SWITCH_TO_LISTING));
 
     connect(this, &HexView::customContextMenuRequested, this,
             [=](const QPoint& pos) {

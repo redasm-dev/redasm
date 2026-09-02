@@ -9,7 +9,7 @@ class MemoryMapDialog: public QDialog {
     Q_OBJECT
 
 public:
-    explicit MemoryMapDialog(const RDContext* ctx, QWidget* parent = nullptr);
+    explicit MemoryMapDialog(RDContext* ctx, QWidget* parent = nullptr);
 
 private Q_SLOTS:
     void show_memory(int idx);
@@ -17,5 +17,5 @@ private Q_SLOTS:
 private:
     ui::MemoryMapDialog m_ui;
     FlagsDelegate* m_flagsdelegate;
-    const RDContext* m_context;
+    RDContext* m_context;
 };

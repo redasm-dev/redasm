@@ -30,7 +30,6 @@ public:
     RDGraph* graph() const override;
     void jump_to_ep() override;
     void jump_to(RDAddress address) override;
-    bool invalidate() override;
     void set_mode(RDRenderMode m) override;
     bool set_position(int row, int col) override;
     bool select(int row, int col) override;
@@ -38,6 +37,7 @@ public:
     // clang-format on
 
 public Q_SLOTS:
+    bool invalidate() override;
     bool go_back() override;
     bool go_forward() override;
     void clear_history() override;

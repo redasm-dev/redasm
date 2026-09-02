@@ -15,6 +15,7 @@ public:
     ~SplitWidget() override;
     [[nodiscard]] QAction* action(int idx) const;
     [[nodiscard]] QWidget* widget() const { return m_widget; }
+    QAction* add_button(const QString& text);
     QAction* add_button(const QIcon& icon);
     QAction* add_button(QAction* action);
     QAction* add_widget(QWidget* w);
