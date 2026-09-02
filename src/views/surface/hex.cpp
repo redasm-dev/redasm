@@ -173,6 +173,9 @@ void HexView::create_popup_menu() {
         m_popupmenu->addAction("Copy", QKeySequence{Qt::CTRL | Qt::Key_C}, this,
                                [&]() { m_hexview->copy(true); });
 
+    QAction* act_switch_listing =
+        actions::create(actions::SWITCH_TO_LISTING, this);
+
     m_popupmenu->addAction("Copy Visual", this,
                            [&]() { m_hexview->copyVisual(); });
 
@@ -180,10 +183,10 @@ void HexView::create_popup_menu() {
                            this, [&]() { m_hexview->selectAll(); });
 
     m_popupmenu->addAction(hexview_new_separator(this));
-    m_popupmenu->addAction(actions::get(actions::SWITCH_TO_LISTING));
+    m_popupmenu->addAction(act_switch_listing);
 
     // attach to widget for shortcuts handling
-    this->addAction(actions::get(actions::SWITCH_TO_LISTING));
+    // this->addAction(actions::get(actions::SWITCH_TO_LISTING));
 
     connect(this, &HexView::customContextMenuRequested, this,
             [=](const QPoint& pos) {

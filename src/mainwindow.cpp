@@ -60,41 +60,40 @@ MainWindow::MainWindow(const RDInitParams& params, QWidget* parent)
 
     connect(m_ui.mnuedit, &QMenu::aboutToShow, this, [&]() {
         ContextView* cv = this->context_view();
-        QAction* actcopy = actions::get(actions::COPY);
-        actcopy->setEnabled(cv && cv->surface()->has_selection());
+        m_ui.act_copy->setEnabled(cv && cv->surface()->has_selection());
     });
 
-    connect(m_ui.actfileexit, &QAction::triggered, this, &MainWindow::close);
-    connect(m_ui.actfileopen, &QAction::triggered, this,
+    connect(m_ui.act_fileexit, &QAction::triggered, this, &MainWindow::close);
+    connect(m_ui.act_fileopen, &QAction::triggered, this,
             &MainWindow::select_file);
-    connect(m_ui.actfilesave, &QAction::triggered, this,
+    connect(m_ui.act_filesave, &QAction::triggered, this,
             &MainWindow::save_project);
-    connect(m_ui.actfilesaveas, &QAction::triggered, this,
+    connect(m_ui.act_filesaveas, &QAction::triggered, this,
             &MainWindow::save_project_as);
-    connect(m_ui.actfileclose, &QAction::triggered, this,
+    connect(m_ui.act_fileclose, &QAction::triggered, this,
             &MainWindow::show_welcome_view);
-    connect(m_ui.actfileexportdb, &QAction::triggered, this,
+    connect(m_ui.act_fileexportdb, &QAction::triggered, this,
             &MainWindow::export_db);
-    connect(m_ui.actfileexportinput, &QAction::triggered, this,
+    connect(m_ui.act_fileexportinput, &QAction::triggered, this,
             &MainWindow::export_input);
-    connect(m_ui.actfileexportpatch, &QAction::triggered, this,
+    connect(m_ui.act_fileexportpatch, &QAction::triggered, this,
             &MainWindow::export_input_patch);
-    connect(m_ui.actviewsegments, &QAction::triggered, this,
+    connect(m_ui.act_viewsegments, &QAction::triggered, this,
             &MainWindow::show_segments);
-    connect(m_ui.actviewmappings, &QAction::triggered, this,
+    connect(m_ui.act_viewmappings, &QAction::triggered, this,
             &MainWindow::show_mappings);
-    connect(m_ui.actviewsegmentregs, &QAction::triggered, this,
+    connect(m_ui.act_viewsegmentregs, &QAction::triggered, this,
             &MainWindow::show_segment_regs);
-    connect(m_ui.actviewstrings, &QAction::triggered, this,
+    connect(m_ui.act_viewstrings, &QAction::triggered, this,
             &MainWindow::show_strings);
-    connect(m_ui.actviewtypedefs, &QAction::triggered, this,
+    connect(m_ui.act_viewtypedefs, &QAction::triggered, this,
             &MainWindow::show_typedefs);
-    connect(m_ui.actviewexported, &QAction::triggered, this,
+    connect(m_ui.act_viewexported, &QAction::triggered, this,
             &MainWindow::show_exported);
-    connect(m_ui.actviewimported, &QAction::triggered, this,
+    connect(m_ui.act_viewimported, &QAction::triggered, this,
             &MainWindow::show_imported);
 
-    connect(m_ui.actviewmemorymap, &QAction::triggered, this, [&]() {
+    connect(m_ui.act_viewmemorymap, &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
 
@@ -102,29 +101,29 @@ MainWindow::MainWindow(const RDInitParams& params, QWidget* parent)
         dlgmemorymap->show();
     });
 
-    connect(m_ui.acttoolsflc, &QAction::triggered, this, [&]() {
+    connect(m_ui.act_toolsflc, &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
         auto* dlgflc = new FLCDialog(ctxview->context(), this);
         dlgflc->show();
     });
 
-    connect(m_ui.actdevdecoder, &QAction::triggered, this, [&]() {
+    connect(m_ui.act_devdecoder, &QAction::triggered, this, [&]() {
         auto* dlgdecoder = new DecoderDialog(this);
         dlgdecoder->show();
     });
 
-    connect(m_ui.actdevgraphs, &QAction::triggered, this, [&]() {
+    connect(m_ui.act_devgraphs, &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
         auto* dlggraphdots = new DevGraphsDialog(ctxview->context(), this);
         dlggraphdots->show();
     });
 
-    connect(m_ui.acttoolsproblems, &QAction::triggered, this,
+    connect(m_ui.act_toolsproblems, &QAction::triggered, this,
             &MainWindow::show_problems);
 
-    connect(m_ui.actwinrestoredefault, &QAction::triggered, this,
+    connect(m_ui.act_winrestoredefault, &QAction::triggered, this,
             [&]() { REDasmSettings{}.restore_state(this); });
 
     connect(statusbar::problems_button(), &QPushButton::clicked, this,
@@ -297,29 +296,29 @@ bool MainWindow::can_close() const {
 void MainWindow::enable_context_actions(bool e) { // NOLINT
     m_ui.mnuexport->menuAction()->setVisible(e);
 
-    m_ui.actfilesave->setVisible(e);
-    m_ui.actfilesaveas->setVisible(e);
-    m_ui.actfileclose->setVisible(e);
-    m_ui.actedit->setVisible(e);
-    m_ui.actview->setVisible(e);
+    m_ui.act_filesave->setVisible(e);
+    m_ui.act_filesaveas->setVisible(e);
+    m_ui.act_fileclose->setVisible(e);
+    m_ui.act_edit->setVisible(e);
+    m_ui.act_view->setVisible(e);
 
-    m_ui.acttbseparator1->setVisible(e);
-    m_ui.acttbseparator2->setVisible(e);
-    m_ui.acttbseparator3->setVisible(e);
-    m_ui.acttbseparator4->setVisible(e);
+    m_ui.act_goto->setVisible(e);
 
-    m_ui.acttoolsflc->setVisible(e);
-    m_ui.acttoolsproblems->setVisible(e);
-    m_ui.actdevgraphs->setVisible(e);
-    m_ui.actviewsegmentregs->setVisible(e);
-    m_ui.actviewsegments->setVisible(e);
-    m_ui.actviewmappings->setVisible(e);
-    m_ui.actviewstrings->setVisible(e);
-    m_ui.actviewtypedefs->setVisible(e);
-    m_ui.actviewimported->setVisible(e);
-    m_ui.actviewexported->setVisible(e);
+    m_ui.act_tbseparator1->setVisible(e);
+    m_ui.act_tbseparator2->setVisible(e);
+    m_ui.act_tbseparator3->setVisible(e);
+    m_ui.act_tbseparator4->setVisible(e);
 
-    actions::get(actions::GOTO)->setVisible(e);
+    m_ui.act_toolsflc->setVisible(e);
+    m_ui.act_toolsproblems->setVisible(e);
+    m_ui.act_devgraphs->setVisible(e);
+    m_ui.act_viewsegmentregs->setVisible(e);
+    m_ui.act_viewsegments->setVisible(e);
+    m_ui.act_viewmappings->setVisible(e);
+    m_ui.act_viewstrings->setVisible(e);
+    m_ui.act_viewtypedefs->setVisible(e);
+    m_ui.act_viewimported->setVisible(e);
+    m_ui.act_viewexported->setVisible(e);
 
     if(!e) {
         statusbar::set_status_text(QString{});

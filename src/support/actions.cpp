@@ -569,157 +569,223 @@ void rename() {
         cv->invalidate();
 }
 
-template<typename Slot>
-QAction* add_detached_action(const QString& text, QObject* recv, Slot&& slot) {
-    auto* act = new QAction(text, g_mainwindow);
-    QObject::connect(act, &QAction::triggered, recv, slot);
-    return act;
-}
-
-template<typename Slot>
-QAction* add_detached_action(const QIcon& icon, const QString& text,
-                             QObject* recv, Slot&& slot) {
-    auto* act = new QAction(icon, text, g_mainwindow);
-    QObject::connect(act, &QAction::triggered, recv, slot);
-    return act;
-}
-
-template<typename Slot>
-QAction* add_detached_action(const QString& text, const QKeySequence& shortcut,
-                             QObject* recv, Slot&& slot) {
-    auto* act = new QAction(text, g_mainwindow);
-    act->setShortcut(shortcut);
-    QObject::connect(act, &QAction::triggered, recv, slot);
-    return act;
-}
-
-template<typename Slot>
-QAction* add_detached_action(const QIcon& icon, const QString& text,
-                             const QKeySequence& shortcut, QObject* recv,
-                             Slot&& slot) {
-    auto* act = new QAction(icon, text, g_mainwindow);
-    act->setShortcut(shortcut);
-    QObject::connect(act, &QAction::triggered, recv, slot);
-    return act;
-}
-
 } // namespace
 
-void init(QMainWindow* mw) {
-    g_mainwindow = static_cast<MainWindow*>(mw);
+void init(QMainWindow* mw) { g_mainwindow = static_cast<MainWindow*>(mw); }
 
-    g_actions[Type::GOTO] = actions::add_detached_action(
-        FA_ICON(0xf1e5), "Goto", QKeySequence{Qt::Key_G}, mw,
-        []() { actions::show_goto(); });
+QAction* create(Type t, QWidget* parent) {
+    QAction* act = nullptr;
 
-    g_actions[Type::COPY] =
-        mw->addAction("Copy", QKeySequence{Qt::CTRL | Qt::Key_C}, mw,
-                      []() { actions::copy(); });
+    switch(t) {
+        case Type::GOTO: {
+            act = parent->addAction(FA_ICON(0xf1e5), "Goto",
+                                    QKeySequence{Qt::Key_G}, parent,
+                                    []() { actions::show_goto(); });
+            break;
+        }
 
-    g_actions[Type::SELECT_ALL] =
-        mw->addAction("Select All", QKeySequence{Qt::CTRL | Qt::Key_A}, mw,
-                      []() { actions::select_all(); });
+        case Type::COPY: {
+            act = parent->addAction("Copy", QKeySequence{Qt::CTRL | Qt::Key_C},
+                                    parent, []() { actions::copy(); });
 
-    g_actions[Type::REFS_TO] = actions::add_detached_action(
-        "Cross References To…", QKeySequence{Qt::Key_X}, mw,
-        []() { actions::xrefs_to(); });
+            break;
+        }
 
-    g_actions[Type::RENAME] = actions::add_detached_action(
-        "Rename", QKeySequence(Qt::Key_N), mw, []() { actions::rename(); });
+        case Type::SELECT_ALL: {
+            act = parent->addAction("Select All",
+                                    QKeySequence{Qt::CTRL | Qt::Key_A}, parent,
+                                    []() { actions::select_all(); });
 
-    g_actions[Type::COMMENT] =
-        actions::add_detached_action("Comment", QKeySequence{Qt::Key_Semicolon},
-                                     mw, []() { actions::comment(); });
+            break;
+        }
 
-    g_actions[Type::OP_AS_ADDRESS] =
-        actions::add_detached_action("As Address", QKeySequence{Qt::Key_A}, mw,
-                                     []() { actions::op_as_address(); });
+        case Type::REFS_TO: {
+            act = parent->addAction("Cross References To…",
+                                    QKeySequence{Qt::Key_X}, parent,
+                                    []() { actions::xrefs_to(); });
 
-    g_actions[Type::OP_AS_IMMEDIATE] =
-        actions::add_detached_action("As Immediate", QKeySequence{Qt::Key_I},
-                                     mw, []() { actions::op_as_immediate(); });
+            break;
+        }
 
-    g_actions[Type::DO_UNDEFINE] =
-        actions::add_detached_action(FA_ICON(0xf00d), "Undefine", Qt::Key_U, mw,
-                                     []() { actions::do_undefine(); });
+        case Type::RENAME: {
+            act = parent->addAction("Rename", QKeySequence(Qt::Key_N), parent,
+                                    []() { actions::rename(); });
 
-    g_actions[Type::DO_CODE] = actions::add_detached_action(
-        FA_ICON(0xf121), "Code", Qt::Key_C, mw, []() { actions::do_code(); });
+            break;
+        }
 
-    g_actions[Type::DO_DATA] = actions::add_detached_action(
-        FA_ICON(0xf1b3), "Data", Qt::Key_D, mw, []() { actions::do_data(); });
+        case Type::COMMENT: {
+            act = parent->addAction("Comment", QKeySequence{Qt::Key_Semicolon},
+                                    parent, []() { actions::comment(); });
 
-    g_actions[Type::CREATE_FUNCTION] = actions::add_detached_action(
-        FA_ICON(0x46), "Create function", Qt::Key_F, mw,
-        []() { actions::create_function(); });
+            break;
+        }
 
-    g_actions[Type::PATCH_INSTRUCTION] =
-        mw->addAction(FA_ICON(0xf462), "Patch Instruction",
-                      QKeySequence{Qt::SHIFT | Qt::Key_Space}, mw,
-                      []() { actions::patch_instruction(); });
+        case Type::OP_AS_ADDRESS: {
+            act = parent->addAction("As Address", QKeySequence{Qt::Key_A},
+                                    parent, []() { actions::op_as_address(); });
 
-    g_actions[Type::REANALYZE] =
-        mw->addAction("Reanalyze", mw, []() { actions::reanalyze(); });
+            break;
+        }
 
-    g_actions[Type::OPEN_DETAILS] = mw->addAction(
-        FA_ICON(0x3f), "Details", mw, []() { actions::show_details(); });
+        case Type::OP_AS_IMMEDIATE: {
+            act =
+                parent->addAction("As Immediate", QKeySequence{Qt::Key_I},
+                                  parent, []() { actions::op_as_immediate(); });
 
-    g_actions[Type::SWITCH_TO_HEX] = mw->addAction(
-        FA_ICON(0xe69b), "Hex Dump", mw, []() { actions::switch_hex(); });
+            break;
+        }
 
-    g_actions[Type::SWITCH_TO_LISTING] =
-        actions::add_detached_action(FA_ICON(0xf550), "Listing", Qt::Key_Space,
-                                     mw, []() { actions::switch_listing(); });
+        case Type::DO_UNDEFINE: {
+            act = parent->addAction(FA_ICON(0xf00d), "Undefine", Qt::Key_U,
+                                    parent, []() { actions::do_undefine(); });
 
-    g_actions[Type::SWITCH_TO_GRAPH] =
-        actions::add_detached_action(FA_ICON(0xf542), "Graph", Qt::Key_Space,
-                                     mw, []() { actions::switch_graph(); });
+            break;
+        }
 
-    g_actions[Type::OPEN_HOME] =
-        mw->addAction(FA_ICON(0xf015), "Home", mw, []() {
-            QDesktopServices::openUrl(QUrl{"https://redasm.dev"});
-        });
+        case Type::DO_CODE: {
+            act = parent->addAction(FA_ICON(0xf121), "Code", Qt::Key_C, parent,
+                                    []() { actions::do_code(); });
 
-    g_actions[Type::OPEN_GITHUB] =
-        mw->addAction(FAB_ICON(0xf113), "Source Code", mw, []() {
-            QDesktopServices::openUrl(QUrl{"https://source.redasm.dev"});
-        });
+            break;
+        }
 
-    g_actions[Type::OPEN_DISCORD] =
-        mw->addAction(FAB_ICON(0xf392), "Discord", mw, []() {
-            QDesktopServices::openUrl(QUrl{"https://discord.redasm.dev"});
-        });
+        case Type::DO_DATA: {
+            act = parent->addAction(FA_ICON(0xf1b3), "Data", Qt::Key_D, parent,
+                                    []() { actions::do_data(); });
 
-    g_actions[Type::OPEN_X] = mw->addAction(FAB_ICON(0xe61b), "X", mw, []() {
-        QDesktopServices::openUrl(QUrl{"https://x.com/re_dasm"});
-    });
+            break;
+        }
 
-    g_actions[Type::OPEN_MASTODON] =
-        mw->addAction(FAB_ICON(0xf4f6), "Infosec.exchange", mw, []() {
-            QDesktopServices::openUrl(QUrl{"https://infosec.exchange/@redasm"});
-        });
+        case Type::CREATE_FUNCTION: {
+            act =
+                parent->addAction(FA_ICON(0x46), "Create function", Qt::Key_F,
+                                  parent, []() { actions::create_function(); });
 
-    g_actions[Type::OPEN_FEEDBACK] =
-        mw->addAction(FA_ICON(0xf188), "Send feedback", mw, []() {
-            QDesktopServices::openUrl(QUrl{"https://bugs.redasm.dev"});
-        });
+            break;
+        }
 
-    g_actions[Type::OPEN_ABOUT] =
-        mw->addAction(FA_ICON(0xf05a), "&About", mw, []() {
-            auto* dlgabout = new AboutDialog(g_mainwindow);
-            dlgabout->show();
-        });
+        case Type::PATCH_INSTRUCTION: {
+            act = parent->addAction(FA_ICON(0xf462), "Patch Instruction",
+                                    QKeySequence{Qt::SHIFT | Qt::Key_Space},
+                                    parent,
+                                    []() { actions::patch_instruction(); });
 
-    g_actions[Type::OPEN_SETTINGS] =
-        mw->addAction(FA_ICON(0xf013), "&Settings", mw, []() {
-            auto* dlgsettings = new SettingsDialog(g_mainwindow);
-            dlgsettings->show();
-        });
-}
+            break;
+        }
 
-QAction* get(Type t) {
-    if(auto it = g_actions.find(t); it != g_actions.end()) return it.value();
-    return nullptr;
+        case Type::REANALYZE: {
+            act = parent->addAction("Reanalyze", parent,
+                                    []() { actions::reanalyze(); });
+
+            break;
+        }
+
+        case Type::OPEN_DETAILS: {
+            act = parent->addAction(FA_ICON(0x3f), "Details", parent,
+                                    []() { actions::show_details(); });
+
+            break;
+        }
+
+        case Type::SWITCH_TO_HEX: {
+            act = parent->addAction(FA_ICON(0xe69b), "Hex Dump", parent,
+                                    []() { actions::switch_hex(); });
+
+            break;
+        }
+
+        case Type::SWITCH_TO_LISTING: {
+            act =
+                parent->addAction(FA_ICON(0xf550), "Listing", Qt::Key_Space,
+                                  parent, []() { actions::switch_listing(); });
+
+            break;
+        }
+
+        case Type::SWITCH_TO_GRAPH: {
+            act = parent->addAction(FA_ICON(0xf542), "Graph", Qt::Key_Space,
+                                    parent, []() { actions::switch_graph(); });
+
+            break;
+        }
+
+        case Type::OPEN_HOME: {
+            act = parent->addAction(FA_ICON(0xf015), "Home", parent, []() {
+                QDesktopServices::openUrl(QUrl{"https://redasm.dev"});
+            });
+
+            break;
+        }
+
+        case Type::OPEN_GITHUB: {
+            act = parent->addAction(FAB_ICON(0xf113), "Source Code", parent,
+                                    []() {
+                                        QDesktopServices::openUrl(
+                                            QUrl{"https://source.redasm.dev"});
+                                    });
+
+            break;
+        }
+
+        case Type::OPEN_DISCORD: {
+            act = parent->addAction(FAB_ICON(0xf392), "Discord", parent, []() {
+                QDesktopServices::openUrl(QUrl{"https://discord.redasm.dev"});
+            });
+
+            break;
+        }
+
+        case Type::OPEN_X: {
+            act = parent->addAction(FAB_ICON(0xe61b), "X", parent, []() {
+                QDesktopServices::openUrl(QUrl{"https://x.com/re_dasm"});
+            });
+
+            break;
+        }
+
+        case Type::OPEN_MASTODON: {
+            act = parent->addAction(
+                FAB_ICON(0xf4f6), "Infosec.exchange", parent, []() {
+                    QDesktopServices::openUrl(
+                        QUrl{"https://infosec.exchange/@redasm"});
+                });
+
+            break;
+        }
+
+        case Type::OPEN_FEEDBACK: {
+            act = parent->addAction(
+                FA_ICON(0xf188), "Send feedback", parent, []() {
+                    QDesktopServices::openUrl(QUrl{"https://bugs.redasm.dev"});
+                });
+
+            break;
+        }
+
+        case Type::OPEN_ABOUT: {
+            act = parent->addAction(FA_ICON(0xf05a), "&About", parent, []() {
+                auto* dlgabout = new AboutDialog(g_mainwindow);
+                dlgabout->show();
+            });
+
+            break;
+        }
+
+        case Type::OPEN_SETTINGS: {
+            act = parent->addAction(FA_ICON(0xf013), "&Settings", parent, []() {
+                auto* dlgsettings = new SettingsDialog(g_mainwindow);
+                dlgsettings->show();
+            });
+
+            break;
+        }
+
+        default: qFatal() << "unhandled action type: " << t; return nullptr;
+    }
+
+    act->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    return act;
 }
 
 } // namespace actions

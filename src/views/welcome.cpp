@@ -7,7 +7,7 @@
 namespace {
 
 void bind_button_to_action(QAbstractButton* button, actions::Type t) {
-    QAction* act = actions::get(t);
+    QAction* act = actions::create(t, button);
 
     if(auto* pb = qobject_cast<QPushButton*>(button); pb)
         pb->setFlat(true);

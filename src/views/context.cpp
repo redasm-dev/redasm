@@ -5,7 +5,7 @@
 #include "views/surface/listing.h"
 
 ContextView::ContextView(RDContext* ctx, QWidget* parent)
-    : QWidget{parent}, m_scheduler{new Scheduler{ctx}},
+    : QWidget{parent}, m_scheduler{new Scheduler{ctx, this}},
       m_ui{ctx, m_scheduler, this}, m_context{ctx} {
 
     connect(m_scheduler, &Scheduler::yield_requested, this,

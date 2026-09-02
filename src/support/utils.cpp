@@ -92,25 +92,26 @@ QString confidence_text(RDConfidence c) {
 }
 
 QMenu* create_surface_menu(ISurface* surface) {
-    auto* listing = qobject_cast<SurfaceListing*>(surface->to_widget());
-    auto* graph = qobject_cast<SurfaceGraph*>(surface->to_widget());
+    QWidget* w = surface->to_widget();
+    auto* listing = qobject_cast<SurfaceListing*>(w);
+    auto* graph = qobject_cast<SurfaceGraph*>(w);
 
-    QAction* actcopy = actions::get(actions::COPY);
-    QAction* actrefs = actions::get(actions::REFS_TO);
-    QAction* actrename = actions::get(actions::RENAME);
-    QAction* actcomment = actions::get(actions::COMMENT);
-    QAction* act_op_as_addr = actions::get(actions::OP_AS_ADDRESS);
-    QAction* act_op_as_imm = actions::get(actions::OP_AS_IMMEDIATE);
-    QAction* act_undefine = actions::get(actions::DO_UNDEFINE);
-    QAction* act_code = actions::get(actions::DO_CODE);
-    QAction* act_data = actions::get(actions::DO_DATA);
-    QAction* act_switch_to_listing = actions::get(actions::SWITCH_TO_LISTING);
-    QAction* act_switch_to_graph = actions::get(actions::SWITCH_TO_GRAPH);
-    QAction* act_open_hex = actions::get(actions::SWITCH_TO_HEX);
-    QAction* act_create_function = actions::get(actions::CREATE_FUNCTION);
-    QAction* act_patch = actions::get(actions::PATCH_INSTRUCTION);
+    // clang-format off
+    QAction* actcopy = actions::create(actions::COPY, w);
+    QAction* actrefs = actions::create(actions::REFS_TO, w);
+    QAction* actrename = actions::create(actions::RENAME, w);
+    QAction* actcomment = actions::create(actions::COMMENT, w);
+    QAction* act_op_as_addr = actions::create(actions::OP_AS_ADDRESS, w);
+    QAction* act_op_as_imm = actions::create(actions::OP_AS_IMMEDIATE, w);
+    QAction* act_undefine = actions::create(actions::DO_UNDEFINE, w);
+    QAction* act_code = actions::create(actions::DO_CODE, w);
+    QAction* act_data = actions::create(actions::DO_DATA, w);
+    QAction* act_open_hex = actions::create(actions::SWITCH_TO_HEX, w);
+    QAction* act_create_function = actions::create(actions::CREATE_FUNCTION, w);
+    QAction* act_patch = actions::create(actions::PATCH_INSTRUCTION, w);
+    // clang-format on
 
-    auto* menu = new QMenu(surface->to_widget());
+    auto* menu = new QMenu(w);
     menu->addAction(actcopy);
     menu->addAction(actrefs);
     menu->addAction(actrename);
@@ -122,24 +123,29 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addAction(act_code);
     menu->addAction(act_data);
     menu->addSeparator();
-    if(listing) menu->addAction(act_switch_to_graph);
-    if(graph) menu->addAction(act_switch_to_listing);
+
+    if(listing) {
+        QAction* act_switch_to_graph =
+            actions::create(actions::SWITCH_TO_GRAPH, w);
+        menu->addAction(act_switch_to_graph);
+    }
+
+    if(graph) {
+        QAction* act_switch_to_listing =
+            actions::create(actions::SWITCH_TO_LISTING, w);
+        menu->addAction(act_switch_to_listing);
+    }
+
     menu->addAction(act_open_hex);
     menu->addSeparator();
     menu->addAction(act_patch);
     menu->addAction(act_create_function);
     menu->addSeparator();
-    menu->addAction(actions::get(actions::GOTO));
+    menu->addAction(actions::create(actions::GOTO, w));
     menu->addSeparator();
-    menu->addAction(actions::get(actions::OPEN_DETAILS));
+    menu->addAction(actions::create(actions::OPEN_DETAILS, w));
 
-    // attach actions to surface
-    for(QAction* act : menu->actions()) {
-        if(act->isSeparator()) continue;
-        surface->to_widget()->addAction(act);
-    }
-
-    QObject::connect(menu, &QMenu::aboutToShow, surface->to_widget(), [=]() {
+    QObject::connect(menu, &QMenu::aboutToShow, w, [=]() {
         auto cursor_addr = surface->get_address_under_cursor();
         auto curr_addr = surface->get_current_address();
 

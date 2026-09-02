@@ -40,6 +40,6 @@ enum Type : quint8 {
 };
 
 void init(QMainWindow* mw);
-QAction* get(Type t);
+QAction* create(Type t, QWidget* parent);
 
 } // namespace actions
