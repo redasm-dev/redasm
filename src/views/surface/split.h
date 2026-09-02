@@ -14,9 +14,6 @@ public:
                                   QObject* parent = nullptr);
     QWidget* create_widget(SplitWidget* current, SplitWidget* split) override;
 
-Q_SIGNALS:
-    void schedule_requested();
-
 private:
     RDContext* m_context;
     Scheduler* m_scheduler;
@@ -29,7 +26,4 @@ public:
     explicit SurfaceSplitView(RDContext* ctx, Scheduler* scheduler,
                               QWidget* parent = nullptr);
     [[nodiscard]] ISurface* surface() const;
-
-Q_SIGNALS:
-    void schedule_requested();
 };
