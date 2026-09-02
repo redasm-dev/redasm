@@ -22,7 +22,7 @@ void hexview_setup_options(QHexView* hexview, RDContext* ctx) {
     options.byte_colors[0x00].foreground =
         theme_provider::color(RD_THEME_MUTED);
     options.address_width = rd_get_ptr_size(ctx) * 2;
-    options.address_label = "Address";
+    options.address_label = "ADDRESS";
 
     hexview->setOptions(options);
 }
