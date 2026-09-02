@@ -96,31 +96,36 @@ Maturity levels:
 ### Loaders (executable formats)
 
 | Format | Description | Status |
-|---|---|:---:|
+|--:|---|:---:|
 | **PE / PE+** | Windows executables and DLLs, 32-bit and 64-bit | **S** |
-| **ELF / ELF64** | Linux, BSD and Unix executables and shared objects | **A** |
-| **MZ (DOS)** | MS-DOS executables and COM programs | **A** |
-| **NE (Win16)** | 16-bit Windows and OS/2 New Executable | **B** |
-| **LE / LX (OS/2)** | Linear Executable, OS/2 and DOS extenders (VxD is supported too) | **B** |
-| **PSX EXE (PS1)** | PlayStation 1 executables | **B** |
+| **ELF / ELF64** | Linux, BSD and Unix executables and shared objects | **S** |
+| **NE (Win16)** | 16-bit Windows and OS/2 New Executable | **A** |
+| **LE / LX (OS/2)** | Linear Executable, OS/2 and DOS extenders (VxD is supported too) | **A** |
+| **PSX EXE (PS1)** | PlayStation 1 executables | **A** |
+| **MZ (DOS)** | MS-DOS executables and COM programs | **B** |
 | **PSX BIOS (PS1)** | PlayStation 1 BIOS | **B** |
 | **XBE (Xbox)** | Original Xbox executables | **B** |
+| **ZX Spectrum** | SNA, Z80, TAP formats | **B** |
+| **NES** | iNES format, mapper 0 only (NROM) | **C** |
 
 ### Processors (CPU architectures)
 
 | Architecture | Description | Status |
-|---|---|:---:|
+|--:|---|:---:|
 | **x86 / x86_64** | 16-bit, 32-bit and 64-bit Intel/AMD | **S** |
 | **MIPS** | MIPS32, big and little endian, delay slot aware | **A** |
-| **ARM / Thumb** | ARM32 and Thumb instruction sets | **B** |
+| **ARM / Thumb** | ARM32 and Thumb instruction sets | **A** |
 | **ARM64** | AArch64 | **A** |
+| **Z80** | Zilog Z80, with register tracking | **B** |
+| **MOS6502** | MOS Technology 6502 | **B** |
 
 ### Analyzers
 
 | Analyzer | Description | Status |
-|---|---|:---:|
+|--:|---|:---:|
 | **Visual Basic** | Recover VB5/VB6 events and project information | **A** |
 | **MSVC RTTI** | MSVC run-time type information and vtable recovery | **D** |
+| **MSVC EH** | MSVC exception handling type recovery | **D** |
 
 ## Download
 
