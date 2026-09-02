@@ -64,6 +64,7 @@ HexView::HexView(RDContext* ctx, QWidget* parent)
     hexview_setup_options(m_hexview, ctx);
 
     auto* vbox = new QVBoxLayout(this);
+    vbox->setContentsMargins(0, 0, 0, 0);
     vbox->addWidget(m_hexview);
 
     this->create_popup_menu();
@@ -184,9 +185,6 @@ void HexView::create_popup_menu() {
 
     m_popupmenu->addAction(hexview_new_separator(this));
     m_popupmenu->addAction(act_switch_listing);
-
-    // attach to widget for shortcuts handling
-    // this->addAction(actions::get(actions::SWITCH_TO_LISTING));
 
     connect(this, &HexView::customContextMenuRequested, this,
             [=](const QPoint& pos) {
