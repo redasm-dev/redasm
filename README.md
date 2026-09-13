@@ -90,7 +90,7 @@ Maturity levels:
 - **S**: production ready.
 - **A**: highly stable.
 - **B**: functional.
-- **C**: basic / stub.
+- **C**: basic.
 - **D**: wip / experimental.
 
 ### Loaders (executable formats)
@@ -106,7 +106,7 @@ Maturity levels:
 | **PSX BIOS (PS1)** | PlayStation 1 BIOS | **B** |
 | **XBE (Xbox)** | Original Xbox executables | **B** |
 | **ZX Spectrum** | SNA, Z80, TAP formats | **B** |
-| **NES** | iNES format, mapper 0 only (NROM) | **C** |
+| **NES** | iNES format, mapper 0 only (NROM) | **B** |
 
 ### Processors (CPU architectures)
 
