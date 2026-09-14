@@ -39,6 +39,9 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
         qApp->clipboard()->setText(
             QString{"0x%1"}.arg(utils::to_hex(m_currenthash)));
     });
+
+    connect(m_ui.chklayoutdot, &QCheckBox::checkStateChanged, this,
+            [&]() { this->show_dot(m_ui.tvfunctions->currentIndex()); });
 }
 
 void DevGraphsDialog::copy_graph_hashes() {
@@ -83,16 +86,21 @@ void DevGraphsDialog::show_dot(const QModelIndex& index) {
     m_currenthash = {};
     m_ui.ptedot->clear();
 
+    if(!index.isValid()) return;
+
     RDAddress address = m_functionsmodel->address(index);
     const char* dot = nullptr;
 
     const RDFunction* f = rd_find_function(m_context, address);
     if(!f) goto fail;
 
-    dot = rd_function_generate_dot(f);
+    dot = m_ui.chklayoutdot->isChecked() ? rd_function_generate_dot_layout(f)
+                                         : rd_function_generate_dot(f);
     if(!dot) goto fail;
 
-    m_currenthash = rd_function_get_hash(f);
+    m_currenthash = m_ui.chklayoutdot->isChecked()
+                        ? rd_function_get_hash_layout(f)
+                        : rd_function_get_hash(f);
     m_currentgraph = QString::fromUtf8(dot);
 
     m_ui.ptedot->setPlainText(m_currentgraph);

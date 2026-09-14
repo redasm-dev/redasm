@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widgets/feedbackpushbutton.h"
+#include <QCheckBox>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QPlainTextEdit>
@@ -13,6 +14,7 @@ namespace ui {
 struct DevGraphsDialog {
     FeedbackPushButton *ftbcopygraphhashes, *ftbcopyhash, *ftbcopyfunctions,
         *ftbcopygraph;
+    QCheckBox* chklayoutdot;
     QTreeView* tvfunctions;
     QPlainTextEdit* ptedot;
 
@@ -31,6 +33,9 @@ struct DevGraphsDialog {
         this->ftbcopyfunctions = new FeedbackPushButton();
         this->ftbcopyfunctions->setText("Copy Functions");
         this->ftbcopyfunctions->set_feedback_text("Copied");
+
+        this->chklayoutdot = new QCheckBox();
+        this->chklayoutdot->setText("Show layout DOT");
 
         auto* hbox = new QHBoxLayout();
         hbox->addWidget(this->ftbcopygraphhashes);
@@ -52,8 +57,9 @@ struct DevGraphsDialog {
         this->ftbcopygraph->set_feedback_text("Copied");
 
         hbox = new QHBoxLayout();
-        hbox->addWidget(this->ftbcopyhash);
-        hbox->addWidget(this->ftbcopygraph);
+        hbox->addWidget(this->ftbcopyhash, 1);
+        hbox->addWidget(this->ftbcopygraph, 1);
+        hbox->addWidget(this->chklayoutdot);
 
         auto* vbox_right = new QVBoxLayout(new QWidget());
         vbox_right->addWidget(this->ptedot, 1);
