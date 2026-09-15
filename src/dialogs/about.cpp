@@ -147,7 +147,7 @@ void compile_analyzers(QTextBrowser* txb) {
 
 void compile_commands(QTextBrowser* txb) {
     RDPluginSlice commands = rd_get_all_command_plugins();
-    QString html;
+    QString html = "<table>";
 
     const RDPlugin** it;
     rd_slice_each(it, commands) {
@@ -164,8 +164,12 @@ void compile_commands(QTextBrowser* txb) {
             cp++;
         }
 
-        html.append(QString("- %1(%2)").arg(p->command->id).arg(params));
+        html.append(QString("<tr><td>- %1(%2)</td></tr>")
+                        .arg(p->command->id)
+                        .arg(params));
     }
+
+    html.append("</table>");
 
     txb->setLineWrapMode(QTextBrowser::NoWrap);
     txb->setHtml(html);
