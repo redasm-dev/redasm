@@ -573,142 +573,87 @@ void rename() {
 
 void init(QMainWindow* mw) { g_mainwindow = static_cast<MainWindow*>(mw); }
 
-QAction* create(Type t, QWidget* parent) {
+QAction* create(Type t, QWidget* parent, bool shortcut) {
     QAction* act = nullptr;
 
+    auto key_seq = [shortcut](QKeyCombination c) {
+        return shortcut ? QKeySequence{c} : QKeySequence{};
+    };
+
+    // clang-format off
+
     switch(t) {
-        case Type::GOTO: {
-            act = parent->addAction(FA_ICON(0xf1e5), "Goto",
-                                    QKeySequence{Qt::Key_G}, parent,
-                                    []() { actions::show_goto(); });
+        case Type::GOTO: 
+            act = parent->addAction(FA_ICON(0xf1e5), "Goto", key_seq(Qt::Key_G), parent, []() { actions::show_goto(); });
             break;
-        }
 
-        case Type::COPY: {
-            act = parent->addAction("Copy", QKeySequence{Qt::CTRL | Qt::Key_C},
-                                    parent, []() { actions::copy(); });
-
+        case Type::COPY: 
+            act = parent->addAction("Copy", key_seq(Qt::CTRL | Qt::Key_C), parent, []() { actions::copy(); });
             break;
-        }
 
-        case Type::SELECT_ALL: {
-            act = parent->addAction("Select All",
-                                    QKeySequence{Qt::CTRL | Qt::Key_A}, parent,
-                                    []() { actions::select_all(); });
-
+        case Type::SELECT_ALL:
+            act = parent->addAction("Select All", key_seq(Qt::CTRL | Qt::Key_A), parent, []() { actions::select_all(); });
             break;
-        }
 
-        case Type::REFS_TO: {
-            act = parent->addAction("Cross References To…",
-                                    QKeySequence{Qt::Key_X}, parent,
-                                    []() { actions::xrefs_to(); });
-
+        case Type::REFS_TO:
+            act = parent->addAction("Cross References To…", key_seq(Qt::Key_X), parent, []() { actions::xrefs_to(); });
             break;
-        }
 
-        case Type::RENAME: {
-            act = parent->addAction("Rename", QKeySequence(Qt::Key_N), parent,
-                                    []() { actions::rename(); });
-
+        case Type::RENAME:
+            act = parent->addAction("Rename", key_seq(Qt::Key_N), parent, []() { actions::rename(); });
             break;
-        }
 
-        case Type::COMMENT: {
-            act = parent->addAction("Comment", QKeySequence{Qt::Key_Semicolon},
-                                    parent, []() { actions::comment(); });
-
+        case Type::COMMENT:
+            act = parent->addAction("Comment", key_seq(Qt::Key_Semicolon), parent, []() { actions::comment(); });
             break;
-        }
 
-        case Type::OP_AS_ADDRESS: {
-            act = parent->addAction("As Address", QKeySequence{Qt::Key_A},
-                                    parent, []() { actions::op_as_address(); });
-
+        case Type::OP_AS_ADDRESS:
+            act = parent->addAction("As Address", key_seq(Qt::Key_A), parent, []() { actions::op_as_address(); });
             break;
-        }
 
-        case Type::OP_AS_IMMEDIATE: {
-            act =
-                parent->addAction("As Immediate", QKeySequence{Qt::Key_I},
-                                  parent, []() { actions::op_as_immediate(); });
-
+        case Type::OP_AS_IMMEDIATE:
+            act = parent->addAction("As Immediate", key_seq(Qt::Key_I), parent, []() { actions::op_as_immediate(); });
             break;
-        }
 
-        case Type::DO_UNDEFINE: {
-            act = parent->addAction(FA_ICON(0xf00d), "Undefine", Qt::Key_U,
-                                    parent, []() { actions::do_undefine(); });
-
+        case Type::DO_UNDEFINE:
+            act = parent->addAction(FA_ICON(0xf00d), "Undefine", key_seq(Qt::Key_U), parent, []() { actions::do_undefine(); });
             break;
-        }
 
-        case Type::DO_CODE: {
-            act = parent->addAction(FA_ICON(0xf121), "Code", Qt::Key_C, parent,
-                                    []() { actions::do_code(); });
-
+        case Type::DO_CODE:
+            act = parent->addAction(FA_ICON(0xf121), "Code", key_seq(Qt::Key_C), parent, []() { actions::do_code(); });
             break;
-        }
 
-        case Type::DO_DATA: {
-            act = parent->addAction(FA_ICON(0xf1b3), "Data", Qt::Key_D, parent,
-                                    []() { actions::do_data(); });
-
+        case Type::DO_DATA:
+            act = parent->addAction(FA_ICON(0xf1b3), "Data", key_seq(Qt::Key_D), parent, []() { actions::do_data(); });
             break;
-        }
 
-        case Type::CREATE_FUNCTION: {
-            act =
-                parent->addAction(FA_ICON(0x46), "Create function", Qt::Key_F,
-                                  parent, []() { actions::create_function(); });
-
+        case Type::CREATE_FUNCTION:
+            act = parent->addAction(FA_ICON(0x46), "Create function", key_seq(Qt::Key_F), parent, []() { actions::create_function(); });
             break;
-        }
 
-        case Type::PATCH_INSTRUCTION: {
-            act = parent->addAction(FA_ICON(0xf462), "Patch Instruction",
-                                    QKeySequence{Qt::SHIFT | Qt::Key_Space},
-                                    parent,
-                                    []() { actions::patch_instruction(); });
-
+        case Type::PATCH_INSTRUCTION:
+            act = parent->addAction(FA_ICON(0xf462), "Patch Instruction", key_seq(Qt::SHIFT | Qt::Key_Space), parent, []() { actions::patch_instruction(); });
             break;
-        }
 
-        case Type::REANALYZE: {
-            act = parent->addAction("Reanalyze", parent,
-                                    []() { actions::reanalyze(); });
-
+        case Type::REANALYZE:
+            act = parent->addAction("Reanalyze", parent, []() { actions::reanalyze(); });
             break;
-        }
 
-        case Type::OPEN_DETAILS: {
-            act = parent->addAction(FA_ICON(0x3f), "Details", parent,
-                                    []() { actions::show_details(); });
-
+        case Type::OPEN_DETAILS:
+            act = parent->addAction(FA_ICON(0x3f), "Details", parent, []() { actions::show_details(); });
             break;
-        }
 
-        case Type::SWITCH_TO_HEX: {
-            act = parent->addAction(FA_ICON(0xe69b), "Hex Dump", parent,
-                                    []() { actions::switch_hex(); });
-
+        case Type::SWITCH_TO_HEX:
+            act = parent->addAction(FA_ICON(0xe69b), "Hex Dump", parent, []() { actions::switch_hex(); });
             break;
-        }
 
-        case Type::SWITCH_TO_LISTING: {
-            act =
-                parent->addAction(FA_ICON(0xf550), "Listing", Qt::Key_Space,
-                                  parent, []() { actions::switch_listing(); });
-
+        case Type::SWITCH_TO_LISTING:
+            act = parent->addAction(FA_ICON(0xf550), "Listing", key_seq(Qt::Key_Space), parent, []() { actions::switch_listing(); });
             break;
-        }
 
-        case Type::SWITCH_TO_GRAPH: {
-            act = parent->addAction(FA_ICON(0xf542), "Graph", Qt::Key_Space,
-                                    parent, []() { actions::switch_graph(); });
-
+        case Type::SWITCH_TO_GRAPH:
+            act = parent->addAction(FA_ICON(0xf542), "Graph", key_seq(Qt::Key_Space), parent, []() { actions::switch_graph(); });
             break;
-        }
 
         case Type::OPEN_HOME: {
             act = parent->addAction(FA_ICON(0xf015), "Home", parent, []() {
@@ -783,6 +728,8 @@ QAction* create(Type t, QWidget* parent) {
 
         default: qFatal() << "unhandled action type: " << t; return nullptr;
     }
+
+    // clang-format on
 
     act->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     return act;

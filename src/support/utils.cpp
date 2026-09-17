@@ -144,7 +144,7 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addAction(act_patch);
     menu->addAction(act_create_function);
     menu->addSeparator();
-    menu->addAction(actions::create(actions::GOTO, w));
+    menu->addAction(actions::create(actions::GOTO, w, false));
     menu->addSeparator();
     menu->addAction(actions::create(actions::OPEN_DETAILS, w));
 

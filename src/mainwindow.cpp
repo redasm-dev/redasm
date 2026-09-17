@@ -12,11 +12,10 @@
 #include "models/problems.h"
 #include "models/segments.h"
 #include "models/strings.h"
-#include "support/actions.h"
-#include "support/surfacerenderer.h"
-// #include "rdui/qtui.h"
 #include "statusbar.h"
+#include "support/actions.h"
 #include "support/settings.h"
+#include "support/surfacerenderer.h"
 #include "support/utils.h"
 #include "views/welcome.h"
 #include <QDragMoveEvent>
@@ -24,6 +23,9 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QMimeData>
+
+#define MW_GET_ACTION(x) m_ui.mw_actions.action(ui::MWActionType::x)
+#define MW_GET_MENU(x) m_ui.mw_actions.menu(ui::MWActionType::x)
 
 namespace {
 
@@ -58,37 +60,38 @@ MainWindow::MainWindow(const RDInitParams& params, QWidget* parent)
 
     this->show_welcome_view();
 
-    connect(m_ui.act_fileexit, &QAction::triggered, this, &MainWindow::close);
-    connect(m_ui.act_fileopen, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_EXIT), &QAction::triggered, this,
+            &MainWindow::close);
+    connect(MW_GET_ACTION(FILE_OPEN), &QAction::triggered, this,
             &MainWindow::select_file);
-    connect(m_ui.act_filesave, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_SAVE), &QAction::triggered, this,
             &MainWindow::save_project);
-    connect(m_ui.act_filesaveas, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_SAVE_AS), &QAction::triggered, this,
             &MainWindow::save_project_as);
-    connect(m_ui.act_fileclose, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_CLOSE), &QAction::triggered, this,
             &MainWindow::show_welcome_view);
-    connect(m_ui.act_fileexportdb, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_EXPORT_DATABASE), &QAction::triggered, this,
             &MainWindow::export_db);
-    connect(m_ui.act_fileexportinput, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_EXPORT_INPUT), &QAction::triggered, this,
             &MainWindow::export_input);
-    connect(m_ui.act_fileexportpatch, &QAction::triggered, this,
+    connect(MW_GET_ACTION(FILE_EXPORT_PATCH), &QAction::triggered, this,
             &MainWindow::export_input_patch);
-    connect(m_ui.act_viewsegments, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_SEGMENTS), &QAction::triggered, this,
             &MainWindow::show_segments);
-    connect(m_ui.act_viewmappings, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_MAPPINGS), &QAction::triggered, this,
             &MainWindow::show_mappings);
-    connect(m_ui.act_viewsegmentregs, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_SEGMENT_REGS), &QAction::triggered, this,
             &MainWindow::show_segment_regs);
-    connect(m_ui.act_viewstrings, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_STRINGS), &QAction::triggered, this,
             &MainWindow::show_strings);
-    connect(m_ui.act_viewtypedefs, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_TYPEDEFS), &QAction::triggered, this,
             &MainWindow::show_typedefs);
-    connect(m_ui.act_viewexported, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_EXPORTED), &QAction::triggered, this,
             &MainWindow::show_exported);
-    connect(m_ui.act_viewimported, &QAction::triggered, this,
+    connect(MW_GET_ACTION(VIEW_IMPORTED), &QAction::triggered, this,
             &MainWindow::show_imported);
 
-    connect(m_ui.act_viewmemorymap, &QAction::triggered, this, [&]() {
+    connect(MW_GET_ACTION(VIEW_MEMORY_MAP), &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
 
@@ -96,29 +99,29 @@ MainWindow::MainWindow(const RDInitParams& params, QWidget* parent)
         dlgmemorymap->show();
     });
 
-    connect(m_ui.act_toolsflc, &QAction::triggered, this, [&]() {
+    connect(MW_GET_ACTION(TOOLS_FLC), &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
         auto* dlgflc = new FLCDialog(ctxview->context(), this);
         dlgflc->show();
     });
 
-    connect(m_ui.act_devdecoder, &QAction::triggered, this, [&]() {
+    connect(MW_GET_ACTION(TOOLS_DEV_DECODER), &QAction::triggered, this, [&]() {
         auto* dlgdecoder = new DecoderDialog(this);
         dlgdecoder->show();
     });
 
-    connect(m_ui.act_devgraphs, &QAction::triggered, this, [&]() {
+    connect(MW_GET_ACTION(TOOLS_DEV_GRAPHS), &QAction::triggered, this, [&]() {
         ContextView* ctxview = this->context_view();
         if(!ctxview) return;
         auto* dlggraphdots = new DevGraphsDialog(ctxview->context(), this);
         dlggraphdots->show();
     });
 
-    connect(m_ui.act_toolsproblems, &QAction::triggered, this,
+    connect(MW_GET_ACTION(ANALYSIS_PROBLEMS), &QAction::triggered, this,
             &MainWindow::show_problems);
 
-    connect(m_ui.act_winrestoredefault, &QAction::triggered, this,
+    connect(MW_GET_ACTION(WINDOW_RESTORE_DEFAULT), &QAction::triggered, this,
             [&]() { REDasmSettings{}.restore_state(this); });
 
     connect(statusbar::problems_button(), &QPushButton::clicked, this,
@@ -169,23 +172,24 @@ void MainWindow::load_window_state() {
 }
 
 void MainWindow::load_recents() {
-    m_ui.mnurecents->clear();
+    QMenu* mnurecents = MW_GET_MENU(FILE_RECENTS);
+    mnurecents->clear();
 
     REDasmSettings settings;
     QStringList recents = settings.recent_files();
-    m_ui.mnurecents->setEnabled(!recents.empty());
+    mnurecents->setEnabled(!recents.empty());
 
     for(int i = 0; i < REDasmSettings::MAX_RECENT_FILES; i++) {
         if(i >= recents.length()) {
-            QAction* action = m_ui.mnurecents->addAction(QString{});
+            QAction* action = mnurecents->addAction(QString{});
             action->setVisible(false);
             continue;
         }
 
         if(!QFileInfo().exists(recents[i])) continue;
 
-        QAction* action = m_ui.mnurecents->addAction(
-            QString("%1 - %2").arg(i).arg(recents[i]));
+        QAction* action =
+            mnurecents->addAction(QString("%1 - %2").arg(i).arg(recents[i]));
         action->setData(recents[i]);
 
         connect(action, &QAction::triggered, this,
@@ -194,8 +198,8 @@ void MainWindow::load_recents() {
 
     if(recents.empty()) return;
 
-    m_ui.mnurecents->addSeparator();
-    QAction* action = m_ui.mnurecents->addAction(tr("Clear"));
+    mnurecents->addSeparator();
+    QAction* action = mnurecents->addAction(tr("Clear"));
 
     connect(action, &QAction::triggered, this,
             [=]() { this->clear_recents(); });
@@ -289,31 +293,33 @@ bool MainWindow::can_close() const {
 }
 
 void MainWindow::enable_context_actions(bool e) { // NOLINT
-    m_ui.mnuexport->menuAction()->setVisible(e);
+    MW_GET_MENU(FILE_EXPORT)->menuAction()->setVisible(e);
 
-    m_ui.act_filesave->setVisible(e);
-    m_ui.act_filesaveas->setVisible(e);
-    m_ui.act_fileclose->setVisible(e);
-    m_ui.act_view->setVisible(e);
+    MW_GET_ACTION(FILE_SAVE)->setVisible(e);
+    MW_GET_ACTION(FILE_SAVE_AS)->setVisible(e);
+    MW_GET_ACTION(FILE_CLOSE)->setVisible(e);
 
-    m_ui.act_goto->setVisible(e);
+    MW_GET_MENU(VIEW)->menuAction()->setVisible(e);
+    MW_GET_ACTION(VIEW_SEGMENT_REGS)->setVisible(e);
+    MW_GET_ACTION(VIEW_SEGMENTS)->setVisible(e);
+    MW_GET_ACTION(VIEW_MAPPINGS)->setVisible(e);
+    MW_GET_ACTION(VIEW_STRINGS)->setVisible(e);
+    MW_GET_ACTION(VIEW_TYPEDEFS)->setVisible(e);
+    MW_GET_ACTION(VIEW_IMPORTED)->setVisible(e);
+    MW_GET_ACTION(VIEW_EXPORTED)->setVisible(e);
+
+    MW_GET_MENU(ANALYSIS)->menuAction()->setVisible(e);
+    MW_GET_ACTION(ANALYSIS_GOTO)->setVisible(e);
+    MW_GET_ACTION(ANALYSIS_REANALYZE)->setVisible(e);
+    MW_GET_ACTION(ANALYSIS_REBASE)->setVisible(e);
+    MW_GET_ACTION(ANALYSIS_PROBLEMS)->setVisible(e);
+
+    MW_GET_ACTION(TOOLS_FLC)->setVisible(e);
+    MW_GET_ACTION(TOOLS_DEV_GRAPHS)->setVisible(e);
 
     m_ui.act_tbseparator1->setVisible(e);
     m_ui.act_tbseparator2->setVisible(e);
     m_ui.act_tbseparator3->setVisible(e);
-    m_ui.act_tbseparator4->setVisible(e);
-
-    m_ui.act_toolsflc->setVisible(e);
-    m_ui.act_toolsreanalyze->setVisible(e);
-    m_ui.act_toolsproblems->setVisible(e);
-    m_ui.act_devgraphs->setVisible(e);
-    m_ui.act_viewsegmentregs->setVisible(e);
-    m_ui.act_viewsegments->setVisible(e);
-    m_ui.act_viewmappings->setVisible(e);
-    m_ui.act_viewstrings->setVisible(e);
-    m_ui.act_viewtypedefs->setVisible(e);
-    m_ui.act_viewimported->setVisible(e);
-    m_ui.act_viewexported->setVisible(e);
 
     if(!e) {
         statusbar::set_status_text(QString{});

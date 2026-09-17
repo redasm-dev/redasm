@@ -6,7 +6,9 @@ class QMainWindow;
 
 namespace actions {
 
-enum Type : quint8 {
+enum Type {
+    NONE = 0,
+
     GOTO,
     COPY,
     SELECT_ALL,
@@ -40,6 +42,6 @@ enum Type : quint8 {
 };
 
 void init(QMainWindow* mw);
-QAction* create(Type t, QWidget* parent);
+QAction* create(Type t, QWidget* parent, bool shortcut = true);
 
 } // namespace actions
