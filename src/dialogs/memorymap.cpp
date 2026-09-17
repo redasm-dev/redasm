@@ -15,11 +15,17 @@ MemoryMapDialog::MemoryMapDialog(RDContext* ctx, QWidget* parent)
 
     for(usize i = 0; i < rd_slice_length(segments); i++) {
         const RDSegment* s = rd_slice_at(segments, i);
-        QString startaddr = utils::to_hex(s->start_address, ctx);
-        QString endaddr = utils::to_hex(s->end_address, ctx);
+
+        RDAddress start = rd_segment_get_start(s);
+        RDAddress end = rd_segment_get_end(s);
+        QString startaddr = utils::to_hex(start, ctx);
+        QString endaddr = utils::to_hex(end, ctx);
 
         m_ui.cbsegments->addItem(
-            QString{"%1 (%2 - %3)"}.arg(s->name).arg(startaddr).arg(endaddr));
+            QString{"%1 (%2 - %3)"}
+                .arg(QString::fromUtf8(rd_segment_get_name(s)))
+                .arg(startaddr)
+                .arg(endaddr));
     }
 
     this->show_memory(m_ui.cbsegments->currentIndex());

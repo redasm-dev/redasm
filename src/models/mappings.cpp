@@ -2,22 +2,26 @@
 #include "support/utils.h"
 
 MappingsModel::MappingsModel(const RDContext* ctx, QObject* parent)
-    : QAbstractListModel{parent} {
+    : QAbstractListModel{parent}, m_context{ctx} {
     m_mappings = rd_get_all_mappings(ctx);
 }
 
 RDAddress MappingsModel::address(const QModelIndex& index) const {
-    return rd_slice_at(m_mappings, index.row()).start_address;
+    return rd_inputmapping_get_start(rd_slice_at(m_mappings, index.row()));
 }
 
 QVariant MappingsModel::data(const QModelIndex& index, int role) const {
     if(role == Qt::DisplayRole) {
-        RDInputMapping m = rd_slice_at(m_mappings, index.row());
+        const RDInputMapping* m = rd_slice_at(m_mappings, index.row());
 
         switch(index.column()) {
-            case 0: return utils::to_hex(m.offset);
-            case 1: return utils::to_hex(m.start_address);
-            case 2: return utils::to_hex(m.end_address);
+            case 0:
+                return utils::to_hex(rd_inputmapping_get_offset(m), m_context);
+
+            case 1:
+                return utils::to_hex(rd_inputmapping_get_start(m), m_context);
+
+            case 2: return utils::to_hex(rd_inputmapping_get_end(m), m_context);
             default: break;
         }
     }

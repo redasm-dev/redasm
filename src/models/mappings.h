@@ -20,4 +20,5 @@ public:
 
 private:
     RDInputMappingSlice m_mappings;
+    const RDContext* m_context;
 };

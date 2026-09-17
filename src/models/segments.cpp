@@ -4,10 +4,12 @@
 namespace {
 
 QString get_segment_type(const RDSegment* seg) {
+    RDSegmentPerm perm = rd_segment_get_perm(seg);
+
     QString s;
-    if(seg->perm & RD_SP_R) s.append("R");
-    if(seg->perm & RD_SP_W) s.append("W");
-    if(seg->perm & RD_SP_X) s.append("X");
+    if(perm & RD_SP_R) s.append("R");
+    if(perm & RD_SP_W) s.append("W");
+    if(perm & RD_SP_X) s.append("X");
     return s;
 }
 
@@ -19,19 +21,18 @@ SegmentsModel::SegmentsModel(const RDContext* ctx, QObject* parent)
 }
 
 RDAddress SegmentsModel::address(const QModelIndex& index) const {
-    return rd_slice_at(m_segments, index.row())->start_address;
+    return rd_segment_get_start(rd_slice_at(m_segments, index.row()));
 }
 
 QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
     if(role == Qt::DisplayRole) {
         const RDSegment* s = rd_slice_at(m_segments, index.row());
-        usize len = s->end_address - s->start_address;
 
         switch(index.column()) {
-            case 0: return s->name;
-            case 1: return utils::to_hex(s->start_address, m_context);
-            case 2: return utils::to_hex(s->end_address, m_context);
-            case 3: return utils::to_hex(len, m_context);
+            case 0: return QString::fromUtf8(rd_segment_get_name(s));
+            case 1: return utils::to_hex(rd_segment_get_start(s), m_context);
+            case 2: return utils::to_hex(rd_segment_get_end(s), m_context);
+            case 3: return utils::to_hex(rd_segment_get_size(s), m_context);
             case 4: return get_segment_type(s);
             default: break;
         }

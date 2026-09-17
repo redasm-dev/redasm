@@ -89,7 +89,7 @@ void set_address(ISurface* surface) {
 
     if(seg) {
         s += QString::fromWCharArray(L"<b>Segment: </b>%1\u00A0\u00A0")
-                 .arg(seg->name);
+                 .arg(rd_segment_get_name(seg));
     }
 
     g_lblstatuslabel->setText(s);
@@ -131,8 +131,7 @@ void check_problems(const RDContext* ctx) {
     static const QString STYLE = QString{"color: %1;"}.arg(
         theme_provider::color(RD_THEME_WARNING).name());
 
-    RDProblemSlice problems = rd_get_all_problems(ctx);
-    if(rd_slice_is_empty(problems)) return;
+    if(!rd_has_problems(ctx)) return;
 
     g_pbproblems->setStyleSheet(STYLE);
     g_pbproblems->show();

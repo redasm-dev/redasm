@@ -20,7 +20,8 @@ SurfaceGraphNode::SurfaceGraphNode(RDSurfaceGraph* surface,
 }
 
 bool SurfaceGraphNode::contains_address(RDAddress address) const {
-    return address >= m_chunk->start && address < m_chunk->end;
+    return address >= rd_functionchunk_get_start(m_chunk) &&
+           address < rd_functionchunk_get_end(m_chunk);
 }
 
 int SurfaceGraphNode::current_row() const {
@@ -98,11 +99,16 @@ void SurfaceGraphNode::get_surface_pos(const QPointF& pt,
 }
 
 int SurfaceGraphNode::start_row() const {
-    return rd_surfacegraph_index_of(m_surface, m_chunk->start);
+    return rd_surfacegraph_index_of(m_surface,
+                                    rd_functionchunk_get_start(m_chunk));
 }
 
 int SurfaceGraphNode::end_row() const {
-    return rd_surfacegraph_last_index_of(m_surface, m_chunk->end - 1);
+    RDAddress end_address = rd_functionchunk_get_end(m_chunk);
+
+    // -1, chunk end is exclusive.
+    // we don't want the last subline of the next range
+    return rd_surfacegraph_last_index_of(m_surface, end_address - 1);
 }
 
 void SurfaceGraphNode::render(QPainter* painter, usize state) {

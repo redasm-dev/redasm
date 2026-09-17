@@ -179,7 +179,8 @@ GraphViewNode* SurfaceGraph::create_node(RDGraphNode n, const RDGraph*) {
 
     if(chunk) {
         auto* g = new SurfaceGraphNode(m_surface, chunk, n, this);
-        g->setObjectName(QString::number(chunk->start, 16));
+        g->setObjectName(
+            QString::number(rd_functionchunk_get_start(chunk), 16));
 
         connect(g, &SurfaceGraphNode::follow_requested, this, [&]() {
             RDAddress address;

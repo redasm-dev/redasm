@@ -441,7 +441,7 @@ void do_code() {
     if(!address) return;
 
     const RDSegment* seg = rd_find_segment(cv->context(), *address);
-    if(!seg || !(seg->perm & RD_SP_X)) return;
+    if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     auto res =
         QMessageBox::question(g_mainwindow, "Please confirm",
@@ -491,7 +491,7 @@ void create_function() {
     if(!address) return;
 
     const RDSegment* seg = rd_find_segment(cv->context(), *address);
-    if(!seg || !(seg->perm & RD_SP_X)) return;
+    if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     RDFlags f;
     if(!rd_get_flags(cv->context(), *address, &f) || rd_flags_has_func(f))
@@ -524,7 +524,7 @@ void patch_instruction() {
     if(!address) return;
 
     const RDSegment* seg = rd_find_segment(cv->context(), *address);
-    if(!seg || !(seg->perm & RD_SP_X)) return;
+    if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     RDFlags f;
     if(!rd_get_flags(cv->context(), *address, &f) || !rd_flags_has_code(f))

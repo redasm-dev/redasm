@@ -7,7 +7,10 @@ FlagsBuffer::FlagsBuffer(RDContext* ctx, const RDSegment* segment,
 }
 
 const RDFlagsBuffer* FlagsBuffer::flags() const { return m_flags; }
-quint64 FlagsBuffer::base_address() const { return m_segment->start_address; }
+
+quint64 FlagsBuffer::base_address() const {
+    return rd_segment_get_start(m_segment);
+}
 
 qint64 FlagsBuffer::length() const {
     return static_cast<qint64>(rd_flagsbuffer_get_length(m_flags));

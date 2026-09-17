@@ -173,7 +173,8 @@ QMenu* create_surface_menu(ISurface* surface) {
         if(flags_found) {
             const RDSegment* seg =
                 rd_find_segment(surface->context(), *cursor_addr);
-            act_create_function->setVisible(seg && (seg->perm & RD_SP_X) &&
+            act_create_function->setVisible(seg &&
+                                            rd_segment_has_perm(seg, RD_SP_X) &&
                                             !rd_flags_has_func(f));
         }
         else
@@ -199,10 +200,10 @@ QMenu* create_surface_menu(ISurface* surface) {
             act_undefine->setVisible(seg && !rd_flags_has_unknown(f));
             act_data->setVisible(seg && !rd_flags_has_data(f));
 
-            act_code->setVisible(seg && (seg->perm & RD_SP_X) &&
+            act_code->setVisible(seg && rd_segment_has_perm(seg, RD_SP_X) &&
                                  !rd_flags_has_code(f));
 
-            act_patch->setVisible(seg && (seg->perm & RD_SP_X) &&
+            act_patch->setVisible(seg && rd_segment_has_perm(seg, RD_SP_X) &&
                                   rd_flags_has_code(f));
         }
         else {
