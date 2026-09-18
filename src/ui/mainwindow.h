@@ -20,12 +20,12 @@
 #include <QStringList>
 #endif
 
-#define MW_ACTION_ITEM(type, act_type, kind, icon, text, key, children)        \
+#define MW_ACTION_ITEM(type, act_type, kind, icon_id, text, key, children)     \
     {                                                                          \
         MWActionType::type,                                                    \
         MWNodeKind::kind,                                                      \
         actions::Type::act_type,                                               \
-        icon,                                                                  \
+        icon_id,                                                               \
         text,                                                                  \
         key,                                                                   \
         children,                                                              \
@@ -33,20 +33,20 @@
 
 #define MW_ACTION_SEP MW_ACTION_ITEM(NONE, NONE, SEPARATOR, {}, {}, {}, {})
 
-#define MW_ACTION_TREE(icon, text, children)                                   \
-    MW_ACTION_ITEM(NONE, NONE, MENU, icon, text, {}, children)
+#define MW_ACTION_TREE(icon_id, text, children)                                \
+    MW_ACTION_ITEM(NONE, NONE, MENU, icon_id, text, {}, children)
 
-#define MW_ACTION_TREE_ID(type, icon, text, children)                          \
-    MW_ACTION_ITEM(type, NONE, MENU, icon, text, {}, children)
+#define MW_ACTION_TREE_ID(type, icon_id, text, children)                       \
+    MW_ACTION_ITEM(type, NONE, MENU, icon_id, text, {}, children)
 
-#define MW_ACTION_TREE_DYNAMIC(type, icon, text)                               \
-    MW_ACTION_ITEM(type, NONE, MENU, icon, text, {}, {})
+#define MW_ACTION_TREE_DYNAMIC(type, icon_id, text)                            \
+    MW_ACTION_ITEM(type, NONE, MENU, icon_id, text, {}, {})
 
 #define MW_ACTION_TYPE(type, act_type)                                         \
-    MW_ACTION_ITEM(type, act_type, LEAF, {}, {}, {}, {})
+    MW_ACTION_ITEM(type, act_type, LEAF, 0, {}, {}, {})
 
-#define MW_ACTION(type, icon, text, key)                                       \
-    MW_ACTION_ITEM(type, NONE, LEAF, icon, text, key, {})
+#define MW_ACTION(type, icon_id, text, key)                                    \
+    MW_ACTION_ITEM(type, NONE, LEAF, icon_id, text, key, {})
 
 namespace ui {
 
@@ -104,7 +104,7 @@ struct MWMenuAction {
     MWNodeKind kind;
     actions::Type action_type;
 
-    QIcon icon;
+    unsigned int icon_id;
     QString text;
     QKeySequence key;
 
@@ -138,51 +138,51 @@ inline const QList<MWMenuAction>& MENU_BAR() { // NOLINT
     static const QList<MWMenuAction> DATA = []() {
         // clang-format off
         const QList<MWMenuAction> MENU_FILE_EXPORT = {
-            MW_ACTION(FILE_EXPORT_DATABASE, {}, "Database", {}),
-            MW_ACTION(FILE_EXPORT_INPUT, {}, "Input", {}),
-            MW_ACTION(FILE_EXPORT_PATCH, {}, "Patched Input", {}),
+            MW_ACTION(FILE_EXPORT_DATABASE, 0, "Database", {}),
+            MW_ACTION(FILE_EXPORT_INPUT, 0, "Input", {}),
+            MW_ACTION(FILE_EXPORT_PATCH, 0, "Patched Input", {}),
         };
 
         const QList<MWMenuAction> MENU_TOOLS_DEV = {
-            MW_ACTION(TOOLS_DEV_DECODER, {}, "&Decoder/Encoder", {}),
-            MW_ACTION(TOOLS_DEV_GRAPHS, {}, "&Graphs", {}),
+            MW_ACTION(TOOLS_DEV_DECODER, 0, "&Decoder/Encoder", {}),
+            MW_ACTION(TOOLS_DEV_GRAPHS, 0, "&Graphs", {}),
         };
 
         const QList<MWMenuAction> MENU_FILE = {
-            MW_ACTION(FILE_OPEN, FA_ICON(0xf07c), "&Open", QKeySequence{Qt::CTRL | Qt::Key_O}),
-            MW_ACTION(FILE_SAVE, FA_ICON(0xf0c7), "Save", QKeySequence{Qt::CTRL | Qt::Key_S}),
-            MW_ACTION(FILE_SAVE_AS, {}, "Save as…", QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_S}),
-            MW_ACTION_TREE_ID(FILE_EXPORT, FA_ICON(0xf30b), "Export…", MENU_FILE_EXPORT),
-            MW_ACTION(FILE_CLOSE, {}, "Close", {}),
+            MW_ACTION(FILE_OPEN, 0xf07c, "&Open", QKeySequence{Qt::CTRL | Qt::Key_O}),
+            MW_ACTION(FILE_SAVE, 0xf0c7, "Save", QKeySequence{Qt::CTRL | Qt::Key_S}),
+            MW_ACTION(FILE_SAVE_AS, 0, "Save as…", QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_S}),
+            MW_ACTION_TREE_ID(FILE_EXPORT, 0xf30b, "Export…", MENU_FILE_EXPORT),
+            MW_ACTION(FILE_CLOSE, 0, "Close", {}),
             MW_ACTION_SEP,
             MW_ACTION_TREE_DYNAMIC(FILE_RECENTS, {}, "&Recent Files"),
             MW_ACTION_TYPE(NONE, OPEN_SETTINGS),
-            MW_ACTION(FILE_EXIT, {}, "Exit", {}),
+            MW_ACTION(FILE_EXIT, 0, "Exit", {}),
         };
 
         const QList<MWMenuAction> MENU_VIEW = {
-            MW_ACTION(VIEW_MEMORY_MAP, {}, "Memory Map", QKeySequence{Qt::SHIFT | Qt::Key_F1}),
-            MW_ACTION(VIEW_MAPPINGS, FA_ICON(0xe697), "Mappings", QKeySequence{Qt::SHIFT | Qt::Key_F2}),
-            MW_ACTION(VIEW_SEGMENTS, FA_ICON(0xf200), "Segments", QKeySequence{Qt::SHIFT | Qt::Key_F3}),
-            MW_ACTION(VIEW_SEGMENT_REGS, {}, "Segment Registers", QKeySequence{Qt::SHIFT | Qt::Key_F4}),
-            MW_ACTION(VIEW_STRINGS, FA_ICON(0xf031), "&Strings", QKeySequence{Qt::SHIFT | Qt::Key_F5}),
-            MW_ACTION(VIEW_TYPEDEFS, FA_ICON(0xf1b3), "&Type Definitions", QKeySequence{Qt::SHIFT | Qt::Key_F6}),
+            MW_ACTION(VIEW_MEMORY_MAP, 0, "Memory Map", QKeySequence{Qt::SHIFT | Qt::Key_F1}),
+            MW_ACTION(VIEW_MAPPINGS, 0xe697, "Mappings", QKeySequence{Qt::SHIFT | Qt::Key_F2}),
+            MW_ACTION(VIEW_SEGMENTS, 0xf200, "Segments", QKeySequence{Qt::SHIFT | Qt::Key_F3}),
+            MW_ACTION(VIEW_SEGMENT_REGS, 0, "Segment Registers", QKeySequence{Qt::SHIFT | Qt::Key_F4}),
+            MW_ACTION(VIEW_STRINGS, 0xf031, "&Strings", QKeySequence{Qt::SHIFT | Qt::Key_F5}),
+            MW_ACTION(VIEW_TYPEDEFS, 0xf1b3, "&Type Definitions", QKeySequence{Qt::SHIFT | Qt::Key_F6}),
             MW_ACTION_SEP,
-            MW_ACTION(VIEW_EXPORTED, FA_ICON(0xf56e), "&Exported", QKeySequence{Qt::SHIFT | Qt::Key_F7}),
-            MW_ACTION(VIEW_IMPORTED, FA_ICON(0xf56f), "&Imported", QKeySequence{Qt::SHIFT | Qt::Key_F8}),
+            MW_ACTION(VIEW_EXPORTED, 0xf56e, "&Exported", QKeySequence{Qt::SHIFT | Qt::Key_F7}),
+            MW_ACTION(VIEW_IMPORTED, 0xf56f, "&Imported", QKeySequence{Qt::SHIFT | Qt::Key_F8}),
         };
 
         const QList<MWMenuAction> MENU_ANALYSIS = {
             MW_ACTION_TYPE(ANALYSIS_GOTO, GOTO),
-            MW_ACTION(ANALYSIS_PROBLEMS, {}, "&Problems", {}),
+            MW_ACTION(ANALYSIS_PROBLEMS, 0, "&Problems", {}),
             MW_ACTION_SEP,
-            MW_ACTION(ANALYSIS_REBASE, {}, "Rebase", {}),
-            MW_ACTION(ANALYSIS_REANALYZE, {}, "Reanalyze", {}),
+            MW_ACTION(ANALYSIS_REBASE, 0, "Rebase", {}),
+            MW_ACTION(ANALYSIS_REANALYZE, 0, "Reanalyze", {}),
         };
 
         const QList<MWMenuAction> MENU_TOOLS = {
-            MW_ACTION(TOOLS_FLC, {}, "&FLC", {}),
-            MW_ACTION_TREE({}, "Dev", MENU_TOOLS_DEV),
+            MW_ACTION(TOOLS_FLC, 0, "&FLC", {}),
+            MW_ACTION_TREE(0, "Dev", MENU_TOOLS_DEV),
         };
 
         const QList<MWMenuAction> MENU_WINDOW = {
@@ -219,7 +219,8 @@ void build_actions_tree(QtContainer* parent, QWidget* owner,
             case MWNodeKind::SEPARATOR: parent->addSeparator(); break;
 
             case MWNodeKind::MENU: {
-                QMenu* menu = parent->addMenu(item.icon, item.text);
+                QMenu* menu = parent->addMenu(
+                    item.icon_id ? FA_ICON(item.icon_id) : QIcon{}, item.text);
                 if(item.type != MWActionType::NONE)
                     mw_actions.insert(item.type, menu);
                 if(!item.actions.isEmpty())
@@ -232,7 +233,7 @@ void build_actions_tree(QtContainer* parent, QWidget* owner,
 
                 if(item.action_type != actions::Type::NONE) {
                     Q_ASSERT_X(
-                        item.icon.isNull() && item.text.isEmpty() &&
+                        !item.icon_id && item.text.isEmpty() &&
                             item.key.isEmpty(),
                         "buildActions",
                         "icon/text/key are ignored when action_type is set; "
@@ -242,7 +243,9 @@ void build_actions_tree(QtContainer* parent, QWidget* owner,
                     parent->addAction(action);
                 }
                 else {
-                    action = new QAction(item.icon, item.text, owner);
+                    action = new QAction(item.icon_id ? FA_ICON(item.icon_id)
+                                                      : QIcon{},
+                                         item.text, owner);
                     if(!item.key.isEmpty()) action->setShortcut(item.key);
                     parent->addAction(action);
                 }
