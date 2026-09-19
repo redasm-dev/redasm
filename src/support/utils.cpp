@@ -69,7 +69,7 @@ QPixmap copy_screenshot(QWidget* w) {
 } // namespace
 
 QString to_hex(RDAddress address, const RDContext* ctx) {
-    QString s = QString::number(address, 16).toUpper();
+    QString s = QString::number(static_cast<qulonglong>(address), 16).toUpper();
 
     if(ctx) {
         return s.rightJustified(
