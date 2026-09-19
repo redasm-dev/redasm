@@ -176,7 +176,7 @@ inline const QList<MWMenuAction>& MENU_BAR() { // NOLINT
             MW_ACTION_TYPE(ANALYSIS_GOTO, GOTO),
             MW_ACTION(ANALYSIS_PROBLEMS, 0, "&Problems", {}),
             MW_ACTION_SEP,
-            MW_ACTION(ANALYSIS_REBASE, 0, "Rebase", {}),
+            MW_ACTION_TYPE(ANALYSIS_REBASE, REBASE),
             MW_ACTION(ANALYSIS_REANALYZE, 0, "Reanalyze", {}),
         };
 

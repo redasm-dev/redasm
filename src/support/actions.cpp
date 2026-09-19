@@ -4,6 +4,7 @@
 #include "dialogs/goto.h"
 #include "dialogs/input.h"
 #include "dialogs/patch.h"
+#include "dialogs/rebase.h"
 #include "dialogs/settings.h"
 #include "dialogs/table.h"
 #include "dialogs/types.h"
@@ -140,7 +141,22 @@ void reanalyze() {
     }
 }
 
-void rebase() {}
+void rebase() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    auto* dlgrebase = new RebaseDialog(cv->context(), g_mainwindow);
+
+    QObject::connect(
+        dlgrebase, &RebaseDialog::accepted, g_mainwindow, [cv, dlgrebase]() {
+            if(rd_set_base_address(cv->context(), dlgrebase->address())) {
+                cv->invalidate();
+                cv->schedule_step();
+            }
+        });
+
+    dlgrebase->show();
+}
 
 void show_details() {
     ContextView* cv = g_mainwindow->context_view();

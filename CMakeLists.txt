@@ -47,6 +47,7 @@ target_sources(${PROJECT_NAME}
         src/dialogs/loader.cpp
         src/dialogs/memorymap.cpp
         src/dialogs/patch.cpp
+        src/dialogs/rebase.cpp
         src/dialogs/segmentregs.cpp
         src/dialogs/settings.cpp
         src/dialogs/table.cpp
