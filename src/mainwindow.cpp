@@ -227,8 +227,14 @@ void MainWindow::show_welcome_view() { // NOLINT
     connect(welcomeview, &WelcomeView::file_selected, this,
             &MainWindow::open_file);
 
+    // try to get the current loaded file
+    ContextView* old_cv = this->context_view();
+
     this->replace_view(welcomeview);
     this->enable_context_actions(false);
+
+    // clear logs only if a file was loaded
+    if(old_cv) m_ui.logview->clear();
 }
 
 void MainWindow::show_problems() {
@@ -325,7 +331,6 @@ void MainWindow::enable_context_actions(bool e) { // NOLINT
         statusbar::set_status_text(QString{});
         statusbar::problems_button()->hide();
         statusbar::status_button()->hide();
-        m_ui.logview->clear();
     }
 }
 
