@@ -13,6 +13,7 @@ const QString RECENT_FILES = "recent_files";
 const QString SELECTED_THEME = "selected_theme";
 const QString SELECTED_FONT = "selected_font";
 const QString SELECTED_FONT_SIZE = "selected_font_size";
+const QString NETWORK_ENABLED = "network_enabled";
 
 } // namespace
 
@@ -85,6 +86,10 @@ int REDasmSettings::current_font_size() const {
     return this->value(SELECTED_FONT_SIZE, size).toInt();
 }
 
+bool REDasmSettings::network_enabled() const {
+    return this->value(NETWORK_ENABLED).toBool();
+}
+
 void REDasmSettings::change_theme(const QString& theme) {
     this->setValue(SELECTED_THEME, theme.toLower());
 }
@@ -93,6 +98,10 @@ void REDasmSettings::change_font(const QFont& font) {
 }
 void REDasmSettings::change_font_size(int size) {
     this->setValue(SELECTED_FONT_SIZE, size);
+}
+
+void REDasmSettings::network_enabled(bool b) {
+    this->setValue(NETWORK_ENABLED, b);
 }
 
 QFont REDasmSettings::load_font() {

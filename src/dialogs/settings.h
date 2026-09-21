@@ -1,5 +1,6 @@
 #pragma once
 
+#include "support/settings.h"
 #include "ui/settingsdialog.h"
 
 class SettingsDialog: public QDialog {
@@ -10,9 +11,9 @@ public:
 
 private:
     void select_size(int size);
-    void select_current_theme();
-    void select_current_font();
-    void select_current_size();
+    void select_current_theme(const REDasmSettings& settings);
+    void select_current_font(const REDasmSettings& settings);
+    void select_current_size(const REDasmSettings& settings);
     void update_preview() const;
 
 public Q_SLOTS:

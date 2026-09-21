@@ -1,9 +1,11 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFontComboBox>
+#include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -16,6 +18,7 @@ struct SettingsDialog {
     QComboBox *cbxthemes, *cbxfontsizes;
     QFontComboBox* fcbxfonts;
     QPushButton* pbfontdefault;
+    QCheckBox* chknetwork;
     QLabel* lblpreview;
 
     explicit SettingsDialog(QDialog* self) {
@@ -30,15 +33,18 @@ struct SettingsDialog {
         this->lblpreview = new QLabel("Lorem ipsum dolor sit amet");
         this->lblpreview->setAlignment(Qt::AlignCenter);
 
-        auto* hbox1 = new QHBoxLayout();
-        hbox1->addWidget(new QLabel("Theme"));
-        hbox1->addWidget(this->cbxthemes, 1);
+        this->chknetwork = new QCheckBox("Enabled");
 
-        auto* hbox2 = new QHBoxLayout();
-        hbox2->addWidget(new QLabel("Font"));
-        hbox2->addWidget(this->fcbxfonts, 1);
-        hbox2->addWidget(this->cbxfontsizes);
-        hbox2->addWidget(this->pbfontdefault);
+        auto* hbox_font = new QHBoxLayout();
+        hbox_font->addWidget(this->fcbxfonts, 1);
+        hbox_font->addWidget(this->cbxfontsizes);
+        hbox_font->addWidget(this->pbfontdefault);
+
+        auto* form = new QFormLayout();
+        form->setLabelAlignment(Qt::AlignRight);
+        form->addRow("Network:", this->chknetwork);
+        form->addRow("Theme:", this->cbxthemes);
+        form->addRow("Font:", hbox_font);
 
         auto* gb = new QGroupBox("Preview");
         gb->setFlat(false);
@@ -50,8 +56,7 @@ struct SettingsDialog {
                                                QDialogButtonBox::Cancel);
 
         auto* vbox1 = new QVBoxLayout(self);
-        vbox1->addLayout(hbox1);
-        vbox1->addLayout(hbox2);
+        vbox1->addLayout(form);
         vbox1->addWidget(gb, 1);
         vbox1->addWidget(buttonbox);
 

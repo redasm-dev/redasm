@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "support/settings.h"
 #include "support/themeprovider.h"
 #include "support/utils.h"
 #include <QApplication>
@@ -149,9 +150,12 @@ int main(int argc, char** argv) {
         theme_provider::init();
         configure_search_paths();
 
+        REDasmSettings settings;
+
         QVector<const char*> kb_paths = get_kb_search_paths();
         RDInitParams params = {};
         params.kb_paths = kb_paths.data();
+        params.network_enabled = settings.network_enabled();
 
         MainWindow mw{params};
         load_modules();

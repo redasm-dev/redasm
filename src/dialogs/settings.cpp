@@ -1,5 +1,4 @@
 #include "settings.h"
-#include "support/settings.h"
 #include "support/themeprovider.h"
 #include <QApplication>
 #include <QMessageBox>
@@ -13,9 +12,12 @@ SettingsDialog::SettingsDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     for(int size : sizes)
         m_ui.cbxfontsizes->addItem(QString::number(size), size);
 
-    this->select_current_theme();
-    this->select_current_font();
-    this->select_current_size();
+    REDasmSettings settings;
+
+    this->select_current_theme(settings);
+    this->select_current_font(settings);
+    this->select_current_size(settings);
+    m_ui.chknetwork->setChecked(settings.network_enabled());
     this->update_preview();
 
     connect(m_ui.fcbxfonts, &QFontComboBox::currentFontChanged, this,
@@ -35,9 +37,8 @@ void SettingsDialog::select_size(int size) { // NOLINT
     }
 }
 
-void SettingsDialog::select_current_theme() { // NOLINT
-    REDasmSettings settings;
-
+void SettingsDialog::select_current_theme( // NOLINT
+    const REDasmSettings& settings) {
     for(int i = 0; i < m_ui.cbxthemes->count(); i++) {
         if(QString::compare(m_ui.cbxthemes->itemText(i),
                             settings.current_theme(), Qt::CaseInsensitive))
@@ -48,13 +49,12 @@ void SettingsDialog::select_current_theme() { // NOLINT
     }
 }
 
-void SettingsDialog::select_current_font() { // NOLINT
-    REDasmSettings settings;
+void SettingsDialog::select_current_font( // NOLINT
+    const REDasmSettings& settings) {
     m_ui.fcbxfonts->setCurrentFont(settings.current_font());
 }
 
-void SettingsDialog::select_current_size() {
-    REDasmSettings settings;
+void SettingsDialog::select_current_size(const REDasmSettings& settings) {
     this->select_size(settings.current_font_size());
 }
 
@@ -69,6 +69,7 @@ void SettingsDialog::accept() {
     settings.change_theme(m_ui.cbxthemes->currentText());
     settings.change_font(m_ui.fcbxfonts->currentFont());
     settings.change_font_size(m_ui.cbxfontsizes->currentData().toInt());
+    settings.network_enabled(m_ui.chknetwork->isChecked());
 
     QMessageBox::information(this, "Settings Applied",
                              "Restart to apply settings");
