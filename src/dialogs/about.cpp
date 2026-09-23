@@ -1,6 +1,9 @@
 #include "about.h"
 #include "support/themeprovider.h"
 #include "support/utils.h"
+#include <QDesktopServices>
+#include <QDir>
+#include <QFileInfo>
 #include <redasm/redasm.h>
 
 namespace {
@@ -9,7 +12,11 @@ void compile_config(QTextBrowser* txb) {
     const QString VERSION_CONTENT = R"(
 <div><b>Qt Version:</b> %1</div>
 <div><b>Core Version:</b> %2</div>
-<div><b>RDAPI Version:</b> %3.%4</div><br>
+<div><b>RDAPI Version:</b> %3.%4</div>
+)";
+
+    const QString SETTINGS_CONTENT = R"(
+<div><b>Settings File:</b> %1 %2</div><br>
 )";
 
     const QString SEARCH_PATHS_CONTENT = R"(
@@ -22,6 +29,23 @@ void compile_config(QTextBrowser* txb) {
                         .arg(rd_version_build())
                         .arg(RD_API_VERSION_MAJOR(RD_API_VERSION))
                         .arg(RD_API_VERSION_MINOR(RD_API_VERSION)));
+
+    txb->insertPlainText("\n");
+
+    const char* settings_filepath = rd_settings_get_filepath();
+
+    QString settings_state =
+        QString{R"(<font color="%1">(%2)</font>)"}
+            .arg(theme_provider::color(
+                     rd_settings_is_loaded() ? RD_THEME_SUCCESS : RD_THEME_FAIL)
+                     .name())
+            .arg(rd_settings_is_loaded() ? "LOADED" : "FAILED");
+
+    txb->insertHtml(SETTINGS_CONTENT
+                        .arg(settings_filepath
+                                 ? QString::fromUtf8(settings_filepath)
+                                 : "<i>None</i>")
+                        .arg(settings_filepath ? settings_state : ""));
 
     if(!utils::search_paths.isEmpty()) {
         QString lines;
@@ -189,4 +213,24 @@ AboutDialog::AboutDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     compile_processors(m_ui.txbprocessors);
     compile_analyzers(m_ui.txbanalyzers);
     compile_commands(m_ui.txbcommands);
+
+    if(rd_settings_get_filepath()) {
+        connect(m_ui.pbsettings, &QPushButton::clicked, this, [&]() {
+            QString fp = QString::fromUtf8(rd_settings_get_filepath());
+            QFileInfo fi{fp};
+
+            if(!fi.exists()) {
+                if(!QDir{fi.path()}.mkpath(".")) return;
+
+                QFile f{fp};
+                if(!f.open(QFile::WriteOnly)) return;
+                f.close();
+            }
+
+            // open containing folder
+            QDesktopServices::openUrl(fi.path());
+        });
+    }
+    else
+        m_ui.pbsettings->hide();
 }

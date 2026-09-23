@@ -21,7 +21,7 @@
 
 namespace {
 
-void configure_search_paths() {
+void get_configure_search_paths() {
 #if !defined(_WIN32)
     const char* appimage_dir = std::getenv("APPDIR");
     bool is_appimage = appimage_dir && std::getenv("APPIMAGE");
@@ -74,6 +74,12 @@ void configure_search_paths() {
         }
     }
     // clang-format on
+}
+
+QByteArray get_settings_filepath() {
+    const QString USER_DIR =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return (USER_DIR + "/settings.toml").toUtf8();
 }
 
 QVector<const char*> get_kb_search_paths() {
@@ -148,13 +154,16 @@ int main(int argc, char** argv) {
 
     { // Scoping makes sure that widgets and context are freed before deinit
         theme_provider::init();
-        configure_search_paths();
+        get_configure_search_paths();
 
         REDasmSettings settings;
 
         QVector<const char*> kb_paths = get_kb_search_paths();
+        QByteArray settings_filepath = get_settings_filepath();
+
         RDInitParams params = {};
         params.kb_paths = kb_paths.data();
+        params.settings_filepath = settings_filepath.constData();
         params.network_enabled = settings.network_enabled();
 
         MainWindow mw{params};

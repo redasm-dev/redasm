@@ -9,6 +9,22 @@ AnalyzerDialog::AnalyzerDialog(RDContext* ctx, QWidget* parent)
     this->get_analyzers();
     this->set_details_visible(false);
 
+    connect(
+        m_ui.tblanalyzers, &QTableView::doubleClicked,
+        [&](const QModelIndex& index) {
+            if(index.isValid()) {
+                QStandardItem* item = m_analyzersmodel->itemFromIndex(index);
+                if(!item) return;
+
+                bool is_checked =
+                    item->data(Qt::CheckStateRole).value<Qt::CheckState>() ==
+                    Qt::Checked;
+
+                item->setData(is_checked ? Qt::Unchecked : Qt::Checked,
+                              Qt::CheckStateRole);
+            }
+        });
+
     connect(m_analyzersmodel, &QStandardItemModel::itemChanged, this,
             [&](QStandardItem* item) {
                 rd_analyzeritem_select(
