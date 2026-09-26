@@ -243,7 +243,9 @@ void GraphView::paintEvent(QPaintEvent*) {
         usize itemstate = GraphViewNode::NONE;
         if(m_selecteditem == item) itemstate |= GraphViewNode::SELECTED;
 
+        painter.save();
         item->render(&painter, itemstate);
+        painter.restore();
     }
 }
 
@@ -260,7 +262,7 @@ void GraphView::selected_item_changed_event() {
 void GraphView::update_edge(const RDGraphEdge&) {}
 void GraphView::update_node(GraphViewNode*) {}
 void GraphView::begin_compute() {}
-void GraphView::end_compute() {}
+void GraphView::end_compute() { this->focus_root_block(); }
 
 void GraphView::compute_layout() {
     rd_graph_compute_layered(this->graph(), RD_LAYERED_LAYOUT_MEDIUM);

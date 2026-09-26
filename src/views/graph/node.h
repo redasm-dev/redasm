@@ -6,9 +6,6 @@
 #include <QRect>
 #include <redasm/redasm.h>
 
-#define BLOCK_MARGIN 4
-#define BLOCK_MARGINS -BLOCK_MARGIN, 0, BLOCK_MARGIN, 0
-
 class GraphViewNode: public QObject {
     Q_OBJECT
 
@@ -26,8 +23,16 @@ public:
     [[nodiscard]] int height() const;
     [[nodiscard]] QRect rect() const;
     [[nodiscard]] bool contains(const QPoint& p) const;
-    [[nodiscard]] const QPoint& position() const;
+    [[nodiscard]] QPoint position() const;
     void move(const QPoint& pos);
+
+protected:
+    [[nodiscard]] int adjusted_x(int x) const;
+    [[nodiscard]] int adjusted_y(int y) const;
+    [[nodiscard]] int adjusted_width(int w) const;
+    [[nodiscard]] int adjusted_height(int h) const;
+    void draw_chrome(QPainter* p, usize state) const;
+    void draw_edge(QPainter* p, usize state) const;
 
 protected:
     virtual void itemselection_changed(bool selected);
@@ -39,11 +44,14 @@ public:
     [[nodiscard]] QPoint map_to_item(const QPoint& p) const;
     [[nodiscard]] virtual int current_row() const;
     [[nodiscard]] virtual QSize size() const = 0;
-    virtual void render(QPainter* painter, size_t state) = 0;
+    virtual void render(QPainter* painter, usize state) = 0;
     virtual void invalidate(bool notify);
 
 public Q_SLOTS:
     void invalidate() { this->invalidate(true); }
+
+private:
+    void draw_shadow(QPainter* p, usize state) const;
 
 Q_SIGNALS:
     void invalidated();

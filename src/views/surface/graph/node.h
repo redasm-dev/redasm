@@ -16,16 +16,13 @@ public:
     [[nodiscard]] int start_row() const;
     [[nodiscard]] int end_row() const;
     void get_surface_pos(const QPointF& pt, RDSurfacePos* pos) const;
-    void render(QPainter* painter, usize state) override;
+    void render(QPainter* p, usize state) override;
     void update_metrics();
 
 protected:
     void mousedoubleclick_event(QMouseEvent*) override;
     void mousepress_event(QMouseEvent* e) override;
     void mousemove_event(QMouseEvent* e) override;
-
-private:
-    void draw_shadow(QPainter* painter, const QRect& r, bool selected);
 
 Q_SIGNALS:
     void follow_requested();

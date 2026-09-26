@@ -1,5 +1,10 @@
 #pragma once
 
+#define RENDERER_BLOCK_CONTENT 4
+
+#define RENDERER_BLOCK_CONTENTS                                                \
+    -RENDERER_BLOCK_CONTENT, 0, -RENDERER_BLOCK_CONTENT, 0
+
 #include <QFont>
 #include <QPoint>
 #include <redasm/redasm.h>
