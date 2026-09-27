@@ -1,5 +1,6 @@
 #include "actions.h"
 #include "dialogs/about.h"
+#include "dialogs/callgraph.h"
 #include "dialogs/detail.h"
 #include "dialogs/goto.h"
 #include "dialogs/input.h"
@@ -316,6 +317,33 @@ void show_details() {
     dlg->show();
 }
 
+void show_callgraph() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    auto cursoraddr = cv->surface()->get_address_under_cursor();
+    auto currentaddr = cv->surface()->get_current_address();
+
+    RDAddress address;
+
+    if(cursoraddr)
+        address = *cursoraddr;
+    else if(currentaddr)
+        address = *currentaddr;
+    else
+        return;
+
+    auto* dlg = new CallGraphDialog(cv->context(), address, cv);
+
+    QObject::connect(dlg, &CallGraphDialog::address_requested, g_mainwindow,
+                     [](RDAddress address) {
+                         ContextView* curr_cv = g_mainwindow->context_view();
+                         if(curr_cv) curr_cv->surface()->jump_to(address);
+                     });
+
+    dlg->show();
+}
+
 void switch_listing() {
     ContextView* cv = g_mainwindow->context_view();
     if(!cv) return;
@@ -621,10 +649,11 @@ void init(QMainWindow* mw) {
         {Type::PATCH_INSTRUCTION, {IconKind::FA,   0xf462, "Patch Instruction",    Qt::SHIFT | Qt::Key_Space, patch_instruction, {}}},
         {Type::REANALYZE,         {IconKind::NONE, 0,      "Reanalyze",            {},                        reanalyze,         {}}},
         {Type::REBASE,            {IconKind::NONE, 0,      "Rebase",               {},                        rebase,            {}}},
-        {Type::OPEN_DETAILS,      {IconKind::FA,   0x3f,   "Details",              {},                        show_details,      {}}},
         {Type::SWITCH_TO_HEX,     {IconKind::FA,   0xe69b, "Hex Dump",             {},                        switch_hex,        {}}},
         {Type::SWITCH_TO_LISTING, {IconKind::FA,   0xf550, "Listing",              Qt::Key_Space,             switch_listing,    {}}},
         {Type::SWITCH_TO_GRAPH,   {IconKind::FA,   0xf542, "Graph",                Qt::Key_Space,             switch_graph,      {}}},
+        {Type::OPEN_DETAILS,      {IconKind::FA,   0x3f,   "Details",              {},                        show_details,      {}}},
+        {Type::OPEN_CALLGRAPH,    {IconKind::FA,   0xe695, "Call Graph",           {},                        show_callgraph,    {}}},
         {Type::OPEN_HOME,         {IconKind::FA,   0xf015, "Home",                 {},                        nullptr,           "https://redasm.dev"}},
         {Type::OPEN_GITHUB,       {IconKind::FAB,  0xf113, "Source Code",          {},                        nullptr,           "https://source.redasm.dev"}},
         {Type::OPEN_DISCORD,      {IconKind::FAB,  0xf392, "Discord",              {},                        nullptr,           "https://discord.redasm.dev"}},

@@ -38,6 +38,7 @@ target_sources(${PROJECT_NAME}
         src/delegates/recentfiles.cpp
         src/dialogs/about.cpp
         src/dialogs/analyzer.cpp
+        src/dialogs/callgraph.cpp
         src/dialogs/decoder.cpp
         src/dialogs/detail.cpp
         src/dialogs/devgraphs.cpp
@@ -77,6 +78,8 @@ target_sources(${PROJECT_NAME}
         src/support/syntaxhighlighter.cpp
         src/support/themeprovider.cpp
         src/support/utils.cpp
+        src/views/callgraph/graph.cpp
+        src/views/callgraph/node.cpp
         src/views/graph/node.cpp
         src/views/graph/view.cpp
         src/views/split/view.cpp

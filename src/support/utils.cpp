@@ -110,6 +110,7 @@ QMenu* create_surface_menu(ISurface* surface) {
     QAction* act_open_hex = actions::create(actions::SWITCH_TO_HEX, w);
     QAction* act_create_function = actions::create(actions::CREATE_FUNCTION, w);
     QAction* act_patch = actions::create(actions::PATCH_INSTRUCTION, w);
+    QAction* act_callgraph = actions::create(actions::OPEN_CALLGRAPH, w);
     // clang-format on
 
     auto* menu = new QMenu(w);
@@ -146,22 +147,35 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addSeparator();
     menu->addAction(actions::create(actions::GOTO, w, false));
     menu->addSeparator();
+    menu->addAction(act_callgraph);
     menu->addAction(actions::create(actions::OPEN_DETAILS, w));
 
     QObject::connect(menu, &QMenu::aboutToShow, w, [=]() {
         auto cursor_addr = surface->get_address_under_cursor();
         auto curr_addr = surface->get_current_address();
+        const RDFunction* func = nullptr;
 
         if(cursor_addr.has_value()) {
-            act_open_hex->setText(
-                QString{"Hex Dump @ %1"}.arg(utils::to_hex(*cursor_addr)));
+            func = rd_find_function(surface->context(), cursor_addr.value());
+            const char* sym_name =
+                rd_get_name(surface->context(), *cursor_addr);
+            QString name = sym_name ? QString::fromUtf8(sym_name)
+                                    : utils::to_hex(*cursor_addr);
+
+            act_open_hex->setText(QString{"Hex Dump @ %1"}.arg(name));
+            act_callgraph->setText(QString{"Call Graph @ %1"}.arg(name));
         }
-        else if(curr_addr.has_value())
+        else if(curr_addr.has_value()) {
+            func = rd_find_function(surface->context(), curr_addr.value());
+
             act_open_hex->setText("Hex Dump");
+            act_callgraph->setText("Call Graph");
+        }
 
         actcopy->setVisible(surface->has_selection());
         actrename->setVisible(cursor_addr.has_value());
         act_open_hex->setVisible(curr_addr.has_value());
+        act_callgraph->setVisible(!!func);
 
         actrefs->setVisible(cursor_addr.has_value() &&
                             !rd_slice_is_empty(rd_get_xrefs_to(
