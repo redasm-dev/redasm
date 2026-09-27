@@ -1,6 +1,5 @@
 #include "node.h"
 #include "support/surfacerenderer.h"
-#include "support/utils.h"
 #include <QApplication>
 #include <QPainter>
 #include <QWidget>
@@ -106,7 +105,7 @@ int SurfaceGraphNode::end_row() const {
 }
 
 void SurfaceGraphNode::render(QPainter* p, usize state) {
-    this->draw_chrome(p, state);
+    this->draw_chrome(p, state, true);
 
     int s = this->start_row();
     int e = this->end_row();
