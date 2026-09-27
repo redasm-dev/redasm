@@ -1,5 +1,6 @@
 #include "view.h"
 #include "support/themeprovider.h"
+#include "views/graph/node.h"
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -77,12 +78,13 @@ void GraphView::focus_block(const GraphViewNode* item, bool force) {
 
 void GraphView::mouseDoubleClickEvent(QMouseEvent* e) {
     QPoint itempos;
-    bool updated = this->update_selected_item(e, &itempos);
+    GraphViewNode* hit = this->node_from_pos(e->position(), &itempos);
+    bool updated = this->update_selected_item(hit);
 
-    if(m_selecteditem && (e->buttons() == Qt::LeftButton)) {
-        QMouseEvent iteme{e->type(),   itempos,      e->globalPosition(),
-                          e->button(), e->buttons(), e->modifiers()};
-        m_selecteditem->mousedoubleclick_event(&iteme);
+    if(hit && (e->buttons() == Qt::LeftButton)) {
+        QMouseEvent item_event{e->type(),   itempos,      e->globalPosition(),
+                               e->button(), e->buttons(), e->modifiers()};
+        hit->mousedoubleclick_event(&item_event);
     }
 
     if(updated) this->selected_item_changed_event();
@@ -91,15 +93,16 @@ void GraphView::mouseDoubleClickEvent(QMouseEvent* e) {
 
 void GraphView::mousePressEvent(QMouseEvent* e) {
     QPoint itempos;
-    bool updated = this->update_selected_item(e, &itempos);
+    GraphViewNode* hit = this->node_from_pos(e->position(), &itempos);
+    bool updated = this->update_selected_item(hit);
 
-    if(m_selecteditem) {
-        QMouseEvent iteme = {
+    if(hit) {
+        QMouseEvent item_event = {
             e->type(),   itempos,      e->globalPosition(),
             e->button(), e->buttons(), e->modifiers(),
         };
 
-        m_selecteditem->mousepress_event(&iteme);
+        hit->mousepress_event(&item_event);
     }
     else if(e->button() == Qt::LeftButton) {
         m_scrollmode = true;
@@ -126,35 +129,49 @@ void GraphView::mouseReleaseEvent(QMouseEvent* e) {
 }
 
 void GraphView::mouseMoveEvent(QMouseEvent* e) {
-    if(m_selecteditem) {
-        QPoint itempos;
-        GraphViewNode* item = this->node_from_pos(e->position(), &itempos);
+    QPoint itempos;
+    GraphViewNode* item = this->node_from_pos(e->position(), &itempos);
 
-        if(item == m_selecteditem) {
-            QMouseEvent iteme = {
-                e->type(),   itempos,      e->globalPosition(),
-                e->button(), e->buttons(), e->modifiers(),
-            };
+    if(item) {
+        QMouseEvent item_event = {
+            e->type(),   itempos,      e->globalPosition(),
+            e->button(), e->buttons(), e->modifiers(),
+        };
 
-            m_selecteditem->mousemove_event(&iteme);
+        if(m_lastmoveitem != item) {
+            m_lastmoveitem = item;
+            item->mouseenter_event(&item_event);
         }
 
+        item->mousemove_event(&item_event);
         return;
     }
 
-    if(m_scrollmode) {
-        QPoint delta = {
-            m_scrollbase.x() - qRound(e->position().x()),
-            m_scrollbase.y() - qRound(e->position().y()),
+    if(m_lastmoveitem) {
+        QMouseEvent item_event = {
+            e->type(),   itempos,      e->globalPosition(),
+            e->button(), e->buttons(), e->modifiers(),
         };
 
-        m_scrollbase = e->pos();
+        m_lastmoveitem->mouseleave_event(&item_event);
+        m_lastmoveitem = nullptr;
+    }
 
-        this->horizontalScrollBar()->setValue(
-            this->horizontalScrollBar()->value() + delta.x());
+    if(e->buttons() == Qt::LeftButton) {
+        if(m_scrollmode) {
+            QPoint delta = {
+                m_scrollbase.x() - qRound(e->position().x()),
+                m_scrollbase.y() - qRound(e->position().y()),
+            };
 
-        this->verticalScrollBar()->setValue(this->verticalScrollBar()->value() +
-                                            delta.y());
+            m_scrollbase = e->pos();
+
+            this->horizontalScrollBar()->setValue(
+                this->horizontalScrollBar()->value() + delta.x());
+
+            this->verticalScrollBar()->setValue(
+                this->verticalScrollBar()->value() + delta.y());
+        }
     }
 
     QAbstractScrollArea::mouseMoveEvent(e);
@@ -194,6 +211,7 @@ void GraphView::paintEvent(QPaintEvent*) {
     };
 
     QPainter painter(this->viewport());
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.translate(translation);
     painter.scale(m_scalefactor, m_scalefactor);
 
@@ -280,6 +298,7 @@ void GraphView::update_graph() {
 
     if(g != m_lastgraph) {
         m_selecteditem = nullptr;
+        m_lastmoveitem = nullptr;
 
         for(auto* item : m_nodes)
             item->deleteLater();
@@ -505,9 +524,11 @@ void GraphView::precompute_line(const RDGraphEdge& e) {
     m_lines[e] = lines;
 }
 
-bool GraphView::update_selected_item(QMouseEvent* e, QPoint* itempos) {
+bool GraphView::update_selected_item(GraphViewNode* hit) {
     GraphViewNode* olditem = m_selecteditem;
-    m_selecteditem = this->node_from_pos(e->position(), itempos);
+    if(hit) m_selecteditem = hit;
+
+    if(olditem == m_selecteditem) return false;
 
     if(olditem) {
         olditem->itemselection_changed(false);
@@ -519,5 +540,5 @@ bool GraphView::update_selected_item(QMouseEvent* e, QPoint* itempos) {
         m_selecteditem->invalidate();
     }
 
-    return olditem != m_selecteditem;
+    return true;
 }

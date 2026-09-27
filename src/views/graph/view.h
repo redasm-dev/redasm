@@ -4,7 +4,6 @@
 //   https://github.com/x64dbg/x64dbg/blob/development/src/gui/Src/Gui/DisassemblerGraphView.h
 //   https://github.com/x64dbg/x64dbg/blob/development/src/gui/Src/Gui/DisassemblerGraphView.cpp
 
-#include "views/graph/node.h"
 #include <QAbstractScrollArea>
 #include <QList>
 #include <QVector>
@@ -29,6 +28,8 @@ struct equal_to<RDGraphEdge> {
 };
 
 } // namespace std
+
+class GraphViewNode;
 
 class GraphView: public QAbstractScrollArea {
     Q_OBJECT
@@ -73,7 +74,7 @@ private:
                      bool fit = false);
     void precompute_arrow(const RDGraphEdge& e);
     void precompute_line(const RDGraphEdge& e);
-    bool update_selected_item(QMouseEvent* e, QPoint* itempos = nullptr);
+    bool update_selected_item(GraphViewNode* hit);
 
 Q_SIGNALS:
     void selected_item_changed();
@@ -83,7 +84,7 @@ protected:
     QHash<RDGraphNode, GraphViewNode*> m_nodes;
 
 private:
-    GraphViewNode* m_selecteditem{nullptr};
+    GraphViewNode *m_selecteditem{nullptr}, *m_lastmoveitem{nullptr};
     std::unordered_map<RDGraphEdge, QVector<QLine>> m_lines;
     std::unordered_map<RDGraphEdge, QPolygon> m_arrows;
     QPoint m_renderoffset, m_scrollbase;
