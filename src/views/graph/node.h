@@ -6,6 +6,8 @@
 #include <QRect>
 #include <redasm/redasm.h>
 
+class GraphView;
+
 class GraphViewNode: public QObject {
     Q_OBJECT
 
@@ -15,7 +17,7 @@ public:
     enum { NONE = 0, SELECTED, FOCUSED };
 
 public:
-    explicit GraphViewNode(RDGraphNode node, QObject* parent = nullptr);
+    explicit GraphViewNode(RDGraphNode node, QWidget* parent = nullptr);
     [[nodiscard]] RDGraphNode node() const;
     [[nodiscard]] int x() const;
     [[nodiscard]] int y() const;
@@ -24,6 +26,7 @@ public:
     [[nodiscard]] QRect rect() const;
     [[nodiscard]] bool contains(const QPoint& p) const;
     [[nodiscard]] QPoint position() const;
+    [[nodiscard]] QWidget* parent_widget() const;
     void move(const QPoint& pos);
 
 protected:
@@ -31,7 +34,7 @@ protected:
     [[nodiscard]] int adjusted_y(int y) const;
     [[nodiscard]] int adjusted_width(int w) const;
     [[nodiscard]] int adjusted_height(int h) const;
-    void draw_chrome(QPainter* p, usize state) const;
+    void draw_chrome(QPainter* p, usize state, bool shadow) const;
     void draw_edge(QPainter* p, usize state) const;
 
 protected:
@@ -39,6 +42,8 @@ protected:
     virtual void mousedoubleclick_event(QMouseEvent* e);
     virtual void mousepress_event(QMouseEvent* e);
     virtual void mousemove_event(QMouseEvent* e);
+    virtual void mouseenter_event(QMouseEvent* e);
+    virtual void mouseleave_event(QMouseEvent* e);
 
 public:
     [[nodiscard]] QPoint map_to_item(const QPoint& p) const;

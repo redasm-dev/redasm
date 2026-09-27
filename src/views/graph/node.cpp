@@ -1,6 +1,7 @@
 #include "node.h"
 #include "support/surfacerenderer.h"
 #include "support/themeprovider.h"
+#include "views/graph/view.h"
 #include <QApplication>
 #include <QPalette>
 
@@ -10,7 +11,7 @@ constexpr int DROP_SHADOW_SIZE = 6;
 
 }
 
-GraphViewNode::GraphViewNode(RDGraphNode node, QObject* parent)
+GraphViewNode::GraphViewNode(RDGraphNode node, QWidget* parent)
     : QObject{parent}, m_node{node} {}
 
 RDGraphNode GraphViewNode::node() const { return m_node; }
@@ -22,6 +23,10 @@ QRect GraphViewNode::rect() const { return {m_pos, this->size()}; }
 
 bool GraphViewNode::contains(const QPoint& p) const {
     return this->rect().contains(p);
+}
+
+QWidget* GraphViewNode::parent_widget() const {
+    return qobject_cast<QWidget*>(this->parent());
 }
 
 QPoint GraphViewNode::position() const { return m_pos; }
@@ -36,6 +41,8 @@ int GraphViewNode::current_row() const { return 0; }
 void GraphViewNode::mousedoubleclick_event(QMouseEvent* e) { Q_UNUSED(e); }
 void GraphViewNode::mousepress_event(QMouseEvent* e) { Q_UNUSED(e); }
 void GraphViewNode::mousemove_event(QMouseEvent* e) { Q_UNUSED(e); }
+void GraphViewNode::mouseenter_event(QMouseEvent* e) { Q_UNUSED(e); }
+void GraphViewNode::mouseleave_event(QMouseEvent* e) { Q_UNUSED(e); }
 
 void GraphViewNode::invalidate(bool notify) {
     if(notify) Q_EMIT invalidated();
@@ -75,8 +82,8 @@ int GraphViewNode::adjusted_height(int h) const {
     return h + (RENDERER_BLOCK_CONTENT * 2);
 }
 
-void GraphViewNode::draw_chrome(QPainter* p, usize state) const {
-    this->draw_shadow(p, state);
+void GraphViewNode::draw_chrome(QPainter* p, usize state, bool shadow) const {
+    if(shadow) this->draw_shadow(p, state);
     p->fillRect(this->rect(), qApp->palette().color(QPalette::Base));
 }
 
