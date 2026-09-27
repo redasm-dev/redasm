@@ -17,8 +17,7 @@ struct ContextView {
     QTreeView* tvfunctions;
 
     explicit ContextView(RDContext* ctx, Scheduler* scheduler, QWidget* self) {
-        this->splitview =
-            new SurfaceSplitView(ctx, scheduler); // FIXME: model leaking in ui
+        this->splitview = new SurfaceSplitView(ctx, scheduler);
 
         this->tvfunctions = new QTreeView();
         this->tvfunctions->header()->setStretchLastSection(false);
