@@ -1,4 +1,5 @@
 #include "problems.h"
+#include "support/themeprovider.h"
 #include "support/utils.h"
 
 ProblemsModel::ProblemsModel(RDContext* ctx, QObject* parent)
@@ -8,20 +9,38 @@ ProblemsModel::ProblemsModel(RDContext* ctx, QObject* parent)
 
 RDAddress ProblemsModel::address(const QModelIndex& index) const {
     if(index.row() < static_cast<int>(m_problems.length))
-        return rd_slice_at(m_problems, index.row()).from_address;
+        return rd_slice_at(m_problems, index.row()).target.value;
 
     qFatal("Cannot get problem");
     return {};
 }
 
 QVariant ProblemsModel::data(const QModelIndex& index, int role) const {
+    const RDProblem* p = &rd_slice_at(m_problems, index.row());
+
     if(role == Qt::DisplayRole) {
-        const RDProblem* p = &rd_slice_at(m_problems, index.row());
 
         switch(index.column()) {
-            case 0: return utils::to_hex(p->from_address, m_context);
-            case 1: return utils::to_hex(p->address, m_context);
+            case 0: return utils::to_hex(p->from.value, m_context);
+            case 1: return utils::to_hex(p->target.value, m_context);
             case 2: return QString::fromUtf8(p->message);
+            default: break;
+        }
+    }
+    else if(role == Qt::ForegroundRole) {
+        switch(index.column()) {
+            case 0: {
+                if(!p->from.is_address)
+                    return theme_provider::color(RD_THEME_MUTED);
+                break;
+            }
+
+            case 1: {
+                if(!p->target.is_address)
+                    return theme_provider::color(RD_THEME_MUTED);
+                break;
+            }
+
             default: break;
         }
     }
@@ -40,7 +59,7 @@ QVariant ProblemsModel::headerData(int section, Qt::Orientation orientation,
 
     switch(section) {
         case 0: return tr("From");
-        case 1: return tr("Address");
+        case 1: return tr("Target");
         case 2: return tr("Problem");
         default: break;
     }
