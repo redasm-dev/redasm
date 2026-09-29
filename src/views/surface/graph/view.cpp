@@ -179,8 +179,6 @@ GraphViewNode* SurfaceGraphView::create_node(RDGraphNode n, const RDGraph*) {
 
     if(chunk) {
         auto* g = new SurfaceGraphNode(m_surface, chunk, n, this);
-        g->setObjectName(
-            QString::number(rd_functionchunk_get_start(chunk), 16));
 
         connect(g, &SurfaceGraphNode::follow_requested, this, [&]() {
             RDAddress address;
@@ -191,6 +189,7 @@ GraphViewNode* SurfaceGraphView::create_node(RDGraphNode n, const RDGraph*) {
 
         connect(g, &SurfaceGraphNode::invalidated, this,
                 &SurfaceGraphView::refresh_content);
+
         return g;
     }
 
@@ -310,10 +309,11 @@ void SurfaceGraphView::show_popup(const QPoint& pt) {
         RDAddress address;
         if(rd_surfacegraph_get_address_under_pos(m_surface, &pos, &address) &&
            rd_surfacegraph_index_of(m_surface, address) == -1) {
-            // m_popup->popup(address);
-            return;
+            const char* word =
+                rd_surfacegraph_get_word_under_pos(m_surface, &pos);
+            m_popup->popup(address, word ? QString::fromUtf8(word) : QString{});
         }
-
-        m_popup->hide();
+        else
+            m_popup->hide();
     }
 }
