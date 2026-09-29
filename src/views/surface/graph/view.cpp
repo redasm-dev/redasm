@@ -65,6 +65,8 @@ void SurfaceGraphView::jump_to(RDAddress address) {
         this->invalidate();
         Q_EMIT history_updated();
     }
+    else // fallback to listing
+        Q_EMIT view_requested(ViewRequest::LISTING, address);
 }
 
 bool SurfaceGraphView::invalidate() {
