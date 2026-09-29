@@ -2,7 +2,7 @@
 #include "actions.h"
 #include "support/fontawesome.h"
 #include "support/themeprovider.h"
-#include "views/surface/graph/graph.h"
+#include "views/surface/graph/view.h"
 #include "views/surface/hex.h"
 #include "views/surface/listing.h"
 #include <QAbstractItemModel>
@@ -33,7 +33,7 @@ QPixmap copy_screenshot(QWidget* w) {
     if(stackw) { // Try to grab surfaces
         if(auto* l = stackw->findChild<SurfaceListing*>(); l && l->isVisible())
             w = l->viewport();
-        else if(auto* g = stackw->findChild<SurfaceGraph*>();
+        else if(auto* g = stackw->findChild<SurfaceGraphView*>();
                 g && g->isVisible()) {
             w = g->viewport();
         }
@@ -94,7 +94,7 @@ QString confidence_text(RDConfidence c) {
 QMenu* create_surface_menu(ISurface* surface) {
     QWidget* w = surface->to_widget();
     auto* listing = qobject_cast<SurfaceListing*>(w);
-    auto* graph = qobject_cast<SurfaceGraph*>(w);
+    auto* graph = qobject_cast<SurfaceGraphView*>(w);
 
     // clang-format off
     QAction* actcopy = actions::create(actions::COPY, w);

@@ -7,14 +7,14 @@
 #include <QMenu>
 #include <optional>
 
-class SurfaceGraph: public GraphView, public ISurface {
+class SurfaceGraphView: public GraphView, public ISurface {
     Q_OBJECT
     Q_INTERFACES(ISurface)
 
 public:
     // clang-format off
-    explicit SurfaceGraph(RDContext* ctx, QWidget* parent = nullptr);
-    ~SurfaceGraph() override;
+    explicit SurfaceGraphView(RDContext* ctx, QWidget* parent = nullptr);
+    ~SurfaceGraphView() override;
     [[nodiscard]] QWidget* to_widget() override { return this; }
     [[nodiscard]] RDContext* context() override { return m_context; }
     [[nodiscard]] RDSurfacePos get_position() const override;

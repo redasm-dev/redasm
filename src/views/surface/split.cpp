@@ -3,7 +3,7 @@
 #include "support/themeprovider.h"
 #include "support/utils.h"
 #include "views/split/widget.h"
-#include "views/surface/graph/graph.h"
+#include "views/surface/graph/view.h"
 #include "views/surface/hex.h"
 #include "views/surface/view.h"
 #include <QComboBox>
@@ -50,14 +50,14 @@ ISurface* _splitwidget_findsurfacelisting(SplitWidget* split) {
     return nullptr;
 }
 
-SurfaceGraph* _splitwidget_findsurfacegraph(SplitWidget* split) {
+SurfaceGraphView* _splitwidget_findsurfacegraph(SplitWidget* split) {
     if(!split) return nullptr;
 
     auto* stackw = qobject_cast<QStackedWidget*>(split->widget());
 
     if(stackw) {
         for(int i = 0; i < stackw->count(); i++) {
-            if(auto* w = qobject_cast<SurfaceGraph*>(stackw->widget(i)); w)
+            if(auto* w = qobject_cast<SurfaceGraphView*>(stackw->widget(i)); w)
                 return w;
         }
     }
@@ -80,7 +80,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
 
     auto* stack = new QStackedWidget();
     auto* surfaceview = new SurfaceView(m_context);
-    auto* surfacegraph = new SurfaceGraph(m_context);
+    auto* surfacegraph = new SurfaceGraphView(m_context);
     auto* hexview = new HexView(m_context);
 
     stack->addWidget(surfaceview);
@@ -91,7 +91,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     connect(m_scheduler, &Scheduler::yield_requested, surfaceview->listing(),
             &SurfaceListing::invalidate);
     connect(m_scheduler, &Scheduler::yield_requested, surfacegraph,
-            &SurfaceGraph::invalidate);
+            &SurfaceGraphView::invalidate);
     connect(m_scheduler, &Scheduler::yield_requested, hexview,
             &HexView::invalidate);
 
@@ -196,7 +196,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                 }
             });
 
-    connect(surfacegraph, &SurfaceGraph::history_updated,
+    connect(surfacegraph, &SurfaceGraphView::history_updated,
             [surfacegraph, act_back, act_forward]() {
                 if(surfacegraph->isVisible()) { // Ignore spurious signals
                     act_back->setEnabled(surfacegraph->can_go_back());
@@ -209,7 +209,7 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
                 do_switch_view(req, address);
             });
 
-    connect(surfacegraph, &SurfaceGraph::view_requested, this,
+    connect(surfacegraph, &SurfaceGraphView::view_requested, this,
             [=](ISurface::ViewRequest req, std::optional<RDAddress> address) {
                 do_switch_view(req, address);
             });

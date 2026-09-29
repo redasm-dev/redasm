@@ -84,8 +84,8 @@ target_sources(${PROJECT_NAME}
         src/views/graph/view.cpp
         src/views/split/view.cpp
         src/views/split/widget.cpp
-        src/views/surface/graph/graph.cpp
         src/views/surface/graph/node.cpp
+        src/views/surface/graph/view.cpp
         src/views/surface/hex.cpp
         src/views/surface/listing.cpp
         src/views/surface/path.cpp

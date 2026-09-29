@@ -1,8 +1,8 @@
-#include "graph.h"
+#include "view.h"
 #include "statusbar.h"
 #include "support/utils.h"
 
-SurfaceGraph::SurfaceGraph(RDContext* ctx, QWidget* parent)
+SurfaceGraphView::SurfaceGraphView(RDContext* ctx, QWidget* parent)
     : GraphView{parent}, m_context{ctx} {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -10,38 +10,38 @@ SurfaceGraph::SurfaceGraph(RDContext* ctx, QWidget* parent)
     m_popup = new SurfacePopup(ctx, this);
     m_menu = utils::create_surface_menu(this);
 
-    connect(this, &SurfaceGraph::customContextMenuRequested, this,
+    connect(this, &SurfaceGraphView::customContextMenuRequested, this,
             [&](const QPoint&) {
                 if(this->selected_item()) m_menu->popup(QCursor::pos());
             });
 }
 
-SurfaceGraph::~SurfaceGraph() {
+SurfaceGraphView::~SurfaceGraphView() {
     rd_surfacegraph_destroy(m_surface);
     m_surface = nullptr;
 }
 
-bool SurfaceGraph::can_go_back() const {
+bool SurfaceGraphView::can_go_back() const {
     return rd_surfacegraph_can_go_back(m_surface);
 }
 
-bool SurfaceGraph::can_go_forward() const {
+bool SurfaceGraphView::can_go_forward() const {
     return rd_surfacegraph_can_go_forward(m_surface);
 }
 
-bool SurfaceGraph::has_selection() const {
+bool SurfaceGraphView::has_selection() const {
     return rd_surfacegraph_has_selection(m_surface);
 }
 
-RDRenderMode SurfaceGraph::get_mode() const {
+RDRenderMode SurfaceGraphView::get_mode() const {
     return rd_surfacegraph_get_mode(m_surface);
 }
 
-RDGraph* SurfaceGraph::graph() const {
+RDGraph* SurfaceGraphView::graph() const {
     return rd_surfacegraph_get_graph(m_surface);
 }
 
-void SurfaceGraph::jump_to_ep() {
+void SurfaceGraphView::jump_to_ep() {
     RDAddress ep;
     if(rd_get_entry_point(m_context, &ep)) return;
 
@@ -56,7 +56,7 @@ void SurfaceGraph::jump_to_ep() {
     }
 }
 
-void SurfaceGraph::jump_to(RDAddress address) {
+void SurfaceGraphView::jump_to(RDAddress address) {
     const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
 
     if(rd_surfacegraph_jump_to(m_surface, address)) {
@@ -67,24 +67,24 @@ void SurfaceGraph::jump_to(RDAddress address) {
     }
 }
 
-bool SurfaceGraph::invalidate() {
+bool SurfaceGraphView::invalidate() {
     rd_surfacegraph_render(m_surface);
     this->update_graph();
     return true;
 }
 
-void SurfaceGraph::refresh_content() {
+void SurfaceGraphView::refresh_content() {
     rd_surfacegraph_render(m_surface); // content only
     this->viewport()->update();        // repaint, don't relayout
     statusbar::set_address(this);
 }
 
-void SurfaceGraph::set_mode(RDRenderMode m) {
+void SurfaceGraphView::set_mode(RDRenderMode m) {
     rd_surfacegraph_set_mode(m_surface, m);
     this->invalidate();
 }
 
-bool SurfaceGraph::set_position(int row, int col) {
+bool SurfaceGraphView::set_position(int row, int col) {
     if(rd_surfacegraph_set_pos(m_surface, row, col)) {
         this->invalidate();
         return true;
@@ -93,7 +93,7 @@ bool SurfaceGraph::set_position(int row, int col) {
     return false;
 }
 
-bool SurfaceGraph::select(int row, int col) {
+bool SurfaceGraphView::select(int row, int col) {
     if(rd_surfacegraph_select(m_surface, row, col)) {
         this->invalidate();
         return true;
@@ -102,7 +102,7 @@ bool SurfaceGraph::select(int row, int col) {
     return false;
 }
 
-bool SurfaceGraph::select_all() {
+bool SurfaceGraphView::select_all() {
     SurfaceGraphNode* n = this->find_node_at_cursor();
     if(!n) return false;
 
@@ -112,7 +112,7 @@ bool SurfaceGraph::select_all() {
     return true;
 }
 
-bool SurfaceGraph::go_back() {
+bool SurfaceGraphView::go_back() {
     const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
 
     if(rd_surfacegraph_go_back(m_surface)) {
@@ -126,7 +126,7 @@ bool SurfaceGraph::go_back() {
     return false;
 }
 
-bool SurfaceGraph::go_forward() {
+bool SurfaceGraphView::go_forward() {
     const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
 
     if(rd_surfacegraph_go_forward(m_surface)) {
@@ -140,23 +140,23 @@ bool SurfaceGraph::go_forward() {
     return false;
 }
 
-void SurfaceGraph::clear_history() {
+void SurfaceGraphView::clear_history() {
     rd_surfacegraph_clear_history(m_surface);
     Q_EMIT history_updated();
 }
 
-void SurfaceGraph::compute_layout() {
+void SurfaceGraphView::compute_layout() {
     if(!m_surface) return;
 
     RDGraph* g = rd_surfacegraph_get_graph(m_surface);
     if(g) rd_graph_compute_layered(g, RD_LAYERED_LAYOUT_MEDIUM);
 }
 
-void SurfaceGraph::begin_compute() {
+void SurfaceGraphView::begin_compute() {
     if(m_functionchanged) this->reset_zoom();
 }
 
-void SurfaceGraph::end_compute() {
+void SurfaceGraphView::end_compute() {
     statusbar::set_address(this);
     if(!m_functionchanged) return;
 
@@ -168,12 +168,12 @@ void SurfaceGraph::end_compute() {
     m_functionchanged = false;
 }
 
-void SurfaceGraph::update_node(GraphViewNode* item) {
+void SurfaceGraphView::update_node(GraphViewNode* item) {
     auto* g = static_cast<SurfaceGraphNode*>(item);
     g->update_metrics();
 }
 
-GraphViewNode* SurfaceGraph::create_node(RDGraphNode n, const RDGraph*) {
+GraphViewNode* SurfaceGraphView::create_node(RDGraphNode n, const RDGraph*) {
     const RDFunction* f = rd_surfacegraph_get_function(m_surface);
     const RDFunctionChunk* chunk = rd_function_get_chunk(f, n);
 
@@ -190,14 +190,14 @@ GraphViewNode* SurfaceGraph::create_node(RDGraphNode n, const RDGraph*) {
         });
 
         connect(g, &SurfaceGraphNode::invalidated, this,
-                &SurfaceGraph::refresh_content);
+                &SurfaceGraphView::refresh_content);
         return g;
     }
 
     return nullptr;
 }
 
-void SurfaceGraph::keyPressEvent(QKeyEvent* e) {
+void SurfaceGraphView::keyPressEvent(QKeyEvent* e) {
     if(!utils::handle_key_press(this, e)) {
         RDSurfacePos pos = this->get_position();
         auto [row, col] = pos;
@@ -217,7 +217,7 @@ void SurfaceGraph::keyPressEvent(QKeyEvent* e) {
     this->invalidate();
 }
 
-void SurfaceGraph::focusInEvent(QFocusEvent* e) {
+void SurfaceGraphView::focusInEvent(QFocusEvent* e) {
     GraphView::focusInEvent(e);
 
     if(m_surface) {
@@ -226,7 +226,7 @@ void SurfaceGraph::focusInEvent(QFocusEvent* e) {
     }
 }
 
-void SurfaceGraph::focusOutEvent(QFocusEvent* e) {
+void SurfaceGraphView::focusOutEvent(QFocusEvent* e) {
     GraphView::focusOutEvent(e);
 
     if(m_surface) {
@@ -235,7 +235,7 @@ void SurfaceGraph::focusOutEvent(QFocusEvent* e) {
     }
 }
 
-bool SurfaceGraph::event(QEvent* event) {
+bool SurfaceGraphView::event(QEvent* event) {
     if(m_surface && event->type() == QEvent::ToolTip) {
         auto* helpevent = static_cast<QHelpEvent*>(event);
         this->show_popup(helpevent->pos());
@@ -245,15 +245,15 @@ bool SurfaceGraph::event(QEvent* event) {
     return GraphView::event(event);
 }
 
-RDSurfacePos SurfaceGraph::get_position() const {
+RDSurfacePos SurfaceGraphView::get_position() const {
     return rd_surfacegraph_get_pos(m_surface);
 }
 
-QString SurfaceGraph::get_selected_text() const {
+QString SurfaceGraphView::get_selected_text() const {
     return QString::fromUtf8(rd_surfacegraph_get_selected_text(m_surface));
 }
 
-std::optional<ISurfaceRange> SurfaceGraph::get_selected_range() const {
+std::optional<ISurfaceRange> SurfaceGraphView::get_selected_range() const {
     RDAddress start, end;
     if(!rd_surfacegraph_get_selected_range(m_surface, &start, &end))
         return std::nullopt;
@@ -261,26 +261,26 @@ std::optional<ISurfaceRange> SurfaceGraph::get_selected_range() const {
     return ISurfaceRange{start, end};
 }
 
-std::optional<RDAddress> SurfaceGraph::get_current_address() const {
+std::optional<RDAddress> SurfaceGraphView::get_current_address() const {
     RDAddress address;
     if(rd_surfacegraph_get_current_address(m_surface, &address)) return address;
     return std::nullopt;
 }
 
-std::optional<RDAddress> SurfaceGraph::get_address_under_cursor() const {
+std::optional<RDAddress> SurfaceGraphView::get_address_under_cursor() const {
     RDAddress address;
     if(rd_surfacegraph_get_address_under_cursor(m_surface, &address))
         return address;
     return std::nullopt;
 }
 
-std::optional<RDCellData> SurfaceGraph::get_cell_data_under_cursor() const {
+std::optional<RDCellData> SurfaceGraphView::get_cell_data_under_cursor() const {
     RDCellData cd;
     if(rd_surfacegraph_get_cell_data_under_cursor(m_surface, &cd)) return cd;
     return std::nullopt;
 }
 
-SurfaceGraphNode* SurfaceGraph::find_node(RDAddress address) {
+SurfaceGraphNode* SurfaceGraphView::find_node(RDAddress address) {
     for(GraphViewNode* g : m_nodes) {
         auto* sg = static_cast<SurfaceGraphNode*>(g);
         if(sg->contains_address(address)) return sg;
@@ -289,14 +289,14 @@ SurfaceGraphNode* SurfaceGraph::find_node(RDAddress address) {
     return nullptr;
 }
 
-SurfaceGraphNode* SurfaceGraph::find_node_at_cursor() {
+SurfaceGraphNode* SurfaceGraphView::find_node_at_cursor() {
     auto address = this->get_current_address();
     if(!address) return nullptr;
 
     return this->find_node(*address);
 }
 
-void SurfaceGraph::show_popup(const QPoint& pt) {
+void SurfaceGraphView::show_popup(const QPoint& pt) {
     if(!m_surface) return;
 
     QPoint nodepos;
