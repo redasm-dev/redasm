@@ -255,14 +255,19 @@ void GraphView::paintEvent(QPaintEvent*) {
 
     // Render nodes
     for(auto* item : m_nodes) {
-        if(!vpr.intersects(item->rect())) // Ignore blocks that are not in view
+        if(!vpr.intersects(item->rect())) // ignore blocks that are not in view
             continue;
 
-        usize itemstate = GraphViewNode::NONE;
-        if(m_selecteditem == item) itemstate |= GraphViewNode::SELECTED;
+        if(m_selecteditem == item) continue;
 
         painter.save();
-        item->render(&painter, itemstate);
+        item->render(&painter, GraphViewNode::NONE);
+        painter.restore();
+    }
+
+    if(m_selecteditem) { // draw selected node above others
+        painter.save();
+        m_selecteditem->render(&painter, GraphViewNode::SELECTED);
         painter.restore();
     }
 }
