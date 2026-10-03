@@ -123,15 +123,13 @@ void set_ready_status() {
 }
 
 void check_problems(const RDContext* ctx) {
-    if(!ctx) {
+    if(!ctx || !rd_has_problems(ctx)) {
         g_pbproblems->hide();
         return;
     }
 
     static const QString STYLE = QString{"color: %1;"}.arg(
         theme_provider::color(RD_THEME_WARNING).name());
-
-    if(!rd_has_problems(ctx)) return;
 
     g_pbproblems->setStyleSheet(STYLE);
     g_pbproblems->show();
