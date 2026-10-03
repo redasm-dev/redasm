@@ -474,8 +474,11 @@ void do_undefine() {
 
         if(res == QMessageBox::Yes &&
            rd_user_undefine_n(cv->context(), range->first,
-                              range->second - range->first + 1))
+                              range->second - range->first + 1,
+                              RD_UNDEFINE_ALL)) {
+            cv->schedule_step();
             cv->invalidate();
+        }
     }
     else {
         auto address = cv->surface()->get_current_address();
@@ -486,8 +489,11 @@ void do_undefine() {
                                   QString{"Do you want to undefine %1?"}.arg(
                                       utils::to_hex(*address)));
 
-        if(res == QMessageBox::Yes && rd_user_undefine(cv->context(), *address))
+        if(res == QMessageBox::Yes &&
+           rd_user_undefine(cv->context(), *address, RD_UNDEFINE_ALL)) {
+            cv->schedule_step();
             cv->invalidate();
+        }
     }
 }
 
