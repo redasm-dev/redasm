@@ -42,6 +42,7 @@ public Q_SLOTS:
     void jump_to(RDAddress address) override;
     void jump_to_ep() override;
     void clear_history() override;
+    void clear_selection() override;
     bool invalidate() override;
 
 protected:

@@ -18,6 +18,7 @@ public:
     // clang-format off
     virtual ~ISurface() = default;
     virtual void clear_history() = 0;
+    virtual void clear_selection() = 0;
     virtual void jump_to_ep() = 0;
     virtual void jump_to(RDAddress address) = 0;
     virtual void set_mode(RDRenderMode m) = 0;

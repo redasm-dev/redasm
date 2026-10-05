@@ -152,6 +152,11 @@ void SurfaceListing::clear_history() {
     Q_EMIT history_updated();
 }
 
+void SurfaceListing::clear_selection() {
+    rd_surface_clear_selection(m_surface);
+    this->viewport()->update();
+}
+
 void SurfaceListing::jump_to(RDAddress address) {
     if(!rd_surface_jump_to(m_surface, address)) return;
 

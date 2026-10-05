@@ -41,6 +41,7 @@ public Q_SLOTS:
     bool go_back() override;
     bool go_forward() override;
     void clear_history() override;
+    void clear_selection() override;
 
 protected:
     GraphViewNode* create_node(RDGraphNode n, const RDGraph* g) override;

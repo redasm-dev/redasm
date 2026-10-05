@@ -74,8 +74,8 @@ HexView::HexView(RDContext* ctx, QWidget* parent)
 }
 
 void HexView::clear_changes() { m_hexview->clearChanges(); }
-
 void HexView::clear_history() {}
+void HexView::clear_selection() { m_hexview->hexCursor()->clearSelection(); }
 bool HexView::can_go_back() const { return false; }
 bool HexView::can_go_forward() const { return false; }
 

@@ -33,6 +33,7 @@ public:
     // clang-format off
 public: // ISurface implementation
     void clear_history() override;
+    void clear_selection() override;
     void jump_to_ep() override;
     void jump_to(RDAddress address) override;
     void set_mode(RDRenderMode m) override;

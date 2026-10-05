@@ -147,6 +147,11 @@ void SurfaceGraphView::clear_history() {
     Q_EMIT history_updated();
 }
 
+void SurfaceGraphView::clear_selection() {
+    rd_surfacegraph_clear_selection(m_surface);
+    this->invalidate();
+}
+
 void SurfaceGraphView::compute_layout() {
     if(!m_surface) return;
 
