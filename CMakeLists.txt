@@ -127,6 +127,7 @@ set_target_properties(${PROJECT_NAME}
     PROPERTIES
         WIN32_EXECUTABLE ON
         MACOSX_BUNDLE ON
+        MACOSX_BUNDLE_BUNDLE_NAME "REDasm"
 )
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
