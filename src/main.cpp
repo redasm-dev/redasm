@@ -137,13 +137,13 @@ int main(int argc, char** argv) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QApplication app{argc, argv};
-    app.setApplicationName("redasm");
-    app.setApplicationDisplayName(
+    QApplication::setApplicationName("redasm");
+    QApplication::setApplicationVersion(rd_version_string());
+    QApplication::setApplicationDisplayName(
         QString{"REDasm %1"}.arg(rd_version_string()));
-    app.setApplicationVersion(rd_version_string());
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("The OpenSource Disassembler");
+    parser.setApplicationDescription("The Open Source Disassembler");
     parser.addHelpOption();
     parser.addVersionOption();
 
