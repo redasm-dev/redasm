@@ -475,8 +475,9 @@ void do_undefine() {
         if(res == QMessageBox::Yes &&
            rd_user_undefine_n(cv->context(), range->first,
                               range->second - range->first + 1,
-                              RD_UNDEFINE_ALL)) {
+                              RD_UNDEFINE_COMMENTS)) {
             cv->schedule_step();
+            cv->surface()->clear_selection();
             cv->invalidate();
         }
     }
@@ -490,7 +491,8 @@ void do_undefine() {
                                       utils::to_hex(*address)));
 
         if(res == QMessageBox::Yes &&
-           rd_user_undefine(cv->context(), *address, RD_UNDEFINE_ALL)) {
+           rd_user_undefine(cv->context(), *address,
+                            RD_UNDEFINE_TRACE | RD_UNDEFINE_COMMENTS)) {
             cv->schedule_step();
             cv->invalidate();
         }
