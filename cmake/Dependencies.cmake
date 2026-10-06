@@ -1,10 +1,8 @@
-include(cmake/CPM.cmake)
-
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup()
 
 function(setup_dependencies)
-    CPMAddPackage(
+    redasm_add_dependency(
         NAME QHexView
         VERSION "5.1.4"
         # GIT_TAG "master"
