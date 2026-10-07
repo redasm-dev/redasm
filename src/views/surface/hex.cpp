@@ -68,6 +68,7 @@ HexView::HexView(RDContext* ctx, QWidget* parent)
     vbox->addWidget(m_hexview);
 
     this->create_popup_menu();
+    this->jump_to_ep();
 
     connect(m_hexview, &QHexView::positionChanged, this,
             [&]() { statusbar::set_address(this); });
