@@ -88,7 +88,7 @@ void HexView::jump_to_ep() {
 }
 
 void HexView::jump_to(RDAddress address) {
-    const RDSegment* seg = rd_find_segment(m_context, address);
+    const RDSegment* seg = rd_segment_find(m_context, address);
     if(!seg) return;
 
     if(m_segment != seg) {

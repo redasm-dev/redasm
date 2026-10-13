@@ -188,7 +188,7 @@ QMenu* create_surface_menu(ISurface* surface) {
 
         if(flags_found) {
             const RDSegment* seg =
-                rd_find_segment(surface->context(), *cursor_addr);
+                rd_segment_find(surface->context(), *cursor_addr);
             act_create_function->setVisible(seg &&
                                             rd_segment_has_perm(seg, RD_SP_X) &&
                                             !rd_flags_has_func(f));
@@ -211,7 +211,7 @@ QMenu* create_surface_menu(ISurface* surface) {
 
         if(flags_found) {
             const RDSegment* seg =
-                rd_find_segment(surface->context(), *curr_addr);
+                rd_segment_find(surface->context(), *curr_addr);
 
             act_undefine->setVisible(seg && !rd_flags_has_unknown(f));
             act_data->setVisible(seg && !rd_flags_has_data(f));

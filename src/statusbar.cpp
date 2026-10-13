@@ -75,7 +75,7 @@ void set_address(ISurface* surface) {
         s += QString::fromWCharArray(L"\u00A0\u00A0");
     }
 
-    const RDSegment* seg = rd_find_segment(ctx, *address);
+    const RDSegment* seg = rd_segment_find(ctx, *address);
 
     s += QString::fromWCharArray(L"<b>Address: </b>%1\u00A0\u00A0")
              .arg(utils::to_hex(*address, ctx));

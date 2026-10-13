@@ -506,7 +506,7 @@ void do_code() {
     auto address = cv->surface()->get_current_address();
     if(!address) return;
 
-    const RDSegment* seg = rd_find_segment(cv->context(), *address);
+    const RDSegment* seg = rd_segment_find(cv->context(), *address);
     if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     auto res =
@@ -556,7 +556,7 @@ void create_function() {
     auto address = cv->surface()->get_address_under_cursor();
     if(!address) return;
 
-    const RDSegment* seg = rd_find_segment(cv->context(), *address);
+    const RDSegment* seg = rd_segment_find(cv->context(), *address);
     if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     RDFlags f;
@@ -589,7 +589,7 @@ void patch_instruction() {
     auto address = cv->surface()->get_current_address();
     if(!address) return;
 
-    const RDSegment* seg = rd_find_segment(cv->context(), *address);
+    const RDSegment* seg = rd_segment_find(cv->context(), *address);
     if(!seg || !rd_segment_has_perm(seg, RD_SP_X)) return;
 
     RDFlags f;

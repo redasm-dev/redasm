@@ -35,7 +35,7 @@ void FLCDialog::on_address_changed(const QString& s) {
             if(rd_to_offset(m_context, val, &offset)) {
                 m_ui.leoffset->setText(rd_to_hexaddr(m_context, offset));
 
-                const RDSegment* seg = rd_find_segment(m_context, val);
+                const RDSegment* seg = rd_segment_find(m_context, val);
 
                 if(seg)
                     m_ui.lesegment->setText(rd_segment_get_name(seg));
@@ -69,7 +69,7 @@ void FLCDialog::on_offset_changed(const QString& s) {
             if(rd_to_address(m_context, val, &address)) {
                 m_ui.leaddress->setText(rd_to_hexaddr(m_context, address));
 
-                const RDSegment* seg = rd_find_segment(m_context, address);
+                const RDSegment* seg = rd_segment_find(m_context, address);
 
                 if(seg)
                     m_ui.lesegment->setText(rd_segment_get_name(seg));
