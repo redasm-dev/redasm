@@ -31,3 +31,8 @@ FeedbackPushButton::FeedbackPushButton(QWidget* parent)
         });
     });
 }
+
+FeedbackPushButton::FeedbackPushButton(const QString& text, QWidget* parent)
+    : FeedbackPushButton{parent} {
+    this->setText(text);
+}

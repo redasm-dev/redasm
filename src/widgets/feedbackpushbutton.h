@@ -7,6 +7,7 @@ class FeedbackPushButton: public QPushButton {
 
 public:
     explicit FeedbackPushButton(QWidget* parent = nullptr);
+    explicit FeedbackPushButton(const QString& text, QWidget* parent = nullptr);
 
     // clang-format off
     [[nodiscard]] int feedback_interval() const { return m_feedbackinterval; }
