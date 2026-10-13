@@ -153,10 +153,11 @@ QMenu* create_surface_menu(ISurface* surface) {
     QObject::connect(menu, &QMenu::aboutToShow, w, [=]() {
         auto cursor_addr = surface->get_address_under_cursor();
         auto curr_addr = surface->get_current_address();
-        const RDFunction* func = nullptr;
+        bool in_func = false;
 
         if(cursor_addr.has_value()) {
-            func = rd_find_function(surface->context(), cursor_addr.value());
+            in_func = rd_function_find(surface->context(), cursor_addr.value(),
+                                       nullptr);
             const char* sym_name =
                 rd_get_name(surface->context(), *cursor_addr);
             QString name = sym_name ? QString::fromUtf8(sym_name)
@@ -166,7 +167,8 @@ QMenu* create_surface_menu(ISurface* surface) {
             act_callgraph->setText(QString{"Call Graph @ %1"}.arg(name));
         }
         else if(curr_addr.has_value()) {
-            func = rd_find_function(surface->context(), curr_addr.value());
+            in_func = rd_function_find(surface->context(), curr_addr.value(),
+                                       nullptr);
 
             act_open_hex->setText("Hex Dump");
             act_callgraph->setText("Call Graph");
@@ -175,7 +177,7 @@ QMenu* create_surface_menu(ISurface* surface) {
         actcopy->setVisible(surface->has_selection());
         actrename->setVisible(cursor_addr.has_value());
         act_open_hex->setVisible(curr_addr.has_value());
-        act_callgraph->setVisible(!!func);
+        act_callgraph->setVisible(in_func);
 
         actrefs->setVisible(cursor_addr.has_value() &&
                             !rd_slice_is_empty(rd_get_xrefs_to(

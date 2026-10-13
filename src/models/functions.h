@@ -23,4 +23,5 @@ private:
 
 private:
     RDContext* m_context;
+    QList<RDAddress> m_addresses;
 };

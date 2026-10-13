@@ -53,18 +53,18 @@ void set_address(ISurface* surface) {
     }
 
     RDContext* ctx = surface->context();
-    const RDFunction* f = rd_find_function(ctx, *address);
+    RDAddress func_addr;
+    bool is_func = rd_function_find(ctx, *address, &func_addr);
     QString s;
 
-    if(f) {
-        RDAddress funcaddr = rd_function_get_address(f);
-        s += QString{"<b>Function: </b>%1"}.arg(rd_get_name(ctx, funcaddr));
+    if(is_func) {
+        s += QString{"<b>Function: </b>%1"}.arg(rd_get_name(ctx, func_addr));
 
-        if(funcaddr != *address) {
-            int diff = static_cast<int>(qMax(funcaddr, *address) -
-                                        qMin(funcaddr, *address));
+        if(func_addr != *address) {
+            int diff = static_cast<int>(qMax(func_addr, *address) -
+                                        qMin(func_addr, *address));
 
-            if(*address < funcaddr)
+            if(*address < func_addr)
                 s += "-";
             else
                 s += "+";

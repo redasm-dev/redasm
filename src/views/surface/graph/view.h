@@ -15,6 +15,7 @@ public:
     // clang-format off
     explicit SurfaceGraphView(RDContext* ctx, QWidget* parent = nullptr);
     ~SurfaceGraphView() override;
+    [[nodiscard]] std::optional<RDAddress> function_address() const;
     [[nodiscard]] QWidget* to_widget() override { return this; }
     [[nodiscard]] RDContext* context() override { return m_context; }
     [[nodiscard]] RDSurfacePos get_position() const override;
@@ -45,7 +46,6 @@ public Q_SLOTS:
 
 protected:
     GraphViewNode* create_node(RDGraphNode n, const RDGraph* g) override;
-    void compute_layout() override;
     void begin_compute() override;
     void end_compute() override;
     void update_node(GraphViewNode*) override;
@@ -57,6 +57,7 @@ protected:
 private:
     SurfaceGraphNode* find_node(RDAddress address);
     SurfaceGraphNode* find_node_at_cursor();
+    void track_function_change(const std::optional<RDAddress>& prev);
     void show_popup(const QPoint& pt);
     void refresh_content();
 

@@ -21,6 +21,12 @@ SurfaceGraphView::~SurfaceGraphView() {
     m_surface = nullptr;
 }
 
+std::optional<RDAddress> SurfaceGraphView::function_address() const {
+    RDAddress a;
+    if(rd_surfacegraph_get_function_address(m_surface, &a)) return a;
+    return std::nullopt;
+}
+
 bool SurfaceGraphView::can_go_back() const {
     return rd_surfacegraph_can_go_back(m_surface);
 }
@@ -38,35 +44,33 @@ RDRenderMode SurfaceGraphView::get_mode() const {
 }
 
 RDGraph* SurfaceGraphView::graph() const {
-    return rd_surfacegraph_get_graph(m_surface);
+    return reinterpret_cast<RDGraph*>(rd_surfacegraph_get_graph(m_surface));
 }
 
 void SurfaceGraphView::jump_to_ep() {
     RDAddress ep;
-    if(rd_get_entry_point(m_context, &ep)) return;
+    if(!rd_get_entry_point(m_context, &ep)) return;
 
-    const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
+    auto prev = this->function_address();
+    if(!rd_surfacegraph_jump_to(m_surface, ep)) return;
 
-    if(!rd_surfacegraph_jump_to(m_surface, ep)) {
-        const RDFunction* curr = rd_surfacegraph_get_function(m_surface);
-        m_functionchanged = (prev != curr);
-        this->invalidate();
-        this->clear_history();
-        Q_EMIT history_updated();
-    }
+    this->track_function_change(prev);
+    this->invalidate();
+    this->clear_history();
 }
 
 void SurfaceGraphView::jump_to(RDAddress address) {
-    const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
+    auto prev = this->function_address();
 
-    if(rd_surfacegraph_jump_to(m_surface, address)) {
-        const RDFunction* curr = rd_surfacegraph_get_function(m_surface);
-        m_functionchanged = (prev != curr);
-        this->invalidate();
-        Q_EMIT history_updated();
-    }
-    else // fallback to listing
+    if(!rd_surfacegraph_jump_to(m_surface, address)) {
+        // fallback to listing
         Q_EMIT view_requested(ViewRequest::LISTING, address);
+        return;
+    }
+
+    this->track_function_change(prev);
+    this->invalidate();
+    Q_EMIT history_updated();
 }
 
 bool SurfaceGraphView::invalidate() {
@@ -76,8 +80,13 @@ bool SurfaceGraphView::invalidate() {
 }
 
 void SurfaceGraphView::refresh_content() {
-    rd_surfacegraph_render(m_surface); // content only
-    this->viewport()->update();        // repaint, don't relayout
+    rd_surfacegraph_render(m_surface); //  may repopulate (new gen, new ids)
+
+    if(rd_graph_get_gen(this->graph()) != m_lastgen)
+        this->update_graph(); // rebuild nodes/edges/layout
+    else
+        this->viewport()->update(); // content only, don't relayout
+
     statusbar::set_address(this);
 }
 
@@ -115,31 +124,23 @@ bool SurfaceGraphView::select_all() {
 }
 
 bool SurfaceGraphView::go_back() {
-    const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
+    auto prev = this->function_address();
+    if(!rd_surfacegraph_go_back(m_surface)) return false;
 
-    if(rd_surfacegraph_go_back(m_surface)) {
-        const RDFunction* curr = rd_surfacegraph_get_function(m_surface);
-        m_functionchanged = !rd_function_is_same(prev, curr);
-        this->invalidate();
-        Q_EMIT history_updated();
-        return true;
-    }
-
-    return false;
+    this->track_function_change(prev);
+    this->invalidate();
+    Q_EMIT history_updated();
+    return true;
 }
 
 bool SurfaceGraphView::go_forward() {
-    const RDFunction* prev = rd_surfacegraph_get_function(m_surface);
+    auto prev = this->function_address();
+    if(!rd_surfacegraph_go_forward(m_surface)) return false;
 
-    if(rd_surfacegraph_go_forward(m_surface)) {
-        const RDFunction* curr = rd_surfacegraph_get_function(m_surface);
-        m_functionchanged = !rd_function_is_same(prev, curr);
-        this->invalidate();
-        Q_EMIT history_updated();
-        return true;
-    }
-
-    return false;
+    this->track_function_change(prev);
+    this->invalidate();
+    Q_EMIT history_updated();
+    return true;
 }
 
 void SurfaceGraphView::clear_history() {
@@ -150,13 +151,6 @@ void SurfaceGraphView::clear_history() {
 void SurfaceGraphView::clear_selection() {
     rd_surfacegraph_clear_selection(m_surface);
     this->invalidate();
-}
-
-void SurfaceGraphView::compute_layout() {
-    if(!m_surface) return;
-
-    RDGraph* g = rd_surfacegraph_get_graph(m_surface);
-    if(g) rd_graph_compute_layered(g, RD_LAYERED_LAYOUT_MEDIUM);
 }
 
 void SurfaceGraphView::begin_compute() {
@@ -181,26 +175,19 @@ void SurfaceGraphView::update_node(GraphViewNode* item) {
 }
 
 GraphViewNode* SurfaceGraphView::create_node(RDGraphNode n, const RDGraph*) {
-    const RDFunction* f = rd_surfacegraph_get_function(m_surface);
-    const RDFunctionChunk* chunk = rd_function_get_chunk(f, n);
+    auto* g = new SurfaceGraphNode(m_surface, n, this);
 
-    if(chunk) {
-        auto* g = new SurfaceGraphNode(m_surface, chunk, n, this);
+    connect(g, &SurfaceGraphNode::follow_requested, this, [&]() {
+        RDAddress address;
 
-        connect(g, &SurfaceGraphNode::follow_requested, this, [&]() {
-            RDAddress address;
+        if(rd_surfacegraph_get_address_under_cursor(m_surface, &address))
+            this->jump_to(address);
+    });
 
-            if(rd_surfacegraph_get_address_under_cursor(m_surface, &address))
-                this->jump_to(address);
-        });
+    connect(g, &SurfaceGraphNode::invalidated, this,
+            &SurfaceGraphView::refresh_content);
 
-        connect(g, &SurfaceGraphNode::invalidated, this,
-                &SurfaceGraphView::refresh_content);
-
-        return g;
-    }
-
-    return nullptr;
+    return g;
 }
 
 void SurfaceGraphView::keyPressEvent(QKeyEvent* e) {
@@ -300,6 +287,12 @@ SurfaceGraphNode* SurfaceGraphView::find_node_at_cursor() {
     if(!address) return nullptr;
 
     return this->find_node(*address);
+}
+
+void SurfaceGraphView::track_function_change(
+    const std::optional<RDAddress>& prev) {
+    auto curr = this->function_address();
+    m_functionchanged = !prev || (curr && *prev != *curr);
 }
 
 void SurfaceGraphView::show_popup(const QPoint& pt) {

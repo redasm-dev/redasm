@@ -4,16 +4,24 @@
 #include <QPainter>
 #include <QWidget>
 
-SurfaceGraphNode::SurfaceGraphNode(RDSurfaceGraph* surface,
-                                   const RDFunctionChunk* chunk, RDGraphNode n,
+SurfaceGraphNode::SurfaceGraphNode(RDSurfaceGraph* surface, RDGraphNode n,
                                    QWidget* parent)
-    : GraphViewNode{n, parent}, m_chunk{chunk}, m_surface{surface} {
+    : GraphViewNode{n, parent}, m_surface{surface} {
     this->update_metrics();
 }
 
 bool SurfaceGraphNode::contains_address(RDAddress address) const {
-    return address >= rd_functionchunk_get_start(m_chunk) &&
-           address < rd_functionchunk_get_end(m_chunk);
+    RDAddress start_address, end_address;
+
+    if(!rd_functiongraph_get_chunk_start(this->graph(), this->node(),
+                                         &start_address))
+        return false;
+
+    if(!rd_functiongraph_get_chunk_end(this->graph(), this->node(),
+                                       &end_address))
+        return false;
+
+    return address >= start_address && address < end_address;
 }
 
 int SurfaceGraphNode::current_row() const {
@@ -84,6 +92,10 @@ void SurfaceGraphNode::update_metrics() {
     }
 }
 
+RDFunctionGraph* SurfaceGraphNode::graph() const {
+    return rd_surfacegraph_get_graph(m_surface);
+}
+
 void SurfaceGraphNode::get_surface_pos(const QPointF& pt,
                                        RDSurfacePos* pos) const {
     pos->row =
@@ -92,16 +104,21 @@ void SurfaceGraphNode::get_surface_pos(const QPointF& pt,
 }
 
 int SurfaceGraphNode::start_row() const {
-    return rd_surfacegraph_index_of(m_surface,
-                                    rd_functionchunk_get_start(m_chunk));
+    RDAddress addr;
+    if(!rd_functiongraph_get_chunk_start(this->graph(), this->node(), &addr))
+        return -1;
+
+    return rd_surfacegraph_index_of(m_surface, addr);
 }
 
 int SurfaceGraphNode::end_row() const {
-    RDAddress end_address = rd_functionchunk_get_end(m_chunk);
+    RDAddress addr;
+    if(!rd_functiongraph_get_chunk_end(this->graph(), this->node(), &addr))
+        return -1;
 
     // -1, chunk end is exclusive.
     // we don't want the last subline of the next range
-    return rd_surfacegraph_last_index_of(m_surface, end_address - 1);
+    return rd_surfacegraph_last_index_of(m_surface, addr - 1);
 }
 
 void SurfaceGraphNode::render(QPainter* p, usize state) {

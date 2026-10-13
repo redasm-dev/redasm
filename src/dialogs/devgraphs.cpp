@@ -50,13 +50,18 @@ void DevGraphsDialog::copy_graph_hashes() {
     for(int i = 0; i < m_functionsmodel->rowCount({}); i++) {
         QModelIndex index = m_functionsmodel->index(i);
         RDAddress address = m_functionsmodel->address(index);
-        const RDFunction* f = rd_find_function(m_context, address);
-        Q_ASSERT(f);
-        u32 hash = rd_function_get_hash(f);
+
+        RDFunctionGraph* g = rd_functiongraph_create(m_context);
+        bool done = rd_functiongraph_populate(g, address);
+        Q_ASSERT(done);
+
+        u32 hash = rd_functiongraph_get_hash(g);
 
         s.append(QString{"  {0x%1, 0x%2},\n"}
                      .arg(utils::to_hex(address))
                      .arg(utils::to_hex(hash)));
+
+        rd_functiongraph_destroy(g);
     }
 
     qApp->clipboard()->setText(s);
@@ -68,8 +73,7 @@ void DevGraphsDialog::copy_functions() {
     for(int i = 0; i < m_functionsmodel->rowCount({}); i++) {
         QModelIndex index = m_functionsmodel->index(i);
         RDAddress address = m_functionsmodel->address(index);
-        const RDFunction* f = rd_find_function(m_context, address);
-        Q_ASSERT(f);
+
         const char* name = rd_get_name(m_context, address);
         Q_ASSERT(name);
 
@@ -91,24 +95,27 @@ void DevGraphsDialog::show_dot(const QModelIndex& index) {
     RDAddress address = m_functionsmodel->address(index);
     const char* dot = nullptr;
 
-    const RDFunction* f = rd_find_function(m_context, address);
-    if(!f) goto fail;
+    RDFunctionGraph* g = rd_functiongraph_create(m_context);
+    if(!rd_functiongraph_populate(g, address)) goto fail;
 
-    dot = m_ui.chklayoutdot->isChecked() ? rd_function_generate_dot_layout(f)
-                                         : rd_function_generate_dot(f);
+    dot = m_ui.chklayoutdot->isChecked()
+              ? rd_functiongraph_generate_dot_layout(g)
+              : rd_functiongraph_generate_dot(g);
     if(!dot) goto fail;
 
     m_currenthash = m_ui.chklayoutdot->isChecked()
-                        ? rd_function_get_hash_layout(f)
-                        : rd_function_get_hash(f);
+                        ? rd_functiongraph_get_hash_layout(g)
+                        : rd_functiongraph_get_hash(g);
     m_currentgraph = QString::fromUtf8(dot);
 
     m_ui.ptedot->setPlainText(m_currentgraph);
     m_ui.ftbcopyhash->setEnabled(true);
     m_ui.ftbcopygraph->setEnabled(true);
+    rd_functiongraph_destroy(g);
     return;
 
 fail:
     m_ui.ftbcopyhash->setEnabled(false);
     m_ui.ftbcopygraph->setEnabled(false);
+    rd_functiongraph_destroy(g);
 }

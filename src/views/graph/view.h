@@ -80,7 +80,7 @@ Q_SIGNALS:
     void selected_item_changed();
 
 protected:
-    RDGraph* m_lastgraph{nullptr};
+    u32 m_lastgen{0};
     QHash<RDGraphNode, GraphViewNode*> m_nodes;
 
 private:

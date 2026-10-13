@@ -300,8 +300,9 @@ void GraphView::focus_root_block() {
 
 void GraphView::update_graph() {
     RDGraph* g = this->graph();
+    u32 gen = g ? rd_graph_get_gen(g) : 0;
 
-    if(g != m_lastgraph) {
+    if(gen != m_lastgen) {
         m_selecteditem = nullptr;
         m_lastmoveitem = nullptr;
 
@@ -309,13 +310,13 @@ void GraphView::update_graph() {
             item->deleteLater();
 
         m_nodes.clear();
-        m_lastgraph = g;
+        m_lastgen = gen;
     }
 
     m_lines.clear();
     m_arrows.clear();
 
-    if(!g) {
+    if(!g || !gen) { // no graph, or an emptied one (gen 0 = "no graph")
         this->viewport()->update();
         return;
     }
