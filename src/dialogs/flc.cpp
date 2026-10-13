@@ -1,87 +1,103 @@
 #include "flc.h"
 #include "support/utils.h"
+#include <QClipboard>
+#include <QGuiApplication>
+
+namespace {
+
+std::optional<u64> parse_hex(const QString& s) {
+    bool ok = false;
+    u64 v = s.toULongLong(&ok, 16);
+    return ok ? std::optional<u64>{v} : std::nullopt;
+}
+
+} // namespace
 
 FLCDialog::FLCDialog(RDContext* ctx, QWidget* parent)
     : QDialog{parent}, m_ui{this}, m_context{ctx} {
     utils::configure_hex_input(m_ui.leaddress);
+    utils::configure_hex_input(m_ui.lereladdress);
     utils::configure_hex_input(m_ui.leoffset);
 
-    connect(m_ui.leaddress, &QLineEdit::textChanged, this,
-            &FLCDialog::on_address_changed);
+    connect(m_ui.leaddress, &QLineEdit::textEdited, this,
+            &FLCDialog::on_address_edited);
 
-    connect(m_ui.leoffset, &QLineEdit::textChanged, this,
-            &FLCDialog::on_offset_changed);
+    connect(m_ui.lereladdress, &QLineEdit::textEdited, this,
+            &FLCDialog::on_rel_address_edited);
 
-    connect(m_ui.lesegment, &QLineEdit::textChanged, this,
-            [&](const QString& s) {
-                m_ui.pbcopysegment->setEnabled(!s.isEmpty());
-            });
+    connect(m_ui.leoffset, &QLineEdit::textEdited, this,
+            &FLCDialog::on_offset_edited);
+
+    auto bind_copy = [this](QLineEdit* le, FeedbackPushButton* pb) {
+        connect(le, &QLineEdit::textChanged, this,
+                [pb](const QString& s) { pb->setEnabled(!s.isEmpty()); });
+
+        connect(pb, &FeedbackPushButton::feedback, this,
+                [le]() { QGuiApplication::clipboard()->setText(le->text()); });
+    };
+
+    bind_copy(m_ui.leaddress, m_ui.pbcopyaddress);
+    bind_copy(m_ui.lereladdress, m_ui.pbcopyreladdress);
+    bind_copy(m_ui.leoffset, m_ui.pbcopyoffset);
+    bind_copy(m_ui.lesegment, m_ui.pbcopysegment);
 }
 
-void FLCDialog::on_address_changed(const QString& s) {
-    if(s.isEmpty()) {
-        m_ui.pbcopyaddress->setEnabled(false);
-        return;
-    }
-
-    bool ok = true;
-
-    if(m_ui.leaddress->hasFocus()) {
-        usize val = s.toULongLong(&ok, 16);
-
-        if(ok) {
-            RDOffset offset{};
-
-            if(rd_to_offset(m_context, val, &offset)) {
-                m_ui.leoffset->setText(rd_to_hexaddr(m_context, offset));
-
-                const RDSegment* seg = rd_segment_find(m_context, val);
-
-                if(seg)
-                    m_ui.lesegment->setText(rd_segment_get_name(seg));
-                else
-                    m_ui.lesegment->clear();
-            }
-            else {
-                m_ui.leoffset->clear();
-                m_ui.lesegment->clear();
-            }
-        }
-    }
-
-    m_ui.pbcopyaddress->setEnabled(ok);
+void FLCDialog::on_address_edited(const QString& s) {
+    this->update_from(m_ui.leaddress, parse_hex(s));
 }
 
-void FLCDialog::on_offset_changed(const QString& s) {
-    if(s.isEmpty()) {
-        m_ui.pbcopyoffset->setEnabled(false);
-        return;
+void FLCDialog::on_rel_address_edited(const QString& s) {
+    std::optional<RDAddress> address;
+
+    if(auto rel = parse_hex(s)) {
+        RDAddress a;
+        if(rd_to_absolute(m_context, *rel, &a)) address = a;
     }
 
-    bool ok = true;
+    this->update_from(m_ui.lereladdress, address);
+}
 
-    if(m_ui.leoffset->hasFocus()) {
-        usize val = s.toULongLong(&ok, 16);
+void FLCDialog::on_offset_edited(const QString& s) {
+    std::optional<RDAddress> address;
 
-        if(ok) {
-            RDAddress address{};
-
-            if(rd_to_address(m_context, val, &address)) {
-                m_ui.leaddress->setText(rd_to_hexaddr(m_context, address));
-
-                const RDSegment* seg = rd_segment_find(m_context, address);
-
-                if(seg)
-                    m_ui.lesegment->setText(rd_segment_get_name(seg));
-                else
-                    m_ui.lesegment->clear();
-            }
-            else {
-                m_ui.leaddress->clear();
-                m_ui.lesegment->clear();
-            }
-        }
+    if(auto off = parse_hex(s)) {
+        RDAddress a;
+        if(rd_to_address(m_context, *off, &a)) address = a;
     }
 
-    m_ui.pbcopyoffset->setEnabled(ok);
+    this->update_from(m_ui.leoffset, address);
+}
+
+void FLCDialog::update_from(const QLineEdit* source,
+                            const std::optional<RDAddress>& address) {
+    std::optional<u64> rel, offset;
+    const RDSegment* seg = nullptr;
+
+    if(address) {
+        RDRelAddress r;
+        if(rd_to_relative(m_context, *address, &r)) rel = r;
+
+        RDOffset off;
+        if(rd_to_offset(m_context, *address, &off)) offset = off;
+
+        seg = rd_segment_find(m_context, *address);
+    }
+
+    auto set = [&](QLineEdit* le, const std::optional<u64>& v) {
+        if(le == source) return;
+
+        if(v)
+            le->setText(QString::fromUtf8(rd_to_hexaddr(m_context, *v)));
+        else
+            le->clear();
+    };
+
+    set(m_ui.leaddress, address);
+    set(m_ui.lereladdress, rel);
+    set(m_ui.leoffset, offset);
+
+    if(seg)
+        m_ui.lesegment->setText(QString::fromUtf8(rd_segment_get_name(seg)));
+    else
+        m_ui.lesegment->clear();
 }
