@@ -26,6 +26,14 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
     connect(m_ui.tvfunctions, &QTreeView::clicked, this,
             &DevGraphsDialog::show_dot);
 
+    connect(m_ui.rbfuncgraph, &QRadioButton::clicked, this, [&](bool checked) {
+        if(checked) this->show_dot(m_ui.tvfunctions->currentIndex());
+    });
+
+    connect(m_ui.rbcallgraph, &QRadioButton::clicked, this, [&](bool checked) {
+        if(checked) this->show_dot(m_ui.tvfunctions->currentIndex());
+    });
+
     connect(m_ui.ftbcopygraphhashes, &FeedbackPushButton::feedback, this,
             &DevGraphsDialog::copy_graph_hashes);
 
@@ -39,9 +47,6 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
         qApp->clipboard()->setText(
             QString{"0x%1"}.arg(utils::to_hex(m_currenthash)));
     });
-
-    connect(m_ui.chklayoutdot, &QCheckBox::checkStateChanged, this,
-            [&]() { this->show_dot(m_ui.tvfunctions->currentIndex()); });
 }
 
 void DevGraphsDialog::copy_graph_hashes() {
@@ -51,17 +56,16 @@ void DevGraphsDialog::copy_graph_hashes() {
         QModelIndex index = m_functionsmodel->index(i);
         RDAddress address = m_functionsmodel->address(index);
 
-        RDFunctionGraph* g = rd_functiongraph_create(m_context);
-        bool done = rd_functiongraph_populate(g, address);
-        Q_ASSERT(done);
+        auto f_dot = this->get_function_dot(address);
+        auto c_dot = this->get_call_dot(address);
 
-        u32 hash = rd_functiongraph_get_hash(g);
+        Q_ASSERT(f_dot.second);
+        Q_ASSERT(c_dot.second);
 
-        s.append(QString{"  {0x%1, 0x%2},\n"}
+        s.append(QString{"  {0x%1, 0x%2, 0x%3},\n"}
                      .arg(utils::to_hex(address))
-                     .arg(utils::to_hex(hash)));
-
-        rd_functiongraph_destroy(g);
+                     .arg(utils::to_hex(f_dot.second))
+                     .arg(utils::to_hex(c_dot.second)));
     }
 
     qApp->clipboard()->setText(s);
@@ -93,29 +97,63 @@ void DevGraphsDialog::show_dot(const QModelIndex& index) {
     if(!index.isValid()) return;
 
     RDAddress address = m_functionsmodel->address(index);
+
+    auto [dot, hash] = m_ui.rbcallgraph->isChecked()
+                           ? this->get_call_dot(address)
+                           : this->get_function_dot(address);
+
+    bool success = hash && !dot.isEmpty();
+
+    if(success) {
+        m_currenthash = hash;
+        m_currentgraph = dot;
+        m_ui.ptedot->setPlainText(m_currentgraph);
+    }
+    else {
+        m_currenthash = {};
+        m_currentgraph = {};
+        m_ui.ptedot->clear();
+    }
+
+    m_ui.ftbcopyhash->setEnabled(success);
+    m_ui.ftbcopygraph->setEnabled(success);
+}
+
+DevGraphsDialog::DotResult
+DevGraphsDialog::get_function_dot(RDAddress address) {
     const char* dot = nullptr;
+    u32 hash = 0;
+    QString graph;
 
     RDFunctionGraph* g = rd_functiongraph_create(m_context);
-    if(!rd_functiongraph_populate(g, address)) goto fail;
+    if(!rd_functiongraph_populate(g, address)) goto cleanup;
 
-    dot = m_ui.chklayoutdot->isChecked()
-              ? rd_functiongraph_generate_dot_layout(g)
-              : rd_functiongraph_generate_dot(g);
-    if(!dot) goto fail;
+    dot = rd_functiongraph_generate_dot(g);
+    if(!dot) goto cleanup;
 
-    m_currenthash = m_ui.chklayoutdot->isChecked()
-                        ? rd_functiongraph_get_hash_layout(g)
-                        : rd_functiongraph_get_hash(g);
-    m_currentgraph = QString::fromUtf8(dot);
+    hash = rd_functiongraph_get_hash(g);
+    graph = QString::fromUtf8(dot);
 
-    m_ui.ptedot->setPlainText(m_currentgraph);
-    m_ui.ftbcopyhash->setEnabled(true);
-    m_ui.ftbcopygraph->setEnabled(true);
+cleanup:
     rd_functiongraph_destroy(g);
-    return;
+    return {graph, hash};
+}
 
-fail:
-    m_ui.ftbcopyhash->setEnabled(false);
-    m_ui.ftbcopygraph->setEnabled(false);
-    rd_functiongraph_destroy(g);
+DevGraphsDialog::DotResult DevGraphsDialog::get_call_dot(RDAddress address) {
+    const char* dot = nullptr;
+    u32 hash = 0;
+    QString graph;
+
+    RDCallGraph* g = rd_callgraph_create(m_context, address);
+    if(!g) goto cleanup;
+
+    dot = rd_callgraph_generate_dot(g);
+    if(!dot) goto cleanup;
+
+    hash = rd_callgraph_get_hash(g);
+    graph = QString::fromUtf8(dot);
+
+cleanup:
+    rd_callgraph_destroy(g);
+    return {graph, hash};
 }

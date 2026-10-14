@@ -1,10 +1,12 @@
 #pragma once
 
 #include "widgets/feedbackpushbutton.h"
-#include <QCheckBox>
+#include <QButtonGroup>
 #include <QDialog>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPlainTextEdit>
+#include <QRadioButton>
 #include <QSplitter>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -14,7 +16,7 @@ namespace ui {
 struct DevGraphsDialog {
     FeedbackPushButton *ftbcopygraphhashes, *ftbcopyhash, *ftbcopyfunctions,
         *ftbcopygraph;
-    QCheckBox* chklayoutdot;
+    QRadioButton *rbfuncgraph, *rbcallgraph;
     QTreeView* tvfunctions;
     QPlainTextEdit* ptedot;
 
@@ -27,15 +29,18 @@ struct DevGraphsDialog {
         this->tvfunctions->setUniformRowHeights(true);
         this->tvfunctions->setRootIsDecorated(false);
 
-        this->ftbcopygraphhashes = new FeedbackPushButton();
-        this->ftbcopygraphhashes->setText("Copy Graph Hashes");
+        this->ftbcopygraphhashes = new FeedbackPushButton("Copy Graph Hashes");
         this->ftbcopygraphhashes->set_feedback_text("Copied");
-        this->ftbcopyfunctions = new FeedbackPushButton();
-        this->ftbcopyfunctions->setText("Copy Functions");
+        this->ftbcopyfunctions = new FeedbackPushButton("Copy Functions");
         this->ftbcopyfunctions->set_feedback_text("Copied");
 
-        this->chklayoutdot = new QCheckBox();
-        this->chklayoutdot->setText("Show layout DOT");
+        this->rbfuncgraph = new QRadioButton("Function");
+        this->rbfuncgraph->setChecked(true);
+        this->rbcallgraph = new QRadioButton("Call");
+
+        auto* rbgroup = new QButtonGroup(self);
+        rbgroup->addButton(this->rbfuncgraph);
+        rbgroup->addButton(this->rbcallgraph);
 
         auto* hbox = new QHBoxLayout();
         hbox->addWidget(this->ftbcopygraphhashes);
@@ -46,20 +51,22 @@ struct DevGraphsDialog {
         vbox_left->addLayout(hbox);
 
         this->ptedot = new QPlainTextEdit();
+        this->ptedot->setLineWrapMode(QPlainTextEdit::NoWrap);
         this->ptedot->setUndoRedoEnabled(false);
         this->ptedot->setReadOnly(true);
 
-        this->ftbcopyhash = new FeedbackPushButton();
-        this->ftbcopyhash->setText("Copy Hash");
+        this->ftbcopyhash = new FeedbackPushButton("Copy Hash");
         this->ftbcopyhash->set_feedback_text("Copied");
-        this->ftbcopygraph = new FeedbackPushButton();
-        this->ftbcopygraph->setText("Copy Graph");
+        this->ftbcopygraph = new FeedbackPushButton("Copy Graph");
         this->ftbcopygraph->set_feedback_text("Copied");
 
         hbox = new QHBoxLayout();
-        hbox->addWidget(this->ftbcopyhash, 1);
-        hbox->addWidget(this->ftbcopygraph, 1);
-        hbox->addWidget(this->chklayoutdot);
+        hbox->addWidget(new QLabel("Graph:"));
+        hbox->addWidget(this->rbfuncgraph);
+        hbox->addWidget(this->rbcallgraph);
+        hbox->addStretch();
+        hbox->addWidget(this->ftbcopyhash);
+        hbox->addWidget(this->ftbcopygraph);
 
         auto* vbox_right = new QVBoxLayout(new QWidget());
         vbox_right->addWidget(this->ptedot, 1);

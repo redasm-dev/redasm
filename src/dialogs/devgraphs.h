@@ -7,11 +7,15 @@
 class DevGraphsDialog: public QDialog {
     Q_OBJECT
 
+    using DotResult = QPair<QString, u32>;
+
 public:
     explicit DevGraphsDialog(RDContext* ctx, QWidget* parent = nullptr);
 
 private Q_SLOTS:
     void show_dot(const QModelIndex& index);
+    DotResult get_function_dot(RDAddress address);
+    DotResult get_call_dot(RDAddress address);
     void copy_graph_hashes();
     void copy_functions();
 
