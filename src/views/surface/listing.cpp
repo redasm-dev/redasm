@@ -461,6 +461,7 @@ void SurfaceListing::show_popup(const QPoint& pt) {
         const char* word = rd_surface_get_word_under_pos(m_surface, &pos);
         m_popup->popup(address, word ? QString::fromUtf8(word) : QString{});
     }
-    else
+    else {
         m_popup->hide();
+    }
 }

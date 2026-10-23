@@ -139,6 +139,8 @@ bool HexView::select(int row, int col) {
 // QHexView has its own selection algorithm
 bool HexView::select_all() { return false; }
 
+bool HexView::is_visible() const { return this->isVisible(); }
+
 RDRenderMode HexView::get_mode() const { return RD_RM_NORMAL; }
 
 // QHexView has its own clipboard algorithm

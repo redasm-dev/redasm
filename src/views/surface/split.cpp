@@ -65,6 +65,13 @@ SurfaceGraphView* _splitwidget_findsurfacegraph(SplitWidget* split) {
     return nullptr;
 }
 
+void connect_when_visible(Scheduler* scheduler, ISurface* s) {
+    QObject::connect(scheduler, &Scheduler::yield_requested, s->to_widget(),
+                     [s]() {
+                         if(s->is_visible()) s->invalidate();
+                     });
+}
+
 } // namespace
 
 SurfaceSplitDelegate::SurfaceSplitDelegate(RDContext* ctx, Scheduler* scheduler,
@@ -88,12 +95,9 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
     stack->addWidget(hexview);
 
     // subscribe all views to scheduler
-    connect(m_scheduler, &Scheduler::yield_requested, surfaceview->listing(),
-            &SurfaceListing::invalidate);
-    connect(m_scheduler, &Scheduler::yield_requested, surfacegraph,
-            &SurfaceGraphView::invalidate);
-    connect(m_scheduler, &Scheduler::yield_requested, hexview,
-            &HexView::invalidate);
+    connect_when_visible(m_scheduler, surfaceview->listing());
+    connect_when_visible(m_scheduler, surfacegraph);
+    connect_when_visible(m_scheduler, hexview);
 
     FeedbackToolButton* tbscreenshot = utils::create_screenshot_button(stack);
     current->add_widget(tbscreenshot);
@@ -136,6 +140,9 @@ QWidget* SurfaceSplitDelegate::create_widget(SplitWidget* current,
             }
 
             case ISurface::ViewRequest::GRAPH: {
+                // chunks are not available during analysis
+                if(m_scheduler->is_busy()) return;
+
                 stack->setCurrentWidget(surfacegraph);
                 act_back->setVisible(true);
                 act_forward->setVisible(true);

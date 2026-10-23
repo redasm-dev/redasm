@@ -42,6 +42,7 @@ public: // ISurface implementation
     bool set_position(int row, int col) override;
     bool select(int row, int col) override;
     bool select_all() override;
+    [[nodiscard]] bool is_visible() const override;
     [[nodiscard]] RDRenderMode get_mode() const override;
     [[nodiscard]] bool has_selection() const override;
     [[nodiscard]] bool can_go_back() const override;

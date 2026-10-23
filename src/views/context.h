@@ -25,6 +25,12 @@ public:
         return m_ui.splitview->surface();
     }
 
+protected:
+    void showEvent(QShowEvent* e) override;
+
+private:
+    void update_statusbar();
+
 public Q_SLOTS:
     void toggle_pause();
 

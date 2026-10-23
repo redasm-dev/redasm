@@ -10,6 +10,8 @@ class Scheduler: public QObject {
 public:
     explicit Scheduler(RDContext* ctx, QObject* parent = nullptr);
     [[nodiscard]] const RDWorkerStatus* status() const { return &m_status; }
+    [[nodiscard]] bool is_busy() const { return m_status.is_busy; }
+    [[nodiscard]] bool is_paused() const { return m_pause; }
 
 public Q_SLOTS:
     void schedule();

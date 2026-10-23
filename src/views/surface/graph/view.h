@@ -18,6 +18,7 @@ public:
     [[nodiscard]] std::optional<RDAddress> function_address() const;
     [[nodiscard]] QWidget* to_widget() override { return this; }
     [[nodiscard]] RDContext* context() override { return m_context; }
+    [[nodiscard]] bool is_visible() const override { return this->isVisible(); }
     [[nodiscard]] RDSurfacePos get_position() const override;
     [[nodiscard]] QString get_selected_text() const override;
     [[nodiscard]] std::optional<ISurfaceRange> get_selected_range() const override;

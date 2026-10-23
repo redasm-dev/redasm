@@ -42,6 +42,7 @@ void Scheduler::toggle_pause() {
         this->schedule();
         statusbar::set_busy_status();
     }
-    else
+    else {
         statusbar::set_pause_status();
+    }
 }

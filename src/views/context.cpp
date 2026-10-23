@@ -45,19 +45,23 @@ void ContextView::show_segment_regs() {
     m_dlg_sregs->show();
 }
 
-void ContextView::toggle_pause() { m_scheduler->toggle_pause(); }
-void ContextView::schedule_step() { m_scheduler->schedule(); }
+void ContextView::showEvent(QShowEvent* e) {
+    QWidget::showEvent(e);
+    this->update_statusbar();
+}
 
-void ContextView::check_status() {
-    m_ui.splitview->surface()->invalidate();
-
+void ContextView::update_statusbar() {
     const RDWorkerStatus* status = m_scheduler->status();
+    if(!status->step) return; // nothing stepped yet
 
-    if(!status->is_busy) {
+    if(!status->is_busy)
         statusbar::set_ready_status();
-        statusbar::check_problems(m_context);
-        if(!status->reconcile) m_ui.splitview->surface()->jump_to_ep();
-    }
+    else if(m_scheduler->is_paused())
+        statusbar::set_pause_status();
+    else
+        statusbar::set_busy_status();
+
+    statusbar::check_problems(m_context);
 
     if(status->segment && status->address.has_value) {
         statusbar::set_status_text(
@@ -75,6 +79,18 @@ void ContextView::check_status() {
                                        .arg(status->pending_calls)
                                        .arg(status->pending_jumps));
     }
+}
+
+void ContextView::toggle_pause() { m_scheduler->toggle_pause(); }
+void ContextView::schedule_step() { m_scheduler->schedule(); }
+
+void ContextView::check_status() {
+    const RDWorkerStatus* status = m_scheduler->status();
+
+    if(!status->is_busy && !status->reconcile)
+        m_ui.splitview->surface()->jump_to_ep();
+
+    if(this->isVisible()) this->update_statusbar();
 }
 
 void ContextView::invalidate() { // NOLINT
