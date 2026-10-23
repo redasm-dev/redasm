@@ -104,7 +104,7 @@ RDRenderMode SurfaceListing::get_mode() const {
 
 void SurfaceListing::set_mode(RDRenderMode m) {
     rd_surface_set_mode(m_surface, m);
-    this->viewport()->update();
+    this->invalidate();
 }
 
 bool SurfaceListing::set_position(int row, int col) {
