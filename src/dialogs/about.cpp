@@ -133,6 +133,38 @@ void compile_processors(QTextBrowser* txb) {
     txb->setHtml(CONTENT.arg(html));
 }
 
+void compile_platforms(QTextBrowser* txb) {
+    const QString CONTENT = R"(
+<table>
+    <tr>
+        <th valign="middle" width="50%">Name</th>
+        <th valign="middle" width="50%">Id</th>
+    </tr>
+    %1
+</table>
+)";
+
+    RDPluginSlice platforms = rd_get_all_platform_plugins();
+    QString html;
+
+    const RDPlugin** it;
+    rd_slice_each(it, platforms) {
+        const RDPlugin* p = *it;
+
+        QString row = R"(
+                <tr>
+                    <td align="center" valign="middle">%1</td>
+                    <td align="center" valign="middle">%2</td>
+                </tr>
+            )";
+
+        html.append(row.arg(p->platform->name).arg(p->platform->id));
+    }
+
+    txb->setLineWrapMode(QTextBrowser::NoWrap);
+    txb->setHtml(CONTENT.arg(html));
+}
+
 void compile_analyzers(QTextBrowser* txb) {
     const QString CONTENT = R"(
 <table>
@@ -211,6 +243,7 @@ AboutDialog::AboutDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     compile_modules(m_ui.txbmodules);
     compile_loaders(m_ui.txbloaders);
     compile_processors(m_ui.txbprocessors);
+    compile_platforms(m_ui.txbplatforms);
     compile_analyzers(m_ui.txbanalyzers);
     compile_commands(m_ui.txbcommands);
 

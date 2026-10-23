@@ -15,7 +15,7 @@ struct AboutDialog {
     QDialogButtonBox* buttonbox;
     QLabel* lblaboutlogo;
     QTextBrowser *txbconfig, *txbmodules, *txbloaders, *txbprocessors,
-        *txbanalyzers, *txbcommands;
+        *txbplatforms, *txbanalyzers, *txbcommands;
     QTabWidget* tabwidget;
     QPushButton* pbsettings;
 
@@ -30,6 +30,7 @@ struct AboutDialog {
         this->txbmodules = this->add_tab("Modules");
         this->txbloaders = this->add_tab("Loaders");
         this->txbprocessors = this->add_tab("Processors");
+        this->txbplatforms = this->add_tab("Platforms");
         this->txbanalyzers = this->add_tab("Analyzers");
         this->txbcommands = this->add_tab("Commands");
 
