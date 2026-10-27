@@ -2,31 +2,31 @@
     "seek": "#deedf1",
 
     "highlight_fg": "#2b2b2b",
-    "highlight_bg": "#aefbaf",
+    "highlight_bg": "#ffe98a",
 
-    "segment": "#662621",
+    "segment": "#0b5f5f",
     "function": "#c71585",
     "type": "#d95459",
 
-    "location": "#065f88",
-    "number": "#b22222",
-    "reg": "#2e8b57",
-    "string": "#5e4534",
+    "location": "#024b80",
+    "number": "#358404",
+    "reg": "#7556c6",
+    "string": "#6b1f3a",
 
-    "comment": "#0f4f34",
+    "comment": "#6c7879",
 
-    "stop": "#cd5c5c",
-    "jump": "#00008b",
-    "jump_cond": "#c0392b",
-    "call": "#8b4513",
-    "call_cond": "#c0392b",
+    "stop": "#b8203f",
+    "jump": "#1f3fd0",
+    "jump_cond": "#d23e21",
+    "call": "#c71585",
+    "call_cond": "#8a1456",
 
     "success": "#27ae60",
     "fail": "#c0392b",
     "warning": "#e67e22",
-    "muted": "#7f8c8d",
+    "muted": "#6c7879",
 
-    "flag_code": "#3366aa",
+    "flag_code": "#024b80",
     "flag_data": "#337733",
 
     "graph_bg": "#f0ffff"
