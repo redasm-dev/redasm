@@ -17,17 +17,21 @@ public:
         f.setPixelSize(drawsize);
 
         QColor pc = this->color;
-        if(mode == QIcon::Disabled)
-            pc =
-                qApp->palette().color(QPalette::Disabled, QPalette::ButtonText);
-        if(mode == QIcon::Selected)
-            pc = qApp->palette().color(QPalette::Active, QPalette::ButtonText);
+        const QPalette& p = qApp->palette();
+
+        if(mode == QIcon::Disabled) {
+            pc = p.color(QPalette::Disabled, QPalette::ButtonText);
+        }
+        else if(mode == QIcon::Selected ||
+                (mode == QIcon::Active &&
+                 QApplication::activePopupWidget() != nullptr)) {
+            pc = p.color(QPalette::Active, QPalette::HighlightedText);
+        }
 
         painter->save();
-        painter->setPen(QPen(pc));
+        painter->setPen(QPen{pc});
         painter->setFont(f);
-        painter->drawText(rect, Qt::AlignCenter | Qt::AlignVCenter,
-                          this->letter);
+        painter->drawText(rect, Qt::AlignCenter, this->letter);
         painter->restore();
     }
 
@@ -38,13 +42,12 @@ public:
 
         QPainter painter(&pixmap);
         this->paint(&painter, QRect(QPoint(0, 0), size), mode, state);
+
         return pixmap;
     }
 
     [[nodiscard]] QIconEngine* clone() const override {
-        auto* engine = new FAIconEngine();
-        engine->font = this->font;
-        return engine;
+        return new FAIconEngine(*this);
     }
 
 public:
