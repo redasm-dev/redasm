@@ -4,6 +4,7 @@
 
 LoaderDialog::LoaderDialog(RDTestResultSlice ctxslice, QWidget* parent)
     : QDialog{parent}, m_ui{this}, m_testslice{ctxslice} {
+    utils::configure_hex_input(m_ui.lebaseaddress);
     utils::configure_hex_input(m_ui.leentrypoint);
     utils::configure_hex_input(m_ui.leaddress);
     utils::configure_hex_input(m_ui.leoffset);
@@ -19,6 +20,7 @@ LoaderDialog::LoaderDialog(RDTestResultSlice ctxslice, QWidget* parent)
     this->accept_params.min_string = RD_MIN_STRING_LENGTH;
 
     m_ui.gbaddressing->setEnabled(false);
+    m_ui.lebaseaddress->setText(QString{"0"}.repeated(sizeof(u32) * 2));
     m_ui.leentrypoint->setText(QString{"0"}.repeated(sizeof(u32) * 2));
     m_ui.leaddress->setText(QString{"0"}.repeated(sizeof(u32) * 2));
     m_ui.leoffset->setText(QString{"0"}.repeated(sizeof(u32) * 2));
@@ -45,6 +47,9 @@ LoaderDialog::LoaderDialog(RDTestResultSlice ctxslice, QWidget* parent)
 
     connect(m_ui.rbopenproject, &QRadioButton::clicked, this,
             &LoaderDialog::update_open_mode);
+
+    connect(m_ui.lebaseaddress, &QLineEdit::textChanged, this,
+            &LoaderDialog::update_base_address);
 
     connect(m_ui.leentrypoint, &QLineEdit::textChanged, this,
             &LoaderDialog::update_entry_point);
@@ -113,8 +118,9 @@ void LoaderDialog::on_processor_changed(int currentrow) {
         this->accept_params.processorplugin =
             rd_processor_find(qUtf8Printable(d.toString()));
     }
-    else
+    else {
         this->accept_params.processorplugin = nullptr;
+    }
 
     this->validate_fields();
 }
@@ -149,6 +155,12 @@ void LoaderDialog::update_open_mode() {
                                   (l && l->flags & RD_LF_MANUAL));
 }
 
+void LoaderDialog::update_base_address() {
+    this->accept_params.addressing.baseaddress =
+        m_ui.lebaseaddress->text().toULongLong(nullptr, 16);
+    this->validate_fields();
+}
+
 void LoaderDialog::update_entry_point() {
     this->accept_params.addressing.entrypoint =
         m_ui.leentrypoint->text().toULongLong(nullptr, 16);
@@ -178,10 +190,12 @@ void LoaderDialog::validate_fields() { // NOLINT
     const RDLoaderPlugin* l = rd_testresult_get_loader_plugin(this->sel_test);
 
     if(l->flags & RD_LF_MANUAL) {
-        pb->setEnabled(!m_ui.leentrypoint->text().isEmpty() &&
+        pb->setEnabled(!m_ui.lebaseaddress->text().isEmpty() &&
+                       !m_ui.leentrypoint->text().isEmpty() &&
                        !m_ui.leaddress->text().isEmpty() &&
                        !m_ui.leoffset->text().isEmpty());
     }
-    else
+    else {
         pb->setEnabled(true);
+    }
 }

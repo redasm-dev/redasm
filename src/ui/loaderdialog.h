@@ -25,7 +25,7 @@ struct LoaderDialog {
     QComboBox* cbprocessors;
     QSpinBox* sbminstring;
     QRadioButton *rbnewanalysis, *rbopenproject;
-    QLineEdit *leentrypoint, *leoffset, *leaddress;
+    QLineEdit *lebaseaddress, *leentrypoint, *leoffset, *leaddress;
     QTabWidget* tabs;
     QTreeView* tvoptions;
     QDialogButtonBox* buttonbox;
@@ -131,15 +131,17 @@ private:
         this->gbaddressing = new QGroupBox();
         this->gbaddressing->setTitle("Addressing");
 
+        this->lebaseaddress = new QLineEdit();
         this->leentrypoint = new QLineEdit();
         this->leaddress = new QLineEdit();
         this->leoffset = new QLineEdit();
 
         auto* form = new QFormLayout(this->gbaddressing);
         form->setLabelAlignment(Qt::AlignRight);
-        form->addRow("Entry Point:", this->leentrypoint);
+        form->addRow("Base Address:", this->lebaseaddress);
         form->addRow("Address:", this->leaddress);
         form->addRow("Offset:", this->leoffset);
+        form->addRow("Entry Point:", this->leentrypoint);
         l->addWidget(this->gbaddressing);
     }
 };

@@ -17,6 +17,7 @@ private Q_SLOTS:
     void on_processor_changed(int currentrow);
     void update_min_string();
     void update_open_mode();
+    void update_base_address();
     void update_entry_point();
     void update_address();
     void update_offset();
