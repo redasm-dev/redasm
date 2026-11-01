@@ -28,12 +28,18 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
     if(role == Qt::DisplayRole) {
         const RDSegment* s = rd_slice_at(m_segments, index.row());
 
+        usize sel_id = 0;
+        RDAddress sel_base = 0;
+        rd_segment_get_selector(s, &sel_id, &sel_base, m_context);
+
         switch(index.column()) {
             case 0: return QString::fromUtf8(rd_segment_get_name(s));
             case 1: return utils::to_hex(rd_segment_get_start(s), m_context);
             case 2: return utils::to_hex(rd_segment_get_end(s), m_context);
             case 3: return utils::to_hex(rd_segment_get_size(s), m_context);
             case 4: return get_segment_type(s);
+            case 5: return utils::to_hex(sel_id, nullptr);
+            case 6: return utils::to_hex(sel_base, m_context);
             default: break;
         }
     }
@@ -55,13 +61,15 @@ QVariant SegmentsModel::headerData(int section, Qt::Orientation orientation,
         case 2: return "End Address";
         case 3: return "Size";
         case 4: return "Perm";
+        case 5: return "Selector Id";
+        case 6: return "Selector Base";
         default: break;
     }
 
     return {};
 }
 
-int SegmentsModel::columnCount(const QModelIndex&) const { return 5; }
+int SegmentsModel::columnCount(const QModelIndex&) const { return 7; }
 
 int SegmentsModel::rowCount(const QModelIndex&) const {
     return static_cast<int>(rd_slice_length(m_segments));

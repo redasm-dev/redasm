@@ -20,7 +20,6 @@ public:
     void set_model(QAbstractItemModel* m);
     void set_button_box_visible(bool b);
     void set_header_visible(bool b);
-    bool eventFilter(QObject* watched, QEvent* e) override;
 
 private Q_SLOTS:
     void on_table_double_clicked(const QModelIndex& index);
@@ -28,6 +27,7 @@ private Q_SLOTS:
     void on_copy_feedback();
 
 protected:
+    bool eventFilter(QObject* watched, QEvent* e) override;
     void closeEvent(QCloseEvent* e) override;
 
 Q_SIGNALS:

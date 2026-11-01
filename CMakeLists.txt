@@ -35,7 +35,9 @@ target_sources(${PROJECT_NAME}
         res/windows/resources.rc
 
     PRIVATE
+        src/delegates/editable.cpp
         src/delegates/recentfiles.cpp
+        src/delegates/referencesfrom.cpp
         src/dialogs/about.cpp
         src/dialogs/analyzer.cpp
         src/dialogs/callgraph.cpp
@@ -49,6 +51,7 @@ target_sources(${PROJECT_NAME}
         src/dialogs/memorymap.cpp
         src/dialogs/patch.cpp
         src/dialogs/rebase.cpp
+        src/dialogs/referencesfrom.cpp
         src/dialogs/segmentregs.cpp
         src/dialogs/settings.cpp
         src/dialogs/table.cpp
@@ -56,13 +59,15 @@ target_sources(${PROJECT_NAME}
         src/dialogs/types.cpp
         src/hexview/flagsbuffer.cpp
         src/hexview/flagsdelegate.cpp
+        src/models/editable.cpp
         src/models/externals.cpp
         src/models/loaderoptions.cpp
         src/models/functions.cpp
         src/models/mappings.cpp
         src/models/problems.cpp
         src/models/recentfiles.cpp
-        src/models/references.cpp
+        src/models/referencesfrom.cpp
+        src/models/referencesto.cpp
         src/models/segmentregs.cpp
         src/models/segments.cpp
         src/models/strings.cpp
@@ -98,6 +103,7 @@ target_sources(${PROJECT_NAME}
         src/views/welcome.cpp
         src/widgets/scroll/qscrollarea64.cpp
         src/widgets/scroll/qscrollbar64.cpp
+        src/widgets/editablelistview.cpp
         src/widgets/feedbackpushbutton.cpp
         src/widgets/feedbacktoolbutton.cpp
         src/main.cpp

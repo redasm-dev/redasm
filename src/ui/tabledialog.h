@@ -23,6 +23,8 @@ struct TableDialog {
         self->resize(800, 600);
 
         this->tvtable = new QTreeView();
+        this->tvtable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
         this->lbldescription = new QLabel();
 
         this->lesearch = new QLineEdit();

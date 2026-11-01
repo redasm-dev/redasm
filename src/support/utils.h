@@ -20,6 +20,12 @@ inline MainWindow* mainwindow{nullptr};
 inline QStringList search_paths;
 inline QList<QByteArray> kb_search_paths; // C compatibility
 
+struct XRefEqual {
+    bool operator()(const RDXRef& a, const RDXRef& b) const {
+        return a.address == b.address && a.type == b.type;
+    }
+};
+
 QString to_hex(RDAddress address, const RDContext* ctx = nullptr);
 QString confidence_text(RDConfidence c);
 QMenu* create_surface_menu(ISurface* surface);
@@ -29,5 +35,7 @@ QPixmap get_logo();
 bool handle_key_press(ISurface* surface, QKeyEvent* e);
 void configure_hex_input(QLineEdit* le);
 QString model_to_csv(const QAbstractItemModel* model, bool with_header);
+QString ref_typetostring(RDXRefType t);
+QString ref_getdirection(RDAddress address, const RDXRef& r);
 
 } // namespace utils

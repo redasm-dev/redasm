@@ -16,8 +16,10 @@ public:
                                 int role) const override;
     [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation,
                                       int role) const override;
-    [[nodiscard]] int columnCount(const QModelIndex&) const override;
     [[nodiscard]] int rowCount(const QModelIndex&) const override;
+
+private:
+    [[nodiscard]] int columnCount(const QModelIndex&) const override;
 
 private:
     RDContext* m_context;

@@ -3,11 +3,12 @@
 #include "models/functions.h"
 #include "ui/devgraphsdialog.h"
 #include <redasm/redasm.h>
+#include <utility>
 
 class DevGraphsDialog: public QDialog {
     Q_OBJECT
 
-    using DotResult = QPair<QString, u32>;
+    using DotResult = std::pair<QString, u32>;
 
 public:
     explicit DevGraphsDialog(RDContext* ctx, QWidget* parent = nullptr);

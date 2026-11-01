@@ -6,11 +6,12 @@
 #include "dialogs/input.h"
 #include "dialogs/patch.h"
 #include "dialogs/rebase.h"
+#include "dialogs/referencesfrom.h"
 #include "dialogs/settings.h"
 #include "dialogs/table.h"
 #include "dialogs/types.h"
 #include "mainwindow.h"
-#include "models/references.h"
+#include "models/referencesto.h"
 #include "support/fontawesome.h"
 #include "support/utils.h"
 #include <QApplication>
@@ -40,13 +41,13 @@ QHash<Type, QAction*> g_actions;
 MainWindow* g_mainwindow;
 QHash<Type, ActionDesc> g_actiontable;
 
-const QString DETAIL_TEMPLATE = QString{R"(
+const char* const DETAIL_TEMPLATE = R"(
     <b>Address:</b> %1<br>
     <b>Offset:</b> %2<br>
     <br>
-    )"};
+    )";
 
-const QString INSTR_TEMPLATE = QString{R"(
+const char* const INSTR_TEMPLATE = R"(
         <b>==== INSTRUCTION ====</b><br>
         <b>Address:</b> %1<br>
         <b>Id:</b> %2<br>
@@ -54,14 +55,14 @@ const QString INSTR_TEMPLATE = QString{R"(
         <b>Length:</b> %4<br>
         <b>Delay slots:</b> %5<br>
         <br>
-        )"};
+        )";
 
-const QString OP_TEMPLATE = QString{R"(
+const char* const OP_TEMPLATE = R"(
         <b>==== OPERAND %1 ====</b><br>
         <b>Type:</b> %2<br>
         <b>Userdata1:</b> %3<br>
         <b>Userdata2:</b> %4<br>
-        )"};
+        )";
 
 QString optype_tostring(const RDOperand* op) {
     switch(op->kind) {
@@ -177,22 +178,24 @@ void show_details() {
     RDOffset offset;
     bool has_offset = rd_to_offset(cv->context(), address, &offset);
 
-    QString s = DETAIL_TEMPLATE.arg(rd_to_hexaddr(cv->context(), address))
+    QString s = QString{DETAIL_TEMPLATE}
+                    .arg(rd_to_hexaddr(cv->context(), address))
                     .arg(has_offset ? utils::to_hex(offset) : "N/A");
 
     RDInstruction instr;
 
     if(rd_decode(cv->context(), address, &instr)) {
-        QString strinstr =
-            INSTR_TEMPLATE.arg(rd_to_hexaddr(cv->context(), instr.address))
-                .arg(rd_to_hexaddr(cv->context(), instr.id))
-                .arg(instrflow_tostring(&instr))
-                .arg(rd_to_hexaddr(cv->context(), instr.length))
-                .arg(QString::number(instr.delay_slots));
+        QString strinstr = QString{INSTR_TEMPLATE}
+                               .arg(rd_to_hexaddr(cv->context(), instr.address))
+                               .arg(rd_to_hexaddr(cv->context(), instr.id))
+                               .arg(instrflow_tostring(&instr))
+                               .arg(rd_to_hexaddr(cv->context(), instr.length))
+                               .arg(QString::number(instr.delay_slots));
 
         rd_foreach_operand(i, op, &instr) {
             QString strop =
-                OP_TEMPLATE.arg(i)
+                QString{OP_TEMPLATE}
+                    .arg(i)
                     .arg(optype_tostring(op))
                     .arg(rd_to_hexaddr(cv->context(), op->userdata1))
                     .arg(rd_to_hexaddr(cv->context(), op->userdata2));
@@ -413,16 +416,40 @@ void xrefs_to() {
 
     QObject::connect(dlg, &TableDialog::double_clicked, g_mainwindow,
                      [cv, dlg](const QModelIndex& index) {
-                         auto* m =
-                             static_cast<ReferencesModel*>(dlg->source_model());
+                         auto* m = static_cast<ReferencesToModel*>(
+                             dlg->source_model());
                          cv->surface()->jump_to(m->address(index));
                          dlg->accept();
                      });
 
-    dlg->set_model(new ReferencesModel(cv->context(), *address, dlg));
+    dlg->set_model(new ReferencesToModel(cv->context(), *address, dlg));
     dlg->set_stretch_last_column(false);
     dlg->resize_column(1, QHeaderView::Stretch);
     dlg->show();
+}
+
+void xrefs_edit() {
+    ContextView* cv = g_mainwindow->context_view();
+    if(!cv) return;
+
+    auto addr = cv->surface()->get_current_address();
+    if(!addr) return;
+
+    auto* dlgrefs =
+        new ReferencesFromDialog(cv->context(), *addr, g_mainwindow);
+
+    QString str_addr = utils::to_hex(*addr, cv->context());
+    dlgrefs->setWindowTitle(QString{"References from %1"}.arg(str_addr));
+
+    QObject::connect(dlgrefs, &ReferencesFromDialog::accepted, g_mainwindow,
+                     [cv]() {
+                         if(rd_reanalyze(cv->context())) {
+                             cv->schedule_step();
+                             cv->invalidate();
+                         }
+                     });
+
+    dlgrefs->show();
 }
 
 void op_as_address() {
@@ -541,8 +568,8 @@ void do_data() {
                       rd_reanalyze(cv->context());
 
             if(ok) {
-                cv->invalidate();
                 cv->schedule_step();
+                cv->invalidate();
             }
         });
 
@@ -645,7 +672,8 @@ void init(QMainWindow* mw) {
         {Type::GOTO,              {IconKind::FA,   0xf1e5, "Goto",                 Qt::Key_G,                 show_goto,         {}}},
         {Type::COPY,              {IconKind::NONE, 0,      "Copy",                 Qt::CTRL | Qt::Key_C,      copy,              {}}},
         {Type::SELECT_ALL,        {IconKind::NONE, 0,      "Select All",           Qt::CTRL | Qt::Key_A,      select_all,        {}}},
-        {Type::REFS_TO,           {IconKind::NONE, 0,      "Cross References To…", Qt::Key_X,                 xrefs_to,          {}}},
+        {Type::XREFS_TO,          {IconKind::NONE, 0,      "Cross References To…", Qt::Key_X,                 xrefs_to,          {}}},
+        {Type::XREFS_EDIT,        {IconKind::FA,   0xf074, "Edit References",      {},                        xrefs_edit,        {}}},
         {Type::RENAME,            {IconKind::NONE, 0,      "Rename",               Qt::Key_N,                 rename,            {}}},
         {Type::COMMENT,           {IconKind::NONE, 0,      "Comment",              Qt::Key_Semicolon,         comment,           {}}},
         {Type::OP_AS_ADDRESS,     {IconKind::NONE, 0,      "As Address",           Qt::Key_A,                 op_as_address,     {}}},

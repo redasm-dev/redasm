@@ -12,7 +12,8 @@ enum Type {
     GOTO,
     COPY,
     SELECT_ALL,
-    REFS_TO,
+    XREFS_TO,
+    XREFS_EDIT,
     RENAME,
     COMMENT,
 

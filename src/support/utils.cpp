@@ -31,8 +31,10 @@ QPixmap copy_screenshot(QWidget* w) {
     int crop_x = -1, crop_y = -1;
 
     if(stackw) { // Try to grab surfaces
-        if(auto* l = stackw->findChild<SurfaceListing*>(); l && l->isVisible())
+        if(auto* l = stackw->findChild<SurfaceListing*>();
+           l && l->isVisible()) {
             w = l->viewport();
+        }
         else if(auto* g = stackw->findChild<SurfaceGraphView*>();
                 g && g->isVisible()) {
             w = g->viewport();
@@ -97,11 +99,12 @@ QMenu* create_surface_menu(ISurface* surface) {
     auto* graph = qobject_cast<SurfaceGraphView*>(w);
 
     // clang-format off
-    QAction* actcopy = actions::create(actions::COPY, w);
-    QAction* actselectall = actions::create(actions::SELECT_ALL, w);
-    QAction* actrefs = actions::create(actions::REFS_TO, w);
-    QAction* actrename = actions::create(actions::RENAME, w);
-    QAction* actcomment = actions::create(actions::COMMENT, w);
+    QAction* act_copy = actions::create(actions::COPY, w);
+    QAction* act_selectall = actions::create(actions::SELECT_ALL, w);
+    QAction* act_xrefs_to = actions::create(actions::XREFS_TO, w);
+    QAction* act_xrefs_edit = actions::create(actions::XREFS_EDIT, w);
+    QAction* act_rename = actions::create(actions::RENAME, w);
+    QAction* act_comment = actions::create(actions::COMMENT, w);
     QAction* act_op_as_addr = actions::create(actions::OP_AS_ADDRESS, w);
     QAction* act_op_as_imm = actions::create(actions::OP_AS_IMMEDIATE, w);
     QAction* act_undefine = actions::create(actions::DO_UNDEFINE, w);
@@ -114,13 +117,13 @@ QMenu* create_surface_menu(ISurface* surface) {
     // clang-format on
 
     auto* menu = new QMenu(w);
-    menu->addAction(actcopy);
-    menu->addAction(actselectall);
+    menu->addAction(act_copy);
+    menu->addAction(act_selectall);
     menu->addSeparator();
-    menu->addAction(actrefs);
-    menu->addAction(actrename);
+    menu->addAction(act_xrefs_to);
+    menu->addAction(act_rename);
     menu->addSeparator();
-    menu->addAction(actcomment);
+    menu->addAction(act_comment);
     menu->addAction(act_op_as_addr);
     menu->addAction(act_op_as_imm);
     menu->addAction(act_undefine);
@@ -143,6 +146,7 @@ QMenu* create_surface_menu(ISurface* surface) {
     menu->addAction(act_open_hex);
     menu->addSeparator();
     menu->addAction(act_patch);
+    menu->addAction(act_xrefs_edit);
     menu->addAction(act_create_function);
     menu->addSeparator();
     menu->addAction(actions::create(actions::GOTO, w, false));
@@ -174,14 +178,15 @@ QMenu* create_surface_menu(ISurface* surface) {
             act_callgraph->setText("Call Graph");
         }
 
-        actcopy->setVisible(surface->has_selection());
-        actrename->setVisible(cursor_addr.has_value());
+        act_copy->setVisible(surface->has_selection());
+        act_rename->setVisible(cursor_addr.has_value());
         act_open_hex->setVisible(curr_addr.has_value());
         act_callgraph->setVisible(in_func);
 
-        actrefs->setVisible(cursor_addr.has_value() &&
-                            !rd_slice_is_empty(rd_get_xrefs_to(
-                                surface->context(), *cursor_addr, RD_XR_NONE)));
+        act_xrefs_to->setVisible(
+            cursor_addr.has_value() &&
+            !rd_slice_is_empty(
+                rd_get_xrefs_to(surface->context(), *cursor_addr, RD_XR_NONE)));
         RDFlags f;
         bool flags_found = cursor_addr.has_value() &&
                            rd_get_flags(surface->context(), *cursor_addr, &f);
@@ -193,8 +198,9 @@ QMenu* create_surface_menu(ISurface* surface) {
                                             rd_segment_has_perm(seg, RD_SP_X) &&
                                             !rd_flags_has_func(f));
         }
-        else
+        else {
             act_create_function->setVisible(false);
+        }
 
         auto celldata = surface->get_cell_data_under_cursor();
 
@@ -221,12 +227,15 @@ QMenu* create_surface_menu(ISurface* surface) {
 
             act_patch->setVisible(seg && rd_segment_has_perm(seg, RD_SP_X) &&
                                   rd_flags_has_code(f));
+
+            act_xrefs_edit->setVisible(seg && !rd_flags_has_unknown(f));
         }
         else {
             act_undefine->setVisible(false);
             act_code->setVisible(false);
             act_data->setVisible(false);
             act_patch->setVisible(false);
+            act_xrefs_edit->setVisible(false);
         }
     });
 
@@ -289,8 +298,9 @@ bool handle_key_press(ISurface* surface, QKeyEvent* e) {
     else if(e->matches(QKeySequence::SelectStartOfDocument)) {
         surface->select(0, 0);
     }
-    else
+    else {
         return false;
+    }
 
     return true;
 }
@@ -336,6 +346,25 @@ QString model_to_csv(const QAbstractItemModel* model, bool with_header) {
     }
 
     return csv;
+}
+
+QString ref_typetostring(RDXRefType t) {
+    switch(t) {
+        case RD_DR_READ: return "READ";
+        case RD_DR_WRITE: return "WRITE";
+        case RD_DR_ADDRESS: return "ADDRESS";
+        case RD_CR_CALL: return "CALL";
+        case RD_CR_JUMP: return "JUMP";
+        default: break;
+    }
+
+    return {};
+}
+
+QString ref_getdirection(RDAddress address, const RDXRef& r) {
+    if(r.address > address) return "DOWN";
+    if(r.address < address) return "UP";
+    return "---";
 }
 
 } // namespace utils

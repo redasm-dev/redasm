@@ -13,9 +13,11 @@ public:
 
 public:
     [[nodiscard]] int rowCount(const QModelIndex&) const override;
-    [[nodiscard]] int columnCount(const QModelIndex&) const override;
     [[nodiscard]] QVariant data(const QModelIndex& index,
                                 int role) const override;
+
+private:
+    [[nodiscard]] int columnCount(const QModelIndex&) const override;
 
 private:
     QStringList m_recents;
