@@ -28,9 +28,9 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
     if(role == Qt::DisplayRole) {
         const RDSegment* s = rd_slice_at(m_segments, index.row());
 
-        usize sel_id = 0;
-        RDAddress sel_base = 0;
-        bool is_sel = rd_segment_get_selector(s, &sel_id, &sel_base, m_context);
+        usize bank_id = 0;
+        RDAddress bank_base = 0;
+        bool is_bank = rd_segment_get_bank(s, &bank_id, &bank_base, m_context);
 
         switch(index.column()) {
             case 0: return QString::fromUtf8(rd_segment_get_name(s));
@@ -38,12 +38,12 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
             case 2: return utils::to_hex(rd_segment_get_end(s), m_context);
             case 3: return utils::to_hex(rd_segment_get_size(s), m_context);
             case 4: return get_segment_type(s);
-            case 5: return utils::to_hex(sel_id, nullptr);
-            case 6: return utils::to_hex(sel_base, m_context);
+            case 5: return utils::to_hex(bank_id, nullptr);
+            case 6: return utils::to_hex(bank_base, m_context);
 
             case 7: {
-                return is_sel
-                           ? utils::to_hex(rd_segment_get_start(s) - sel_base,
+                return is_bank
+                           ? utils::to_hex(rd_segment_get_start(s) - bank_base,
                                            m_context)
                            : QString{};
             }
@@ -69,9 +69,9 @@ QVariant SegmentsModel::headerData(int section, Qt::Orientation orientation,
         case 2: return "End Address";
         case 3: return "Size";
         case 4: return "Perm";
-        case 5: return "Sel. Id";
-        case 6: return "Sel. Base";
-        case 7: return "Sel. Address";
+        case 5: return "Bank Id";
+        case 6: return "Bank Base";
+        case 7: return "Bank Address";
         default: break;
     }
 
