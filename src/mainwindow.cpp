@@ -523,8 +523,9 @@ void MainWindow::select_analyzers(RDContext* ctx) {
                 [&, ctx]() { rd_destroy(ctx); });
         dlganalyzers->show();
     }
-    else
+    else {
         this->show_context_view(ctx);
+    }
 }
 
 void MainWindow::show_segments() {
@@ -542,6 +543,7 @@ void MainWindow::show_segments() {
 
     dlg->set_model(new SegmentsModel(ctxview->context(), dlg));
     dlg->resize_column(0, QHeaderView::Stretch);
+    dlg->set_stretch_last_column(false);
     dlg->show();
 }
 
@@ -651,6 +653,7 @@ void MainWindow::closeEvent(QCloseEvent* e) {
         QWidget::closeEvent(e);
         Q_EMIT closed();
     }
-    else
+    else {
         e->ignore();
+    }
 }
