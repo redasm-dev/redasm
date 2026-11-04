@@ -4,7 +4,7 @@
 
 ProblemsModel::ProblemsModel(RDContext* ctx, QObject* parent)
     : QAbstractListModel{parent}, m_context{ctx} {
-    m_problems = rd_get_all_problems(ctx);
+    m_problems = rd_get_all_problems(ctx, RD_PROBLEM_NONE);
 }
 
 RDAddress ProblemsModel::address(const QModelIndex& index) const {
@@ -24,6 +24,7 @@ QVariant ProblemsModel::data(const QModelIndex& index, int role) const {
             case 0: return utils::to_hex(p->from.value, m_context);
             case 1: return utils::to_hex(p->target.value, m_context);
             case 2: return QString::fromUtf8(p->message);
+            case 3: return utils::to_hex(p->code);
             default: break;
         }
     }
@@ -47,7 +48,8 @@ QVariant ProblemsModel::data(const QModelIndex& index, int role) const {
     else if(role == Qt::TextAlignmentRole) {
         if(index.column() == 0 || index.column() == 1)
             return QVariant{Qt::AlignRight | Qt::AlignVCenter};
-        return Qt::AlignLeft;
+
+        if(index.column() == 3) return Qt::AlignRight;
     }
 
     return {};
@@ -61,13 +63,14 @@ QVariant ProblemsModel::headerData(int section, Qt::Orientation orientation,
         case 0: return tr("From");
         case 1: return tr("Target");
         case 2: return tr("Problem");
+        case 3: return tr("Code");
         default: break;
     }
 
     return {};
 }
 
-int ProblemsModel::columnCount(const QModelIndex&) const { return 3; }
+int ProblemsModel::columnCount(const QModelIndex&) const { return 4; }
 
 int ProblemsModel::rowCount(const QModelIndex&) const {
     return static_cast<int>(m_problems.length);

@@ -254,6 +254,9 @@ void MainWindow::show_problems() {
                      });
 
     dlg->set_model(new ProblemsModel(ctxview->context(), dlg));
+    dlg->set_stretch_last_column(false);
+    dlg->resize_column(2, QHeaderView::Stretch);
+    dlg->resize_column(3, QHeaderView::ResizeToContents);
     dlg->show();
 }
 

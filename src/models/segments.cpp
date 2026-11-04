@@ -38,7 +38,7 @@ QVariant SegmentsModel::data(const QModelIndex& index, int role) const {
             case 2: return utils::to_hex(rd_segment_get_end(s), m_context);
             case 3: return utils::to_hex(rd_segment_get_size(s), m_context);
             case 4: return get_segment_type(s);
-            case 5: return utils::to_hex(bank_id, nullptr);
+            case 5: return utils::to_hex(bank_id);
             case 6: return utils::to_hex(bank_base, m_context);
 
             case 7: {
