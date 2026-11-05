@@ -342,8 +342,9 @@ private:
         // Fallback: match XDG_CURRENT_DESKTOP / DESKTOP_SESSION against known
         // tiling WM names (covers ones without a dedicated socket env var)
         static const QStringList TILING_WM_NAMES = {
-            "i3",           "sway",  "bspwm",    "awesome", "dwm",  "xmonad",
-            "herbstluftwm", "qtile", "spectrwm", "leftwm",  "river"};
+            "i3",           "sway",  "bspwm",    "awesome", "dwm",   "xmonad",
+            "herbstluftwm", "qtile", "spectrwm", "leftwm",  "river",
+        };
 
         QString desktop = ENV.value("XDG_CURRENT_DESKTOP").toLower();
         QString session = ENV.value("DESKTOP_SESSION").toLower();

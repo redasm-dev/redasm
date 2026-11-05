@@ -1,5 +1,6 @@
 #include "view.h"
 #include "statusbar.h"
+#include "support/surfacetarget.h"
 #include "support/utils.h"
 
 SurfaceGraphView::SurfaceGraphView(RDContext* ctx, QWidget* parent)
@@ -8,7 +9,7 @@ SurfaceGraphView::SurfaceGraphView(RDContext* ctx, QWidget* parent)
 
     m_surface = rd_surfacegraph_create(ctx, RD_RF_GRAPH);
     m_popup = new SurfacePopup(ctx, this);
-    m_menu = utils::create_surface_menu(this);
+    m_menu = surface::create_menu(this);
 
     connect(this, &SurfaceGraphView::customContextMenuRequested, this,
             [&](const QPoint&) {
@@ -201,8 +202,9 @@ void SurfaceGraphView::keyPressEvent(QKeyEvent* e) {
         else if(e->matches(QKeySequence::MoveToPreviousLine)) {
             if(row > 0) this->set_position(row - 1, col);
         }
-        else
+        else {
             GraphView::keyPressEvent(e);
+        }
 
         return;
     }
@@ -313,7 +315,8 @@ void SurfaceGraphView::show_popup(const QPoint& pt) {
                 rd_surfacegraph_get_word_under_pos(m_surface, &pos);
             m_popup->popup(address, word ? QString::fromUtf8(word) : QString{});
         }
-        else
+        else {
             m_popup->hide();
+        }
     }
 }

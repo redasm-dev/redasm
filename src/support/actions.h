@@ -22,6 +22,7 @@ enum Type {
     DO_UNDEFINE,
     DO_CODE,
     DO_DATA,
+    DO_BRANCH,
     CREATE_FUNCTION,
     PATCH_INSTRUCTION,
     REANALYZE,

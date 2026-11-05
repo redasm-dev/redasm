@@ -2,7 +2,7 @@
 #include "support/surfacerenderer.h"
 
 DetailDialog::DetailDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
-    m_ui.tbdetail->setFont(surface_renderer::get_font());
+    m_ui.tbdetail->setFont(surface::get_font());
 }
 
 void DetailDialog::set_html(const QString& s) { // NOLINT

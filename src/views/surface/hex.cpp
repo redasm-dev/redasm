@@ -59,7 +59,7 @@ HexView::HexView(RDContext* ctx, QWidget* parent)
     m_delegate = new HexViewDelegate(this);
 
     m_hexview = new QHexView{};
-    m_hexview->setFont(surface_renderer::get_font());
+    m_hexview->setFont(surface::get_font());
     m_hexview->setDelegate(m_delegate);
     hexview_setup_options(m_hexview, ctx);
 

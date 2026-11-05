@@ -11,7 +11,7 @@ constexpr int POPUP_MARGIN = 16;
 }
 
 SurfacePopup::SurfacePopup(RDContext* ctx, QWidget* parent): QWidget{parent} {
-    this->setFont(surface_renderer::get_font());
+    this->setFont(surface::get_font());
     this->setCursor(Qt::ArrowCursor);
     this->setWindowFlags(Qt::Popup);
     this->setMouseTracking(true);
@@ -69,8 +69,8 @@ void SurfacePopup::render() {
         len = qMax(len, row.length);
     }
 
-    this->resize(qFloor(static_cast<int>(len) * surface_renderer::cell_width()),
-                 qFloor(static_cast<int>(n) * surface_renderer::cell_height()));
+    this->resize(qFloor(static_cast<int>(len) * surface::cell_width()),
+                 qFloor(static_cast<int>(n) * surface::cell_height()));
 
     this->update();
 }
@@ -80,8 +80,9 @@ void SurfacePopup::mouseMoveEvent(QMouseEvent* event) {
         this->hide();
         event->accept();
     }
-    else
+    else {
         QWidget::mouseMoveEvent(event);
+    }
 }
 
 void SurfacePopup::wheelEvent(QWheelEvent* event) {
@@ -103,5 +104,5 @@ void SurfacePopup::paintEvent(QPaintEvent* e) {
     }
 
     QPainter painter{this};
-    surface_renderer::render(&painter, m_surface, m_nrows);
+    surface::render(&painter, m_surface, m_nrows);
 }

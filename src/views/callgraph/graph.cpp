@@ -5,7 +5,7 @@
 
 CallGraph::CallGraph(RDContext* ctx, RDAddress address, QWidget* parent)
     : GraphView{parent}, m_context{ctx} {
-    this->setFont(surface_renderer::get_font());
+    this->setFont(surface::get_font());
 
     m_graph = rd_callgraph_create(ctx, address);
 

@@ -3,11 +3,11 @@
 #include "support/themeprovider.h"
 #include <QPainter>
 
-namespace surface_renderer {
+namespace surface {
 
 namespace {
 
-QFont g_font;
+QFont g_font; // NOLINT
 qreal g_cell_w = 0;
 qreal g_cell_h = 0;
 qreal g_baseline = 0;
@@ -73,7 +73,7 @@ void init() {
 }
 
 RDSurfacePos hit_test(QPoint pt, quint64 start_x) {
-    pt.rx() += surface_renderer::cell_width() * start_x;
+    pt.rx() += surface::cell_width() * start_x;
 
     return {
         qFloor(pt.y() / g_cell_h),
@@ -81,12 +81,12 @@ RDSurfacePos hit_test(QPoint pt, quint64 start_x) {
     };
 }
 
-qreal cell_width() { return surface_renderer::g_cell_w; }
-qreal cell_height() { return surface_renderer::g_cell_h; }
-QFont get_font() { return surface_renderer::g_font; }
+qreal cell_width() { return surface::g_cell_w; }
+qreal cell_height() { return surface::g_cell_h; }
+QFont get_font() { return surface::g_font; }
 
 void render(QPainter* p, RDSurface* surface, usize n, usize start_x) {
-    p->setFont(surface_renderer::g_font);
+    p->setFont(surface::g_font);
 
     for(usize i = 0; i < n; i++) {
         render_cells(p, rd_surface_get_row(surface, i), start_x,
@@ -103,4 +103,4 @@ void render_block(QPainter* p, RDSurfaceGraph* surface, usize start, usize n) {
     }
 }
 
-} // namespace surface_renderer
+} // namespace surface

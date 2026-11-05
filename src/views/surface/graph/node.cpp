@@ -42,9 +42,8 @@ QSize SurfaceGraphNode::size() const {
     if(s == -1 || e == -1) return {};
 
     return {
-        this->adjusted_width(
-            qCeil(m_maxwidth * surface_renderer::cell_width())),
-        qCeil((e - s + 1) * surface_renderer::cell_height()),
+        this->adjusted_width(qCeil(m_maxwidth * surface::cell_width())),
+        qCeil((e - s + 1) * surface::cell_height()),
     };
 }
 
@@ -59,8 +58,9 @@ void SurfaceGraphNode::mousepress_event(QMouseEvent* e) {
         rd_surfacegraph_set_pos(m_surface, pos.row, pos.col);
         this->invalidate();
     }
-    else
+    else {
         GraphViewNode::mousepress_event(e);
+    }
 
     e->accept();
 }
@@ -98,9 +98,8 @@ RDFunctionGraph* SurfaceGraphNode::graph() const {
 
 void SurfaceGraphNode::get_surface_pos(const QPointF& pt,
                                        RDSurfacePos* pos) const {
-    pos->row =
-        this->start_row() + qFloor(pt.y() / surface_renderer::cell_height());
-    pos->col = qFloor(pt.x() / surface_renderer::cell_width());
+    pos->row = this->start_row() + qFloor(pt.y() / surface::cell_height());
+    pos->col = qFloor(pt.x() / surface::cell_width());
 }
 
 int SurfaceGraphNode::start_row() const {
@@ -131,8 +130,8 @@ void SurfaceGraphNode::render(QPainter* p, usize state) {
         p->save();
         p->setClipRect(this->rect());
         p->translate(this->adjusted_x(this->x()), this->y());
-        surface_renderer::render_block(p, m_surface, static_cast<usize>(s),
-                                       static_cast<usize>(e - s) + 1);
+        surface::render_block(p, m_surface, static_cast<usize>(s),
+                              static_cast<usize>(e - s) + 1);
         p->restore();
     }
 

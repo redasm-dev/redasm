@@ -14,8 +14,8 @@ DevGraphsDialog::DevGraphsDialog(RDContext* ctx, QWidget* parent)
     m_functionsmodel = new FunctionsModel(ctx, m_ui.tvfunctions);
     m_ui.tvfunctions->setModel(m_functionsmodel);
 
-    m_ui.ptedot->setFont(surface_renderer::get_font());
-    m_ui.ptedot->setTabStopDistance(4 * surface_renderer::cell_width());
+    m_ui.ptedot->setFont(surface::get_font());
+    m_ui.ptedot->setTabStopDistance(4 * surface::cell_width());
 
     QHeaderView* hdrview = m_ui.tvfunctions->header();
     hdrview->setSectionResizeMode(0, QHeaderView::ResizeToContents);

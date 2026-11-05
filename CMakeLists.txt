@@ -40,6 +40,7 @@ target_sources(${PROJECT_NAME}
         src/delegates/referencesfrom.cpp
         src/dialogs/about.cpp
         src/dialogs/analyzer.cpp
+        src/dialogs/branch.cpp
         src/dialogs/callgraph.cpp
         src/dialogs/decoder.cpp
         src/dialogs/detail.cpp
@@ -80,6 +81,7 @@ target_sources(${PROJECT_NAME}
         src/support/scheduler.cpp
         src/support/settings.cpp
         src/support/surfacerenderer.cpp
+        src/support/surfacetarget.cpp
         src/support/syntaxhighlighter.cpp
         src/support/themeprovider.cpp
         src/support/utils.cpp

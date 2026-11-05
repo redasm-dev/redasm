@@ -23,7 +23,7 @@ struct TypesDialog {
         this->sbcount->setMinimum(0);
 
         auto* form = new QFormLayout();
-
+        form->setLabelAlignment(Qt::AlignRight);
         form->addRow("Type", this->cbxtypes);
         form->addRow("Count (0=no array)", this->sbcount);
         form->addRow("Modifier", this->cbxmod);
@@ -36,6 +36,7 @@ struct TypesDialog {
         vbox->addWidget(buttonbox);
 
         self->adjustSize();
+        self->resize(400, self->height());
 
         QObject::connect(buttonbox, &QDialogButtonBox::accepted, self,
                          &QDialog::accept);

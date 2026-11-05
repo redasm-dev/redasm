@@ -42,7 +42,7 @@ MainWindow::MainWindow(const RDInitParams& params, QWidget* parent)
     utils::mainwindow = this;
 
     rd_set_log_callback(on_log, this);
-    surface_renderer::init();
+    surface::init();
     rd_init(&params);
 
     this->setWindowIcon(utils::get_logo());
@@ -249,7 +249,6 @@ void MainWindow::show_problems() {
                              auto* m = static_cast<ProblemsModel*>(
                                  dlg->source_model());
                              cv->surface()->jump_to(m->address(index));
-                             dlg->accept();
                          }
                      });
 
@@ -541,7 +540,6 @@ void MainWindow::show_segments() {
             [&, ctxview, dlg](const QModelIndex& index) {
                 auto* m = static_cast<SegmentsModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
-                dlg->accept();
             });
 
     dlg->set_model(new SegmentsModel(ctxview->context(), dlg));
@@ -560,7 +558,6 @@ void MainWindow::show_mappings() {
             [&, ctxview, dlg](const QModelIndex& index) {
                 auto* m = static_cast<MappingsModel*>(dlg->source_model());
                 ctxview->surface()->jump_to(m->address(index));
-                dlg->accept();
             });
 
     dlg->set_model(new MappingsModel(ctxview->context(), dlg));

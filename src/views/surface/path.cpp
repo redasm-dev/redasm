@@ -22,11 +22,11 @@ void SurfacePath::paintEvent(QPaintEvent* event) {
     if(rd_slice_is_empty(path)) return;
 
     QPainter painter{this};
-    painter.setFont(surface_renderer::get_font());
+    painter.setFont(surface::get_font());
 
     const int NROWS = m_surfacelisting->visible_rows();
-    const qreal W = surface_renderer::cell_width();
-    const qreal H = surface_renderer::cell_height();
+    const qreal W = surface::cell_width();
+    const qreal H = surface::cell_height();
 
     qreal x = this->width() - (W * 2);
 
@@ -59,8 +59,9 @@ void SurfacePath::paintEvent(QPaintEvent* event) {
 
             penstyle = dotted ? Qt::DotLine : Qt::SolidLine;
         }
-        else
+        else {
             penstyle = Qt::DashDotLine;
+        }
 
         painter.setPen(
             QPen{theme_provider::color(p->style), penwidth, penstyle});
@@ -78,8 +79,8 @@ bool SurfacePath::is_path_selected(const RDSurfacePathItem* p) const {
 }
 
 void SurfacePath::fill_arrow(QPainter* painter, int y) {
-    const int W = qRound(surface_renderer::cell_width() / 2);
-    const int HL = qRound(surface_renderer::cell_height() / 3);
+    const int W = qRound(surface::cell_width() / 2);
+    const int HL = qRound(surface::cell_height() / 3);
 
     QPainterPath path;
     path.moveTo(QPoint{this->width() - W, y});

@@ -42,9 +42,9 @@ struct SettingsDialog {
 
         auto* form = new QFormLayout();
         form->setLabelAlignment(Qt::AlignRight);
-        form->addRow("Network:", this->chknetwork);
-        form->addRow("Theme:", this->cbxthemes);
-        form->addRow("Font:", hbox_font);
+        form->addRow("Network", this->chknetwork);
+        form->addRow("Theme", this->cbxthemes);
+        form->addRow("Font", hbox_font);
 
         auto* gb = new QGroupBox("Preview");
         gb->setFlat(false);

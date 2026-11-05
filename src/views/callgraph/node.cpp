@@ -11,8 +11,8 @@ QSize CallGraphNode::size() const {
     QString s = this->get_node_text();
 
     return {
-        this->adjusted_width(qCeil(s.size() * surface_renderer::cell_width())),
-        qCeil(surface_renderer::cell_height()),
+        this->adjusted_width(qCeil(s.size() * surface::cell_width())),
+        qCeil(surface::cell_height()),
     };
 }
 

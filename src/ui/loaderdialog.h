@@ -102,8 +102,8 @@ private:
 
         auto* form = new QFormLayout(this->gbloader);
         form->setLabelAlignment(Qt::AlignRight);
-        form->addRow("Processor:", this->cbprocessors);
-        form->addRow("Min String:", this->sbminstring);
+        form->addRow("Processor", this->cbprocessors);
+        form->addRow("Min String", this->sbminstring);
 
         // right part
         this->gbopenmode = new QGroupBox();
@@ -138,10 +138,10 @@ private:
 
         auto* form = new QFormLayout(this->gbaddressing);
         form->setLabelAlignment(Qt::AlignRight);
-        form->addRow("Base Address:", this->lebaseaddress);
-        form->addRow("Address:", this->leaddress);
-        form->addRow("Offset:", this->leoffset);
-        form->addRow("Entry Point:", this->leentrypoint);
+        form->addRow("Base Address", this->lebaseaddress);
+        form->addRow("Address", this->leaddress);
+        form->addRow("Offset", this->leoffset);
+        form->addRow("Entry Point", this->leentrypoint);
         l->addWidget(this->gbaddressing);
     }
 };

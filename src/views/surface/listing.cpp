@@ -1,6 +1,7 @@
 #include "listing.h"
 #include "statusbar.h"
 #include "support/surfacerenderer.h"
+#include "support/surfacetarget.h"
 #include "support/utils.h"
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
@@ -27,7 +28,7 @@ SurfaceListing::SurfaceListing(RDContext* ctx, QWidget* parent)
     this->horizontalScrollBar()->setMinimum(0);
     this->horizontalScrollBar()->setValue(0);
 
-    m_menu = utils::create_surface_menu(this);
+    m_menu = surface::create_menu(this);
 
     connect(this, &SurfaceListing::customContextMenuRequested, this,
             [&](const QPoint&) { m_menu->popup(QCursor::pos()); });
@@ -330,8 +331,8 @@ void SurfaceListing::paintEvent(QPaintEvent* e) {
 
     quint64 start_x = this->horizontalScrollBar()->value();
     QPainter p{this->viewport()};
-    surface_renderer::render(&p, m_surface, rd_surface_get_row_count(m_surface),
-                             static_cast<usize>(start_x));
+    surface::render(&p, m_surface, rd_surface_get_row_count(m_surface),
+                    static_cast<usize>(start_x));
 
     Q_EMIT render_completed();
     statusbar::set_address(this);
@@ -356,15 +357,15 @@ bool SurfaceListing::can_go_forward() const {
 }
 
 int SurfaceListing::visible_columns() const {
-    return qFloor(this->viewport()->width() / surface_renderer::cell_width());
+    return qFloor(this->viewport()->width() / surface::cell_width());
 }
 
 int SurfaceListing::visible_rows() const {
-    return qFloor(this->viewport()->height() / surface_renderer::cell_height());
+    return qFloor(this->viewport()->height() / surface::cell_height());
 }
 
 RDSurfacePos SurfaceListing::get_surface_coords(QPoint pt) const {
-    return surface_renderer::hit_test(pt, this->horizontalScrollBar()->value());
+    return surface::hit_test(pt, this->horizontalScrollBar()->value());
 }
 
 RDSurfacePos SurfaceListing::get_position() const {

@@ -27,6 +27,7 @@ struct FLCDialog {
         this->lesegment->setReadOnly(true);
 
         auto* form = new QFormLayout();
+        form->setLabelAlignment(Qt::AlignRight);
         form->addRow("Address", this->leaddress);
         form->addRow("Address (Rel)", this->lereladdress);
         form->addRow("Offset", this->leoffset);

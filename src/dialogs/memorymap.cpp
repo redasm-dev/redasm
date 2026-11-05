@@ -8,7 +8,7 @@ MemoryMapDialog::MemoryMapDialog(RDContext* ctx, QWidget* parent)
 
     m_flagsdelegate = new FlagsDelegate(m_ui.hexview);
 
-    m_ui.hexview->setFont(surface_renderer::get_font());
+    m_ui.hexview->setFont(surface::get_font());
     m_ui.hexview->setDelegate(m_flagsdelegate);
 
     RDSegmentSlice segments = rd_get_all_segments(ctx);
