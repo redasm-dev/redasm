@@ -26,46 +26,49 @@ struct Rule {
     bool shortcut{true};
 };
 
-bool always(const Target&) { return true; }
-
 constexpr bool TARGETED = true;
 constexpr Rule MENU_SEP = {actions::NONE};
 
+bool always(const Target&) { return true; }
+#define COND(body) [](const Target& t) { return body; }
+
 // clang-format off
 const Rule RULES[] = { // NOLINT
-    {actions::COPY,              [](const Target& t) { return t.has_selection; }},
+    {actions::COPY,              COND(t.has_selection)},
     {actions::SELECT_ALL,        always},
     MENU_SEP,
-    {actions::XREFS_TO,          [](const Target& t) { return t.address && rd_has_refs_to(t.ctx, *t.address); }, TARGETED},
-    {actions::RENAME,            [](const Target& t) { return t.address.has_value(); }, TARGETED},
+    {actions::XREFS_TO,          COND(t.from_cursor && t.address && rd_has_refs_to(t.context, *t.address)), TARGETED},
+    {actions::RENAME,            COND(t.address.has_value()), TARGETED},
     MENU_SEP,
-    {actions::OP_AS_ADDRESS,     [](const Target& t) { return t.has_operand() && t.cell->operand.value.kind == RD_OP_IMM && rd_is_address(t.ctx, t.cell->operand.value.imm); }},
-    {actions::OP_AS_IMMEDIATE,   [](const Target& t) { return t.has_operand() && t.cell->operand.value.kind == RD_OP_ADDR; }},
-    {actions::COMMENT,           [](const Target& t) { return t.has_flags; }, TARGETED},
-    {actions::DO_UNDEFINE,       [](const Target& t) { return t.range || (t.has_flags && t.has_value() && !t.is_unknown()); }, TARGETED},
-    {actions::DO_CODE,           [](const Target& t) { return t.is_executable() && t.has_flags && t.has_value() && !t.is_code(); }, TARGETED},
-    {actions::DO_DATA,           [](const Target& t) { return t.has_flags && t.has_value() && !t.is_data(); }, TARGETED},
-    {actions::DO_BRANCH,         [](const Target& t) { return t.has_flags && t.has_value() && !t.is_code(); }, TARGETED},
+    {actions::OP_AS_ADDRESS,     COND(t.has_operand() && t.cell->operand.value.kind == RD_OP_IMM && rd_is_address(t.context, t.cell->operand.value.imm))},
+    {actions::OP_AS_IMMEDIATE,   COND(t.has_operand() && t.cell->operand.value.kind == RD_OP_ADDR)},
+    {actions::COMMENT,           COND(t.has_flags)},
+    {actions::DO_UNDEFINE,       COND(t.range || (t.has_flags && t.has_value() && !t.is_unknown()))},
+    {actions::DO_CODE,           COND(t.is_executable() && t.has_flags && t.has_value() && !t.is_code())},
+    {actions::DO_DATA,           COND(t.has_flags && t.has_value() && !t.is_data())},
+    {actions::DO_BRANCH,         COND(t.has_flags && t.has_value() && !t.is_code()), TARGETED},
     MENU_SEP,
     {actions::SWITCH_TO_GRAPH,   always, false, View::LISTING},
     {actions::SWITCH_TO_LISTING, always, false, View::GRAPH},
-    {actions::SWITCH_TO_HEX,     [](const Target& t) { return t.address.has_value(); }, TARGETED},
+    {actions::SWITCH_TO_HEX,     COND(t.address.has_value()), TARGETED},
     MENU_SEP,
-    {actions::PATCH_INSTRUCTION, [](const Target& t) { return t.is_executable() && t.is_code(); }, TARGETED},
-    {actions::XREFS_EDIT,        [](const Target& t) { return t.has_flags && !t.is_unknown(); }, TARGETED},
-    {actions::CREATE_FUNCTION,   [](const Target& t) { return t.is_executable() && t.has_flags && !t.is_data() && !t.is_func_start() && !t.in_func; }, TARGETED},
+    {actions::PATCH_INSTRUCTION, COND(rd_can_encode(t.context) && t.is_executable() && t.is_code())},
+    {actions::XREFS_EDIT,        COND(t.has_flags && !t.is_unknown()), TARGETED},
+    {actions::CREATE_FUNCTION,   COND(t.is_executable() && t.has_flags && !t.is_data() && !t.is_func_start() && !t.in_func)},
     MENU_SEP,
     {actions::GOTO,              always, false, View::ANY, false},
-    {actions::OPEN_CALLGRAPH,    [](const Target& t) { return t.in_func; }, TARGETED},
-    {actions::OPEN_DETAILS,      [](const Target& t) { return t.address.has_value(); }, TARGETED},
+    {actions::OPEN_CALLGRAPH,    COND(t.in_func), TARGETED},
+    {actions::OPEN_DETAILS,      COND(t.address.has_value())},
 };
 // clang-format on
+
+#undef COND
 
 } // namespace
 
 Target resolve(ISurface* surface) {
     Target t;
-    t.ctx = surface->context();
+    t.context = surface->context();
     t.row_address = surface->get_current_address();
     t.range = surface->get_selected_range();
     t.cell = surface->get_cell_data_under_cursor();
@@ -81,9 +84,10 @@ Target resolve(ISurface* surface) {
     }
 
     if(t.address) {
-        t.segment = rd_segment_find(t.ctx, *t.address);
-        t.has_flags = t.segment && rd_get_flags(t.ctx, *t.address, &t.flags);
-        t.in_func = rd_function_find(t.ctx, *t.address, nullptr);
+        t.segment = rd_segment_find(t.context, *t.address);
+        t.has_flags =
+            t.segment && rd_get_flags(t.context, *t.address, &t.flags);
+        t.in_func = rd_function_find(t.context, *t.address, nullptr);
     }
 
     return t;
@@ -134,7 +138,7 @@ QMenu* create_menu(ISurface* surface) {
         QString name;
 
         if(TGT.from_cursor && TGT.address) {
-            const char* n = rd_get_name(TGT.ctx, *TGT.address);
+            const char* n = rd_get_name(TGT.context, *TGT.address);
             name = n ? QString::fromUtf8(n) : utils::to_hex(*TGT.address);
         }
 

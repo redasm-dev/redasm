@@ -46,18 +46,31 @@ QHash<Type, ActionDesc> g_actiontable;
 struct SurfaceCall {
     ContextView* context_view;
     surface::target::Target target;
+    RDAddress address;
 };
 
 // Resolves the active surface's target and applies the SAME rule the context
 // menu uses, so a menu click and a keyboard shortcut always agree.
 // nullopt -> the action doesn't apply here.
-std::optional<SurfaceCall> resolve(Type type) {
+std::optional<SurfaceCall> resolve(Type type, bool targeted) {
     ContextView* cv = g_mainwindow->context_view();
     if(!cv) return std::nullopt;
 
     surface::target::Target t = surface::target::resolve(cv->surface());
     if(!surface::target::is_enabled(type, t)) return std::nullopt;
-    return SurfaceCall{cv, std::move(t)};
+
+    RDAddress address;
+
+    if(targeted) {
+        if(!t.address.has_value()) return std::nullopt;
+        address = *t.address;
+    }
+    else {
+        if(!t.row_address.has_value()) return std::nullopt;
+        address = *t.row_address;
+    }
+
+    return SurfaceCall{cv, std::move(t), address};
 }
 
 const char* const DETAIL_TEMPLATE = R"(
@@ -179,22 +192,21 @@ void rebase() {
 }
 
 void show_details() {
-    auto sc = actions::resolve(Type::OPEN_DETAILS);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::OPEN_DETAILS, false);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    RDAddress address = *sc->target.address;
 
     RDOffset offset;
-    bool has_offset = rd_to_offset(cv->context(), address, &offset);
+    bool has_offset = rd_to_offset(cv->context(), sc->address, &offset);
 
     QString s = QString{DETAIL_TEMPLATE}
-                    .arg(rd_to_hexaddr(cv->context(), address))
+                    .arg(rd_to_hexaddr(cv->context(), sc->address))
                     .arg(has_offset ? utils::to_hex(offset) : "N/A");
 
     RDInstruction instr;
 
-    if(rd_decode(cv->context(), address, &instr)) {
+    if(rd_decode(cv->context(), sc->address, &instr)) {
         QString strinstr = QString{INSTR_TEMPLATE}
                                .arg(rd_to_hexaddr(cv->context(), instr.address))
                                .arg(rd_to_hexaddr(cv->context(), instr.id))
@@ -290,11 +302,12 @@ void show_details() {
         s.append(strinstr);
     }
 
-    RDXRefSlice xrefs = rd_get_xrefs_from(cv->context(), address, RD_XR_NONE);
+    RDXRefSlice xrefs =
+        rd_get_xrefs_from(cv->context(), sc->address, RD_XR_NONE);
 
     if(!rd_slice_is_empty(xrefs)) {
         s.append(QString{"<br><b>==== XREFS FROM %1 ====</b><br>"}.arg(
-            rd_to_hexaddr(cv->context(), address)));
+            rd_to_hexaddr(cv->context(), sc->address)));
 
         for(usize i = 0; i < rd_slice_length(xrefs); i++) {
             RDXRef r = rd_slice_at(xrefs, i);
@@ -306,11 +319,11 @@ void show_details() {
         }
     }
 
-    xrefs = rd_get_xrefs_to(cv->context(), address, RD_XR_NONE);
+    xrefs = rd_get_xrefs_to(cv->context(), sc->address, RD_XR_NONE);
 
     if(!rd_slice_is_empty(xrefs)) {
         s.append(QString{"<br><b>==== XREFS TO %1 ====</b><br>"}.arg(
-            rd_to_hexaddr(cv->context(), address)));
+            rd_to_hexaddr(cv->context(), sc->address)));
 
         for(usize i = 0; i < rd_slice_length(xrefs); i++) {
             RDXRef r = rd_slice_at(xrefs, i);
@@ -324,18 +337,18 @@ void show_details() {
 
     auto* dlg = new DetailDialog(cv);
     auto title =
-        QString("Details @ %1").arg(rd_to_hexaddr(cv->context(), address));
+        QString("Details @ %1").arg(rd_to_hexaddr(cv->context(), sc->address));
     dlg->setWindowTitle(title);
     dlg->set_html(s);
     dlg->show();
 }
 
 void show_callgraph() {
-    auto sc = actions::resolve(Type::OPEN_CALLGRAPH);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::OPEN_CALLGRAPH, true);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto* dlg = new CallGraphDialog(cv->context(), *sc->target.address, cv);
+    auto* dlg = new CallGraphDialog(cv->context(), sc->address, cv);
 
     QObject::connect(dlg, &CallGraphDialog::address_requested, g_mainwindow,
                      [](RDAddress address) {
@@ -363,29 +376,29 @@ void switch_graph() {
 }
 
 void switch_hex() {
-    auto sc = actions::resolve(Type::SWITCH_TO_HEX);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::SWITCH_TO_HEX, true);
+    if(!sc) return;
 
     sc->context_view->handle_view_requested(ISurface::ViewRequest::HEX,
-                                            sc->target.address);
+                                            sc->address);
 }
 
 void comment() {
-    auto sc = actions::resolve(Type::COMMENT);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::COMMENT, false);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
     bool ok = false;
-    const char* cmt = rd_get_comment_inline(cv->context(), *address);
+    const char* cmt = rd_get_comment_inline(cv->context(), sc->address);
 
     QString s = input_dialog::get_multi_line_text(
-        g_mainwindow, QString{"Comment @ %1"}.arg(utils::to_hex(*address)),
+        g_mainwindow, QString{"Comment @ %1"}.arg(utils::to_hex(sc->address)),
         "Insert comment (or leave empty), CTRL+ENTER to accept:",
         cmt ? cmt : QString{}, &ok);
 
-    if(ok && rd_set_comment_inline(cv->context(), *address, qUtf8Printable(s)))
+    if(ok &&
+       rd_set_comment_inline(cv->context(), sc->address, qUtf8Printable(s)))
         cv->invalidate();
 }
 
@@ -394,17 +407,18 @@ void xrefs_to() {
     if(!cv) return;
 
     surface::target::Target t = surface::target::resolve(cv->surface());
-    auto address = t.address;
-    if(!address) return;
+    if(!t.address.has_value()) return;
+
+    RDAddress address = *t.address;
 
     // Not a silent no-op: tell the user why the shortcut did nothing.
     if(!surface::target::is_enabled(Type::XREFS_TO, t)) {
-        RD_LOG_INFO("no xrefs to %" PRIX64, *address);
+        RD_LOG_INFO("no xrefs to %" PRIX64, address);
         return;
     }
 
     auto* dlg = new TableDialog(
-        QString("References to %1").arg(rd_to_hexaddr(cv->context(), *address)),
+        QString("References to %1").arg(rd_to_hexaddr(cv->context(), address)),
         cv);
 
     QObject::connect(dlg, &TableDialog::double_clicked, g_mainwindow,
@@ -415,22 +429,21 @@ void xrefs_to() {
                          dlg->accept();
                      });
 
-    dlg->set_model(new ReferencesToModel(cv->context(), *address, dlg));
+    dlg->set_model(new ReferencesToModel(cv->context(), address, dlg));
     dlg->set_stretch_last_column(false);
     dlg->resize_column(1, QHeaderView::Stretch);
     dlg->show();
 }
 
 void xrefs_edit() {
-    auto sc = actions::resolve(Type::XREFS_EDIT);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::XREFS_EDIT, true);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto addr = sc->target.address;
 
-    auto* dlgrefs = new ReferencesFromDialog(cv->context(), *addr, cv);
+    auto* dlgrefs = new ReferencesFromDialog(cv->context(), sc->address, cv);
 
-    QString str_addr = utils::to_hex(*addr, cv->context());
+    QString str_addr = utils::to_hex(sc->address, cv->context());
     dlgrefs->setWindowTitle(QString{"References from %1"}.arg(str_addr));
 
     QObject::connect(dlgrefs, &ReferencesFromDialog::accepted, cv, [cv]() {
@@ -444,27 +457,27 @@ void xrefs_edit() {
 }
 
 void op_as_address() {
-    auto sc = actions::resolve(Type::OP_AS_ADDRESS);
-    if(!sc || !sc->target.row_address.has_value()) return;
+    auto sc = actions::resolve(Type::OP_AS_ADDRESS, false);
+    if(!sc) return;
 
-    if(rd_operand_as_address(sc->context_view->context(),
-                             *sc->target.row_address,
-                             sc->target.cell->operand.index))
+    if(rd_operand_as_address(sc->context_view->context(), sc->address,
+                             sc->target.cell->operand.index)) {
         sc->context_view->invalidate();
+    }
 }
 
 void op_as_immediate() {
-    auto sc = actions::resolve(Type::OP_AS_IMMEDIATE);
-    if(!sc || !sc->target.row_address.has_value()) return;
+    auto sc = actions::resolve(Type::OP_AS_IMMEDIATE, false);
+    if(!sc) return;
 
-    if(rd_operand_as_immediate(sc->context_view->context(),
-                               *sc->target.row_address,
-                               sc->target.cell->operand.index))
+    if(rd_operand_as_immediate(sc->context_view->context(), sc->address,
+                               sc->target.cell->operand.index)) {
         sc->context_view->invalidate();
+    }
 }
 
 void do_undefine() {
-    auto sc = actions::resolve(Type::DO_UNDEFINE);
+    auto sc = actions::resolve(Type::DO_UNDEFINE, false);
     if(!sc) return;
 
     ContextView* cv = sc->context_view;
@@ -487,16 +500,13 @@ void do_undefine() {
         }
     }
     else {
-        auto address = sc->target.address;
-        if(!address.has_value()) return;
-
         auto res =
             QMessageBox::question(g_mainwindow, "Please confirm",
                                   QString{"Do you want to undefine %1?"}.arg(
-                                      utils::to_hex(*address)));
+                                      utils::to_hex(sc->address)));
 
         if(res == QMessageBox::Yes &&
-           rd_user_undefine(cv->context(), *address,
+           rd_user_undefine(cv->context(), sc->address,
                             RD_UNDEFINE_TRACE | RD_UNDEFINE_COMMENTS)) {
             cv->schedule_step();
             cv->invalidate();
@@ -505,37 +515,36 @@ void do_undefine() {
 }
 
 void do_code() {
-    auto sc = actions::resolve(Type::DO_CODE);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::DO_CODE, false);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
     auto res =
         QMessageBox::question(g_mainwindow, "Please confirm",
                               QString{"Do you want to convert to code %1?"}.arg(
-                                  utils::to_hex(*address)));
+                                  utils::to_hex(sc->address)));
 
     if(res != QMessageBox::Yes) return;
 
-    if(rd_make_code(cv->context(), *address) && rd_reanalyze(cv->context())) {
+    if(rd_make_code(cv->context(), sc->address) &&
+       rd_reanalyze(cv->context())) {
         cv->schedule_step();
         cv->invalidate();
     }
 }
 
 void do_data() {
-    auto sc = actions::resolve(Type::DO_DATA);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::DO_DATA, false);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
     auto* dlgtypes = new TypesDialog(cv->context(), cv);
 
     QObject::connect(
         dlgtypes, &TypesDialog::accepted, cv,
-        [cv, dlgtypes, addr = *address]() {
+        [cv, dlgtypes, addr = sc->address]() {
             bool ok = rd_user_type(cv->context(), addr,
                                    qUtf8Printable(dlgtypes->selected_type()),
                                    dlgtypes->selected_count(),
@@ -552,17 +561,16 @@ void do_data() {
 }
 
 void do_branch() {
-    auto sc = actions::resolve(Type::DO_BRANCH);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::DO_BRANCH, true);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
-    auto* dlgbranch = new BranchDialog(*address, cv);
+    auto* dlgbranch = new BranchDialog(sc->address, cv);
 
     QObject::connect(
         dlgbranch, &BranchDialog::accepted, cv,
-        [cv, dlgbranch, addr = *address]() {
+        [cv, dlgbranch, addr = sc->address]() {
             bool ok =
                 rd_user_branch_table(
                     cv->context(), addr,
@@ -583,25 +591,23 @@ void do_branch() {
 }
 
 void create_function() {
-    auto sc = actions::resolve(Type::CREATE_FUNCTION);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::CREATE_FUNCTION, true);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
     bool ok = false;
     QString n = QInputDialog::getText(
         g_mainwindow,
-        QString{"Create function @ %1"}.arg(utils::to_hex(*address)),
+        QString{"Create function @ %1"}.arg(utils::to_hex(sc->address)),
         "Function name (can be empty):", QLineEdit::Normal, {}, &ok);
 
     if(!ok) return;
 
-    if(rd_set_function(cv->context(), *address) &&
+    if(rd_set_function(cv->context(), sc->address) &&
        rd_reanalyze(cv->context())) {
-
         if(!n.isEmpty())
-            rd_user_name(cv->context(), *address, qUtf8Printable(n));
+            rd_user_name(cv->context(), sc->address, qUtf8Printable(n));
 
         cv->schedule_step();
         cv->invalidate();
@@ -609,16 +615,15 @@ void create_function() {
 }
 
 void patch_instruction() {
-    auto sc = actions::resolve(Type::PATCH_INSTRUCTION);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::PATCH_INSTRUCTION, false);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
-    auto* dlgpatch = new PatchDialog(*address, cv);
+    auto* dlgpatch = new PatchDialog(sc->address, cv);
 
     QObject::connect(dlgpatch, &PatchDialog::accepted, cv,
-                     [cv, dlgpatch, addr = *address]() {
+                     [cv, dlgpatch, addr = sc->address]() {
                          bool ok = rd_patch_instruction(
                              cv->context(), addr,
                              qUtf8Printable(dlgpatch->instruction_text()),
@@ -634,23 +639,22 @@ void patch_instruction() {
 }
 
 void rename() {
-    auto sc = actions::resolve(Type::RENAME);
-    if(!sc || !sc->target.address.has_value()) return;
+    auto sc = actions::resolve(Type::RENAME, true);
+    if(!sc) return;
 
     ContextView* cv = sc->context_view;
-    auto address = sc->target.address;
 
     QString name;
 
-    if(const char* s = rd_get_name(cv->context(), *address); s) name = s;
+    if(const char* s = rd_get_name(cv->context(), sc->address); s) name = s;
 
     bool ok = false;
     QString s = QInputDialog::getText(
         g_mainwindow,
-        QString("Rename @ %1").arg(rd_to_hexaddr(cv->context(), *address)),
+        QString("Rename @ %1").arg(rd_to_hexaddr(cv->context(), sc->address)),
         "New Name", QLineEdit::Normal, name, &ok);
 
-    if(ok && rd_user_name(cv->context(), *address, qUtf8Printable(s)))
+    if(ok && rd_user_name(cv->context(), sc->address, qUtf8Printable(s)))
         cv->invalidate();
 }
 

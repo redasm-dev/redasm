@@ -32,7 +32,7 @@ namespace surface {
 namespace target {
 
 struct Target {
-    RDContext* ctx{};
+    RDContext* context{};
 
     std::optional<RDAddress> address;
     std::optional<RDAddress> row_address;
