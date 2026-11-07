@@ -19,7 +19,7 @@ public:
 
 private:
     [[nodiscard]] int columnCount(const QModelIndex&) const override;
-    static void on_hook(RDContext* ctx, const RDHookEvent* e, void* userdata);
+    static bool on_hook(RDContext* ctx, const RDHookEvent* e, void* userdata);
 
 private:
     RDContext* m_context;

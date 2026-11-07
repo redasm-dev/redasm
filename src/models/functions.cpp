@@ -26,8 +26,9 @@ QVariant FunctionsModel::data(const QModelIndex& index, int role) const {
             default: break;
         }
     }
-    else if(role == Qt::TextAlignmentRole)
+    else if(role == Qt::TextAlignmentRole) {
         return Qt::AlignLeft;
+    }
 
     return {};
 }
@@ -51,7 +52,7 @@ int FunctionsModel::rowCount(const QModelIndex&) const {
     return static_cast<int>(m_addresses.size());
 }
 
-void FunctionsModel::on_hook(RDContext* ctx, const RDHookEvent* e,
+bool FunctionsModel::on_hook(RDContext* ctx, const RDHookEvent* e,
                              void* userdata) {
     RD_UNUSED(ctx);
 
@@ -62,17 +63,20 @@ void FunctionsModel::on_hook(RDContext* ctx, const RDHookEvent* e,
     int row = static_cast<int>(it - v.begin());
 
     if(!std::strcmp(e->name, "redasm.func_added")) {
-        if(it != v.end() && *it == address) return; // already in the snapshot
+        if(it != v.end() && *it == address)
+            return true; // already in the snapshot
 
         self->beginInsertRows(QModelIndex{}, row, row);
         v.insert(it, address);
         self->endInsertRows();
     }
     else if(!std::strcmp(e->name, "redasm.func_removed")) {
-        if(it == v.end() || *it != address) return;
+        if(it == v.end() || *it != address) return true; // already removed
 
         self->beginRemoveRows(QModelIndex{}, row, row);
         v.erase(it);
         self->endRemoveRows();
     }
+
+    return true;
 }
