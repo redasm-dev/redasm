@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "support/fontawesome.h"
+#include "support/settings.h"
 #include "support/themeprovider.h"
 #include "views/surface/graph/view.h"
 #include "views/surface/hex.h"
@@ -49,20 +50,23 @@ QPixmap copy_screenshot(QWidget* w) {
         }
     }
 
-    QPixmap logo = utils::get_logo();
     QPixmap scrshot =
         w->grab(QRect{0, 0, w->width() - crop_x, w->height() - crop_y});
 
-    logo = logo.scaled(utils::LOGO_SIZE, utils::LOGO_SIZE, Qt::KeepAspectRatio,
-                       Qt::SmoothTransformation);
+    if(REDasmSettings{}.screenshot_logo()) {
+        QPixmap logo = utils::get_logo();
 
-    int x = scrshot.width() - logo.width() - utils::LOGO_MARGIN_X;
-    int y = scrshot.height() - logo.height() - utils::LOGO_MARGIN_Y;
+        logo = logo.scaled(utils::LOGO_SIZE, utils::LOGO_SIZE,
+                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    QPainter painter(&scrshot);
-    painter.setOpacity(0.5);
-    painter.drawPixmap(x, y, logo);
-    painter.end();
+        int x = scrshot.width() - logo.width() - utils::LOGO_MARGIN_X;
+        int y = scrshot.height() - logo.height() - utils::LOGO_MARGIN_Y;
+
+        QPainter painter(&scrshot);
+        painter.setOpacity(0.5);
+        painter.drawPixmap(x, y, logo);
+        painter.end();
+    }
 
     return scrshot;
 }

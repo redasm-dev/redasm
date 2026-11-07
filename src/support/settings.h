@@ -16,6 +16,7 @@ public:
     [[nodiscard]] QFont current_font() const;
     [[nodiscard]] int current_font_size() const;
     [[nodiscard]] bool network_enabled() const;
+    [[nodiscard]] bool screenshot_logo() const;
     bool restore_state(QMainWindow* mainwindow);
     void default_state(QMainWindow* mainwindow);
     void save_state(const QMainWindow* mainwindow);
@@ -25,6 +26,7 @@ public:
     void change_font(const QFont& font);
     void change_font_size(int size);
     void network_enabled(bool b);
+    void screenshot_logo(bool b);
 
 public:
     static QFont load_font();

@@ -7,13 +7,14 @@
 
 namespace {
 
-const QString CURRENT_WINDOW_GEOMETRY = "window_geometry";
-const QString CURRENT_WINDOW_STATE = "window_state";
-const QString RECENT_FILES = "recent_files";
-const QString SELECTED_THEME = "selected_theme";
-const QString SELECTED_FONT = "selected_font";
-const QString SELECTED_FONT_SIZE = "selected_font_size";
-const QString NETWORK_ENABLED = "network_enabled";
+const QString CURRENT_WINDOW_GEOMETRY = "window_geometry"; // NOLINT
+const QString CURRENT_WINDOW_STATE = "window_state";       // NOLINT
+const QString RECENT_FILES = "recent_files";               // NOLINT
+const QString SELECTED_THEME = "selected_theme";           // NOLINT
+const QString SELECTED_FONT = "selected_font";             // NOLINT
+const QString SELECTED_FONT_SIZE = "selected_font_size";   // NOLINT
+const QString NETWORK_ENABLED = "network_enabled";         // NOLINT
+const QString SCREENSHOT_LOGO = "screenshot_logo";         // NOLINT
 
 } // namespace
 
@@ -90,6 +91,10 @@ bool REDasmSettings::network_enabled() const {
     return this->value(NETWORK_ENABLED).toBool();
 }
 
+bool REDasmSettings::screenshot_logo() const {
+    return this->value(SCREENSHOT_LOGO, true).toBool();
+}
+
 void REDasmSettings::change_theme(const QString& theme) {
     this->setValue(SELECTED_THEME, theme.toLower());
 }
@@ -102,6 +107,10 @@ void REDasmSettings::change_font_size(int size) {
 
 void REDasmSettings::network_enabled(bool b) {
     this->setValue(NETWORK_ENABLED, b);
+}
+
+void REDasmSettings::screenshot_logo(bool b) {
+    this->setValue(SCREENSHOT_LOGO, b);
 }
 
 QFont REDasmSettings::load_font() {

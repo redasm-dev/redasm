@@ -18,7 +18,7 @@ struct SettingsDialog {
     QComboBox *cbxthemes, *cbxfontsizes;
     QFontComboBox* fcbxfonts;
     QPushButton* pbfontdefault;
-    QCheckBox* chknetwork;
+    QCheckBox *chknetwork, *chkscreenlogo;
     QLabel* lblpreview;
 
     explicit SettingsDialog(QDialog* self) {
@@ -34,6 +34,7 @@ struct SettingsDialog {
         this->lblpreview->setAlignment(Qt::AlignCenter);
 
         this->chknetwork = new QCheckBox("Enabled");
+        this->chkscreenlogo = new QCheckBox("Enabled");
 
         auto* hbox_font = new QHBoxLayout();
         hbox_font->addWidget(this->fcbxfonts, 1);
@@ -42,7 +43,8 @@ struct SettingsDialog {
 
         auto* form = new QFormLayout();
         form->setLabelAlignment(Qt::AlignRight);
-        form->addRow("Network", this->chknetwork);
+        form->addRow("Network Support", this->chknetwork);
+        form->addRow("Screenshot Logo", this->chkscreenlogo);
         form->addRow("Theme", this->cbxthemes);
         form->addRow("Font", hbox_font);
 

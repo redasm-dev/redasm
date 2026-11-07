@@ -18,6 +18,7 @@ SettingsDialog::SettingsDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     this->select_current_font(settings);
     this->select_current_size(settings);
     m_ui.chknetwork->setChecked(settings.network_enabled());
+    m_ui.chkscreenlogo->setChecked(settings.screenshot_logo());
     this->update_preview();
 
     connect(m_ui.fcbxfonts, &QFontComboBox::currentFontChanged, this,
@@ -70,6 +71,7 @@ void SettingsDialog::accept() {
     settings.change_font(m_ui.fcbxfonts->currentFont());
     settings.change_font_size(m_ui.cbxfontsizes->currentData().toInt());
     settings.network_enabled(m_ui.chknetwork->isChecked());
+    settings.screenshot_logo(m_ui.chkscreenlogo->isChecked());
 
     QMessageBox::information(this, "Settings Applied",
                              "Restart to apply settings");
