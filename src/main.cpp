@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QApplication app{argc, argv};
+    QApplication::setDesktopFileName("dev.redasm.redasm");
     QApplication::setApplicationName("redasm");
     QApplication::setApplicationVersion(rd_version_string());
     QApplication::setApplicationDisplayName(

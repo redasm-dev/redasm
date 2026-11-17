@@ -169,8 +169,12 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 if(NOT WIN32 AND NOT APPLE)
-    install(FILES res/redasm.desktop
+    install(FILES res/dev.redasm.redasm.desktop
             DESTINATION share/applications
+    )
+
+    install(FILES res/dev.redasm.redasm.metainfo.xml
+            DESTINATION share/metainfo
     )
 
     install(FILES res/logo.png

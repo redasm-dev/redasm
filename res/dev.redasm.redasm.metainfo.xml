@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.redasm.redasm</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <name>REDasm</name>
+  <summary>The Open Source Disassembler</summary>
+
+  <developer id="dev.redasm">
+    <name>Antonio Davide Trogu</name>
+  </developer>
+
+  <description>
+    <p>
+      REDasm is an open source, interactive disassembler for reverse engineering.
+      It analyzes executables and lets you explore them through listing, graph and hex views.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Loaders for common binary formats such as PE and ELF</li>
+      <li>Processors for x86, ARM/Thumb, MIPS, Z80 and more</li>
+      <li>Function graph view with cross references</li>
+      <li>Plugin-based architecture for loaders, processors and analyzers</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">dev.redasm.redasm.desktop</launchable>
+
+  <url type="homepage">https://redasm.dev</url>
+  <url type="bugtracker">https://github.com/redasm-dev/redasm/issues</url>
+  <url type="vcs-browser">https://github.com/redasm-dev/redasm</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Listing and graph views</caption>
+      <image>https://github.com/user-attachments/assets/e9beae42-7999-4945-bf51-5b4bd62dae16</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1"/>
+
+  <provides>
+    <binary>redasm-gui</binary>
+  </provides>
+
+  <releases>
+    <release version="4.0.0-beta4" date="2026-11-19" type="development"/>
+    <release version="4.0.0-beta3" date="2026-09-02" type="development"/>
+  </releases>
+</component>

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=REDasm
+GenericName=Disassembler
+Comment=The Open Source Disassembler
+Icon=redasm
+Exec=redasm-gui
+Terminal=false
+Categories=Development;Debugger;
+Keywords=disassembler;reverse;engineering;binary;
