@@ -10,6 +10,6 @@ function(setup_dependencies)
 
         OPTIONS 
             "QHEXVIEW_BUILD_EXAMPLE OFF"
-            "QHEXVIEW_ASAN ON"
+            "QHEXVIEW_ASAN OFF"
     )
 endfunction()

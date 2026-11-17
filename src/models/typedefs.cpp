@@ -66,5 +66,5 @@ QVariant TypedefsModel::headerData(int section, Qt::Orientation orientation,
 int TypedefsModel::columnCount(const QModelIndex&) const { return 3; }
 
 int TypedefsModel::rowCount(const QModelIndex&) const {
-    return rd_slice_length(m_typedefs);
+    return static_cast<int>(rd_slice_length(m_typedefs));
 }

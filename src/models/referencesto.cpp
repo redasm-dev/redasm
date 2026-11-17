@@ -11,11 +11,12 @@ RDAddress ReferencesToModel::address(const QModelIndex& index) const {
     return this->xref(index).address;
 }
 
-const RDXRef& ReferencesToModel::xref(const QModelIndex& index) const {
+RDXRef ReferencesToModel::xref(const QModelIndex& index) const {
     if(index.row() < static_cast<int>(rd_slice_length(m_refs)))
         return rd_slice_at(m_refs, index.row());
 
     qFatal("Cannot get current reference");
+    return {};
 }
 
 QVariant ReferencesToModel::data(const QModelIndex& index, int role) const {
@@ -57,5 +58,5 @@ QVariant ReferencesToModel::headerData(int section, Qt::Orientation orientation,
 int ReferencesToModel::columnCount(const QModelIndex&) const { return 4; }
 
 int ReferencesToModel::rowCount(const QModelIndex&) const {
-    return rd_slice_length(m_refs);
+    return static_cast<int>(rd_slice_length(m_refs));
 }

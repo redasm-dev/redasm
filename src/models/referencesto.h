@@ -10,7 +10,7 @@ public:
     explicit ReferencesToModel(RDContext* ctx, RDAddress address,
                                QObject* parent = nullptr);
     [[nodiscard]] RDAddress address(const QModelIndex& index) const;
-    [[nodiscard]] const RDXRef& xref(const QModelIndex& index) const;
+    [[nodiscard]] RDXRef xref(const QModelIndex& index) const;
 
 public:
     [[nodiscard]] int rowCount(const QModelIndex&) const override;

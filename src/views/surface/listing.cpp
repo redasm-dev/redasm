@@ -40,45 +40,48 @@ SurfaceListing::SurfaceListing(RDContext* ctx, QWidget* parent)
                     this->viewport()->update();
             });
 
-    connect(this->verticalScrollBar(), &QScrollBar64::actionTriggered, this,
-            [&](int action) {
-                QScrollBar64* vbar = this->verticalScrollBar();
+    connect(
+        this->verticalScrollBar(), &QScrollBar64::actionTriggered, this,
+        [&](int action) {
+            QScrollBar64* vbar = this->verticalScrollBar();
 
-                switch(action) {
-                    case QAbstractSlider::SliderSingleStepAdd: {
-                        if(!rd_surface_scroll(m_surface, vbar->singleStep()))
-                            return;
+            switch(action) {
+                case QAbstractSlider::SliderSingleStepAdd: {
+                    if(!rd_surface_scroll(m_surface,
+                                          static_cast<int>(vbar->singleStep())))
+                        return;
 
-                        break;
-                    }
-
-                    case QAbstractSlider::SliderSingleStepSub: {
-                        if(!rd_surface_scroll(m_surface, -vbar->singleStep()))
-                            return;
-
-                        break;
-                    }
-
-                    case QAbstractSlider::SliderPageStepAdd: {
-                        if(!rd_surface_scroll(m_surface, this->visible_rows()))
-                            return;
-
-                        break;
-                    }
-
-                    case QAbstractSlider::SliderPageStepSub: {
-                        if(!rd_surface_scroll(m_surface, -this->visible_rows()))
-                            return;
-
-                        break;
-                    }
-
-                    default: break;
+                    break;
                 }
 
-                this->viewport()->update();
-                this->sync_scrollbars();
-            });
+                case QAbstractSlider::SliderSingleStepSub: {
+                    if(!rd_surface_scroll(
+                           m_surface, -static_cast<int>(vbar->singleStep())))
+                        return;
+
+                    break;
+                }
+
+                case QAbstractSlider::SliderPageStepAdd: {
+                    if(!rd_surface_scroll(m_surface, this->visible_rows()))
+                        return;
+
+                    break;
+                }
+
+                case QAbstractSlider::SliderPageStepSub: {
+                    if(!rd_surface_scroll(m_surface, -this->visible_rows()))
+                        return;
+
+                    break;
+                }
+
+                default: break;
+            }
+
+            this->viewport()->update();
+            this->sync_scrollbars();
+        });
 
     connect(this->verticalScrollBar(), &QScrollBar64::sliderReleased, this,
             [&]() { this->sync_scrollbars(); });

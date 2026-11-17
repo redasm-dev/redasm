@@ -47,7 +47,7 @@ void LoaderOptionsModel::reset_default() {
     static const QVector<int> ROLES = {Qt::CheckStateRole, Qt::FontRole};
 
     if(!m_grouped) {
-        int n = rd_slice_length(m_options);
+        int n = static_cast<int>(rd_slice_length(m_options));
         if(n)
             emit dataChanged(this->index(0, 0, {}), this->index(n - 1, 1, {}),
                              ROLES);
@@ -140,7 +140,9 @@ QVariant LoaderOptionsModel::data(const QModelIndex& index, int role) const {
 }
 
 int LoaderOptionsModel::rowCount(const QModelIndex& parent) const {
-    if(!m_grouped) return parent.isValid() ? 0 : rd_slice_length(m_options);
+    if(!m_grouped)
+        return parent.isValid() ? 0
+                                : static_cast<int>(rd_slice_length(m_options));
 
     if(!parent.isValid()) return m_nodes.size();
 
