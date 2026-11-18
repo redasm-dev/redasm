@@ -6,6 +6,7 @@
 SettingsDialog::SettingsDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     m_ui.cbxthemes->addItems(theme_provider::themes());
     m_ui.fcbxfonts->setFontFilters(QFontComboBox::MonospacedFonts);
+    m_ui.chknetwork->setEnabled(rd_net_is_supported());
 
     auto sizes = QFontDatabase::standardSizes();
 
@@ -17,7 +18,8 @@ SettingsDialog::SettingsDialog(QWidget* parent): QDialog{parent}, m_ui{this} {
     this->select_current_theme(settings);
     this->select_current_font(settings);
     this->select_current_size(settings);
-    m_ui.chknetwork->setChecked(settings.network_enabled());
+    m_ui.chknetwork->setChecked(rd_net_is_supported() &&
+                                settings.network_enabled());
     m_ui.chkscreenlogo->setChecked(settings.screenshot_logo());
     this->update_preview();
 
