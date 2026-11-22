@@ -46,7 +46,7 @@ function recovery.
   modified and rebuilt.
 - **Native, self-contained**: [core](https://github.com/redasm-dev/core) is written in C17 and 
   doesn't depends on VM, runtime or interpreter. 
-- **No platform lock-in**: Windows and Linux are what's actively developed and tested;
+- **No platform lock-in**: Windows, Linux and macOS are what's actively developed and tested;
   support for other platforms is open to anyone willing to contribute the changes they need.
 - **Extendable**: plugins are shared libraries loaded at runtime. Adding a CPU architecture or a file format 
   never requires touching the core.
@@ -80,8 +80,8 @@ Maturity levels:
 |---|---|:---:|
 | **Windows** | Windows 10+, MSVC / Visual Studio 2022 | **S** |
 | **Linux** | Ubuntu 24.04 / Debian 13 reference, GCC 12+ | **S** |
+| **MacOS** | macOS Sonoma (univrsal, x86 and Silicon) | **S** |
 | **FreeBSD** | 15.1, via CI (compiles + full test suite passes) | **A** |
-| **MacOS** | via CI (compiles + full test suite passes) | **A** |
 | **Haiku** | R1/beta6, via CI (compiles only: automated test suite is disabled because it hangs indefinitely at the `tier0` suite; root cause not identified) | **B** |
 
 ## Supported Formats and Architectures
@@ -102,6 +102,8 @@ Maturity levels:
 | **NE (Win16)** | 16-bit Windows and OS/2 New Executable | **A** |
 | **LE / LX (OS/2)** | Linear Executable, OS/2 and DOS extenders (VxD is supported too) | **A** |
 | **PSX EXE (PS1)** | PlayStation 1 executables | **A** |
+| **GameBoy** | GB and GBC cartridges ROMs formats (Classic and Color) | **A** |
+| **GameBoy Advance** | GBA cartridges ROMs | **A** |
 | **MZ (DOS)** | MS-DOS executables and COM programs | **B** |
 | **PSX BIOS (PS1)** | PlayStation 1 BIOS | **B** |
 | **XBE (Xbox)** | Original Xbox executables | **B** |
@@ -116,6 +118,7 @@ Maturity levels:
 | **MIPS** | MIPS32, big and little endian, delay slot aware | **A** |
 | **ARM / Thumb** | ARM32 and Thumb instruction sets | **A** |
 | **ARM64** | AArch64 | **A** |
+| **SM83** | Sharp SM83 | **A** |
 | **Z80** | Zilog Z80, with register tracking | **B** |
 | **MOS6502** | MOS Technology 6502 | **B** |
 
@@ -123,16 +126,25 @@ Maturity levels:
 
 | Analyzer | Description | Status |
 |--:|---|:---:|
+| **PDB** | Load PDB Debug Symbols locally or from PDB Server | **S** |
 | **Visual Basic** | Recover VB5/VB6 events and project information | **A** |
 | **MSVC RTTI** | MSVC run-time type information and vtable recovery | **D** |
 | **MSVC EH** | MSVC exception handling type recovery | **D** |
+
+### Other Plugins
+
+| Plugin | Description | Status |
+|--:|---|:---:|
+| **COFF** | COFF Parser | **S** |
+| **MCP** | Model Context Protocol for LLMs | **D** |
 
 ## Download
 
 Pre-built binaries are published on the [Releases page](https://github.com/redasm-dev/redasm/releases):
 
-- **Linux**: AppImage, runs on any reasonably recent distribution.
 - **Windows**: portable build, no installation required.
+- **Linux**: AppImage, runs on any reasonably recent distribution.
+- **macOS**: disk image (.dmg), available as Universal, Apple Silicon (ARM), or Intel (x86).
 
 Other platforms aren't officially packaged yet.  
 See the [Supported Platforms](#supported-platforms) section above for what's CI-verified today.
