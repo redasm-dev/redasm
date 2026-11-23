@@ -42,6 +42,7 @@
 
   <provides>
     <binary>redasm-gui</binary>
+    <binary>redasm-mcp</binary>
   </provides>
 
   <releases>
