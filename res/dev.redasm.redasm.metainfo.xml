@@ -46,6 +46,6 @@
   </provides>
 
   <releases>
-    <release version="4.0.0-beta4" date="2026-11-19" type="development"/>
+    <release version="4.0.0-beta4" date="2026-11-24" type="development"/>
   </releases>
 </component>
