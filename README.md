@@ -80,9 +80,11 @@ Maturity levels:
 |---|---|:---:|
 | **Windows** | Windows 10+, MSVC / Visual Studio 2022 | **S** |
 | **Linux** | Ubuntu 24.04 / Debian 13 reference, GCC 12+ | **S** |
-| **MacOS** | macOS Sonoma (univrsal, x86 and Silicon) | **S** |
+| **MacOS** | macOS Sonoma (universal, x86 and Silicon) | **S** |
+<!--
 | **FreeBSD** | 15.1, via CI (compiles + full test suite passes) | **A** |
 | **Haiku** | R1/beta6, via CI (compiles only: automated test suite is disabled because it hangs indefinitely at the `tier0` suite; root cause not identified) | **B** |
+-->
 
 ## Supported Formats and Architectures
 
