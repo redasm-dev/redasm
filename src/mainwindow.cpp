@@ -218,7 +218,11 @@ void MainWindow::replace_view(QWidget* w) { // NOLINT
 
 void MainWindow::show_welcome_view() { // NOLINT
     m_filepath.clear();
-    this->setWindowTitle({});
+
+    // an empty title leaves X11's WM_NAME empty (Qt only fills _NET_WM_NAME
+    // with the display name), so tools that look windows up by WM_NAME can't
+    // find it
+    this->setWindowTitle(qApp->applicationDisplayName());
 
     auto* welcomeview = new WelcomeView(m_ui.stackwidget);
 
